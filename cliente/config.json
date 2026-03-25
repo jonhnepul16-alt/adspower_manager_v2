@@ -1,0 +1,4 @@
+{
+  "server_url": "ws://localhost:8000/ws/agent",
+  "dashboard_url": "https://stately-torrone-4253a1.netlify.app/"
+}

@@ -1,0 +1,35 @@
+================================================================
+          VEXEL CONTIGÊNCIA PRO - MANUAL DO CLIENTE
+================================================================
+
+Este é o seu robô local (Agente Vexel). Ele trabalha em conjunto 
+com o Painel Web para automatizar seus perfis do AdsPower.
+
+--- 1. PRÉ-REQUISITOS ---
+
+Antes de começar, certifique-se de que:
+- O AdsPower está aberto e logado na sua conta.
+
+--- 2. COMO USAR ---
+
+1. Execute o arquivo:
+   > Vexel_Agent.exe
+
+2. Uma janela abrirá com a mensagem: "AGENTE ONLINE".
+   Isso significa que seu computador já está conectado à nuvem.
+
+3. Agora, basta ir ao seu Painel Web (SaaS) e clicar em 
+   "INICIAR AQUECIMENTO". 
+
+O robô começará a abrir os navegadores automaticamente e você 
+poderá acompanhar tudo em tempo real através dos logs no site.
+
+--- 3. NOTAS IMPORTANTES ---
+
+- NÃO FECHE a janela do Agente enquanto o robô estiver rodando.
+- O Agente Local precisa de internet estável para receber comandos.
+- Se o status no site estiver "Offline", verifique se o EXE está aberto.
+
+================================================================
+         TECNOLOGIA VEXEL - PERFORMANCE E SEGURANÇA
+================================================================
