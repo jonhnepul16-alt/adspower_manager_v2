@@ -25,15 +25,17 @@ const Index = () => {
   const [results, setResults] = useState<Record<string, ProfileResult>>({});
   const [currentProfile, setCurrentProfile] = useState<string | null>(null);
 
+  const safeResults = results ?? {};
+
   useEffect(() => {
     const check = async () => {
       try {
         const status = await fetchStatus("default");
-        setIsActive(status.is_running);
-        setIsAgentConnected(status.agent_connected);
-        setLogs(status.logs);
-        setResults(status.results);
-        setCurrentProfile(status.current_profile);
+        setIsActive(status.is_running ?? false);
+        setIsAgentConnected(status.agent_connected ?? false);
+        setLogs(status.logs ?? []);
+        setResults(status.results ?? {});
+        setCurrentProfile(status.current_profile ?? null);
       } catch (err) {
         console.error("Failed to fetch status", err);
       }
@@ -64,9 +66,9 @@ const Index = () => {
     }
   };
 
-  const totalLikes = Object.values(results).reduce((acc, r) => acc + (r.curtidas_feed || 0), 0);
-  const totalReels = Object.values(results).reduce((acc, r) => acc + (r.reels_assistidos || 0), 0);
-  const totalPosts = Object.values(results).reduce((acc, r) => acc + (r.postagem ? 1 : 0), 0);
+  const totalLikes = Object.values(safeResults).reduce((acc, r) => acc + (r.curtidas_feed || 0), 0);
+  const totalReels = Object.values(safeResults).reduce((acc, r) => acc + (r.reels_assistidos || 0), 0);
+  const totalPosts = Object.values(safeResults).reduce((acc, r) => acc + (r.postagem ? 1 : 0), 0);
   const totalProfilesCount = profiles.split("\n").filter(Boolean).length;
 
   return (
