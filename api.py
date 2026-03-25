@@ -95,9 +95,14 @@ async def start_warmup(req: WarmupRequest):
 
 @app.post("/api/warmup/stop")
 async def stop_warmup(machine_id: str = "default"):
-    ok = await manager.send_command(machine_id, {"type": "STOP"})
-    if not ok:
-        raise HTTPException(status_code=404, detail="Agent not connected")
+    # Always reset local cloud state first
+    state = get_state(machine_id)
+    state.is_running = False
+    state.current_profile = None
+    
+    # Best-effort: try to notify the agent too (it may already be offline)
+    await manager.send_command(machine_id, {"type": "STOP"})
+    
     return {"message": "Stop command sent"}
 
 @app.get("/api/warmup/status")
@@ -144,9 +149,16 @@ async def agent_tunnel(websocket: WebSocket, machine_id: str):
 
     except WebSocketDisconnect:
         manager.disconnect(machine_id)
+        # Auto-reset running state so site doesn't show stale status
+        state = get_state(machine_id)
+        state.is_running = False
+        state.current_profile = None
     except Exception as e:
         print(f"Error in tunnel for {machine_id}: {e}")
         manager.disconnect(machine_id)
+        state = get_state(machine_id)
+        state.is_running = False
+        state.current_profile = None
 
 if __name__ == "__main__":
     import uvicorn
