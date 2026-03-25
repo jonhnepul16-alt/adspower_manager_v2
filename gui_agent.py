@@ -25,8 +25,8 @@ from main import facebook_warmup_por_tempo, MODOS_TEMPO, set_log_callback
 
 # Configuration
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
-DEFAULT_SERVER_URL = "ws://localhost:8000/ws/agent"
-DEFAULT_DASHBOARD_URL = "http://localhost:8080" # Default local URL
+DEFAULT_SERVER_URL = "wss://certo134-production.up.railway.app/ws/agent"
+DEFAULT_DASHBOARD_URL = "https://stately-torrone-4253a1.netlify.app/"
 MACHINE_ID = "default"
 
 def load_config():

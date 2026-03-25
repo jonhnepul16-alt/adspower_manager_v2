@@ -31,6 +31,7 @@ const Index = () => {
     const check = async () => {
       try {
         const status = await fetchStatus("default");
+        if (!status) return;
         setIsActive(status.is_running ?? false);
         setIsAgentConnected(status.agent_connected ?? false);
         setLogs(status.logs ?? []);
