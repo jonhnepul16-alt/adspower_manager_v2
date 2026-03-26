@@ -47,6 +47,18 @@ class AgentState:
         self.logs: List[str] = []
         self.current_profile: Optional[str] = None
         self.results: Dict[str, Any] = {}
+        self.scheduler_status: Dict[str, Any] = {}
+        self.scheduler_config: Dict[str, Any] = {
+            "active": False,
+            "windows": {
+                "morning": {"enabled": True, "start": "08:00", "end": "12:00", "frequency": "medium"},
+                "afternoon": {"enabled": True, "start": "13:00", "end": "18:00", "frequency": "medium"},
+                "night": {"enabled": True, "start": "19:00", "end": "23:00", "frequency": "medium"}
+            },
+            "intensity": "normal",
+            "style": "normal",
+            "daily_limit": 15
+        }
 
 # machine_id -> AgentState
 agent_states: Dict[str, AgentState] = {}
@@ -113,8 +125,23 @@ def get_status(machine_id: str = "default"):
         "current_profile": state.current_profile,
         "logs": state.logs,
         "results": state.results,
+        "scheduler_config": state.scheduler_config,
+        "scheduler_status": state.scheduler_status,
         "agent_connected": machine_id in manager.active_agents
     }
+
+@app.post("/api/scheduler/update")
+async def update_scheduler(machine_id: str, config: Dict[str, Any]):
+    state = get_state(machine_id)
+    state.scheduler_config.update(config)
+    
+    # Notify agent about the change
+    await manager.send_command(machine_id, {
+        "type": "SCHEDULER_UPDATE",
+        "data": state.scheduler_config
+    })
+    
+    return {"message": "Scheduler config updated", "config": state.scheduler_config}
 
 # --- WebSocket Agent Tunnel ---
 
@@ -142,6 +169,9 @@ async def agent_tunnel(websocket: WebSocket, machine_id: str):
                 pid = data.get("profile_id")
                 if pid:
                     state.results[pid] = data.get("data")
+
+            elif msg_type == "SCHEDULER_STATUS":
+                state.scheduler_status = data
 
             elif msg_type == "FINISHED":
                 state.is_running = False

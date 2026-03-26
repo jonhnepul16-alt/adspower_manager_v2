@@ -7,6 +7,8 @@ import websockets
 import sys
 import os
 import time
+import datetime
+import random
 from typing import List, Dict, Any, Optional
 
 if sys.platform == "win32":
@@ -24,7 +26,123 @@ if sys.platform == "win32":
         pass
 
 from core.account_manager import AccountManager
-from main import facebook_warmup_por_tempo, MODOS_TEMPO, set_log_callback
+from main import facebook_warmup_por_tempo, MODOS_TEMPO, set_log_callback, ruido_humano
+
+# ═══════════════════════════════════════════════════════════════
+#  SCHEDULER ENGINE (v1.0)
+# ═══════════════════════════════════════════════════════════════
+
+class SchedulerEngine:
+    def __init__(self):
+        self.config = {
+            "active": False,
+            "windows": {},
+            "intensity": "normal",
+            "style": "normal",
+            "daily_limit": 15
+        }
+        self.active_flag = False
+        self.current_stype = "normal"
+        self.next_sessions = {} # profile_id -> datetime
+        self.session_types = {}  # profile_id -> str (lazy, curious, normal)
+        self.daily_counts = {}  # profile_id -> count
+        self.last_reset = datetime.datetime.now().date()
+
+    def update_config(self, new_config):
+        self.config.update(new_config)
+        self.active_flag = bool(self.config.get("active", False))
+        print(f"    [Scheduler] Configuração atualizada. Ativo: {self.active_flag}")
+
+    def should_run(self, profile_id):
+        if not self.active_flag: return False
+        
+        # Reset diário
+        today = datetime.datetime.now().date()
+        if today > self.last_reset:
+            self.daily_counts = {}
+            self.last_reset = today
+
+        # Limite diário
+        limit = int(self.config.get("daily_limit", 15))
+        if self.daily_counts.get(profile_id, 0) >= limit:
+            return False
+
+        now = datetime.datetime.now()
+        
+        # Se não tem próxima sessão agendada, agenda uma
+        if profile_id not in self.next_sessions:
+            self.schedule_next(profile_id)
+            return False
+
+        if now >= self.next_sessions[profile_id]:
+            return True
+        
+        return False
+
+    def schedule_next(self, profile_id):
+        now = datetime.datetime.now()
+        windows = self.config.get("windows", {})
+        
+        # Define a intensidade do próximo micro-loop
+        r = random.random()
+        if r < 0.2: self.current_stype = "lazy"
+        elif r < 0.5: self.current_stype = "curious"
+        else: self.current_stype = "normal"
+
+        # Encontrar janelas ativas
+        active_windows = []
+        raw_windows = self.config.get("windows")
+        if isinstance(raw_windows, dict):
+            for name, win in raw_windows.items():
+                if isinstance(win, dict) and win.get("enabled"):
+                    try:
+                        start_h = int(str(win.get("start", "08")).split(":")[0])
+                        end_h = int(str(win.get("end", "18")).split(":")[0])
+                        active_windows.append((start_h, end_h))
+                    except: pass
+
+        if not active_windows:
+            # Fallback se nada habilitado
+            wait = random.randint(60, 180)
+            self.next_sessions[profile_id] = now + datetime.timedelta(minutes=wait)
+            return
+
+        # Calcula o próximo slot baseado nas janelas
+        intensidade_global = self.config.get("intensity", "normal")
+        base_min = 45 if intensidade_global == "high" else 90 if intensidade_global == "normal" else 180
+        
+        wait_min = random.randint(int(base_min * 0.5), int(base_min * 1.5))
+        target_time = now + datetime.timedelta(minutes=wait_min)
+        
+        # Verifica se caiu em janela ativa
+        is_in_window = False
+        target_h = target_time.hour
+        for start, end in active_windows:
+            if start <= target_h < end:
+                is_in_window = True
+                break
+        
+        if not is_in_window:
+            # Encontra a próxima janela que começa após target_time
+            next_start = 24
+            for start, end in active_windows:
+                if start > target_h and start < next_start:
+                    next_start = start
+            
+            if next_start == 24: # Nenhuma hoje, pega a primeira de amanhã
+                sorted_windows = sorted(active_windows, key=lambda x: x[0])
+                next_start = sorted_windows[0][0]
+                target_time = target_time.replace(hour=next_start, minute=random.randint(0, 59)) + datetime.timedelta(days=1)
+            else:
+                target_time = target_time.replace(hour=next_start, minute=random.randint(0, 59))
+
+        self.next_sessions[profile_id] = target_time
+        self.session_types[profile_id] = self.current_stype
+        print(f"    [Scheduler] Agendado {profile_id} para {target_time.strftime('%d/%m %H:%M:%S')} (Estilo: {self.current_stype})")
+
+    def mark_executed(self, profile_id):
+        self.daily_counts[profile_id] = self.daily_counts.get(profile_id, 0) + 1
+        self.schedule_next(profile_id)
 
 # Configuration
 if getattr(sys, 'frozen', False):
@@ -168,6 +286,9 @@ class AgentWorker:
         self.ws = None
         self.is_connected = False
         self.is_running = False
+        self.scheduler = SchedulerEngine()
+        self.target_profiles = [] # Profiles eligible for scheduler
+        self.main_loop = None
 
     async def log(self, message: str):
         try:
@@ -175,14 +296,14 @@ class AgentWorker:
         except Exception:
             pass
             
-        if self.ws:
+        if self.ws and hasattr(self.ws, "send"):
             try:
                 await self.ws.send(json.dumps({"type": "LOG", "message": message}))
             except: pass
 
     async def update_status(self, is_running: bool, current_profile: Optional[str] = None):
         self.is_running = is_running
-        if self.ws:
+        if self.ws and hasattr(self.ws, "send"):
             try:
                 await self.ws.send(json.dumps({
                     "type": "STATUS_UPDATE",
@@ -227,7 +348,60 @@ class AgentWorker:
 
         self.is_running = False
         await self.update_status(False)
-        await self.ws.send(json.dumps({"type": "FINISHED"}))
+        if self.ws and hasattr(self.ws, "send"):
+            try:
+                await self.ws.send(json.dumps({"type": "FINISHED"}))
+            except: pass
+
+    async def scheduler_loop(self):
+        """Background loop that checks for scheduled sessions."""
+        while True:
+            if self.scheduler.active_flag:
+                # Envia status do scheduler para o painel a cada loop
+                if self.ws and hasattr(self.ws, "send"):
+                    try:
+                        next_times = {pid: dt.strftime("%H:%M") for pid, dt in self.scheduler.next_sessions.items()}
+                        await self.ws.send(json.dumps({
+                            "type": "SCHEDULER_STATUS",
+                            "next_sessions": next_times,
+                            "active": self.scheduler.active_flag
+                        }))
+                    except: pass
+
+                if not self.is_running:
+                    for pid in self.target_profiles:
+                        if self.scheduler.should_run(pid):
+                            await self.log(f"⏰ [Scheduler] Iniciando micro-sessão para {pid}...")
+                            duracao = random.randint(60, 240)
+                            asyncio.create_task(self.execute_micro_session(pid, duracao))
+                            break
+            await asyncio.sleep(60) # Checa a cada minuto
+
+    async def execute_micro_session(self, profile_id: str, duracao: int):
+        """Executes a single short session."""
+        if self.is_running: return
+        self.is_running = True
+        await self.update_status(True, profile_id)
+
+        session = self.manager.open_account(profile_id)
+        if session:
+            try:
+                await self.log(f"🚀 Sessão curta iniciada ({duracao}s)")
+                result = await asyncio.to_thread(
+                    self.manager.run_task,
+                    profile_id,
+                    lambda ctrl: facebook_warmup_por_tempo(ctrl, duracao, "Rápido")
+                )
+                self.scheduler.mark_executed(profile_id)
+                if self.ws:
+                    await self.ws.send(json.dumps({"type": "RESULT", "profile_id": profile_id, "data": result}))
+            except Exception as e:
+                await self.log(f"Erro na micro-sessão: {e}")
+            finally:
+                self.manager.close_account(profile_id)
+        
+        self.is_running = False
+        await self.update_status(False)
 
     async def connect(self):
         self.main_loop = asyncio.get_event_loop()
@@ -250,11 +424,17 @@ class AgentWorker:
                     
                     async for message in websocket:
                         data = json.loads(message)
-                        if data.get("type") == "START":
+                        msg_type = data.get("type")
+                        
+                        if msg_type == "START":
+                            self.target_profiles = data["data"].get("profile_ids", [])
                             asyncio.create_task(self.execute_task(
-                                data["data"].get("profile_ids", []),
+                                self.target_profiles,
                                 data["data"].get("mode", "1")
                             ))
+                        elif data.get("type") == "SCHEDULER_UPDATE":
+                            self.scheduler.update_config(data.get("data", {}))
+                            await self.log("⚙️ Dashboard sincronizado: Agendamento atualizado.")
                         elif data.get("type") == "STOP":
                             was_running = self.is_running
                             self.is_running = False
@@ -270,6 +450,8 @@ class AgentWorker:
 def run_async_loop(worker):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+    # Start scheduler background task
+    loop.create_task(worker.scheduler_loop())
     loop.run_until_complete(worker.connect())
 
 if __name__ == "__main__":

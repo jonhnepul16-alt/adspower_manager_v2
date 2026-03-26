@@ -32,3 +32,8 @@ export const fetchStatus = async (machine_id: string = "default") => {
   const res = await api.get('/warmup/status', { params: { machine_id } });
   return res.data;
 };
+
+export const updateScheduler = async (machine_id: string, config: any) => {
+  const res = await api.post('/scheduler/update', config, { params: { machine_id } });
+  return res.data;
+};

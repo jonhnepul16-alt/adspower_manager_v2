@@ -7,7 +7,8 @@ import GlassCard from "@/components/dashboard/GlassCard";
 import StrategySelector from "@/components/dashboard/StrategySelector";
 import EngineCore from "@/components/dashboard/EngineCore";
 import LogTerminal from "@/components/dashboard/LogTerminal";
-import { fetchStatus, startWarmup, stopWarmup } from "@/lib/api";
+import SchedulerConfig from "@/components/dashboard/SchedulerConfig";
+import { fetchStatus, startWarmup, stopWarmup, updateScheduler } from "@/lib/api";
 import { toast } from "sonner";
 
 type ProfileResult = {
@@ -28,6 +29,8 @@ const Index = () => {
   const [selectedMode, setSelectedMode] = useState("1");
   const [logs, setLogs] = useState<string[]>([]);
   const [results, setResults] = useState<Record<string, ProfileResult>>({});
+  const [schedulerConfig, setSchedulerConfig] = useState<any>(null);
+  const [schedulerStatus, setSchedulerStatus] = useState<any>(null);
   const [currentProfile, setCurrentProfile] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("vexel_api_key") || "default");
 
@@ -47,6 +50,8 @@ const Index = () => {
         setIsAgentConnected(status.agent_connected ?? false);
         setLogs(status.logs ?? []);
         setResults(status.results ?? {});
+        setSchedulerConfig(status.scheduler_config ?? null);
+        setSchedulerStatus(status.scheduler_status ?? null);
         setCurrentProfile(status.current_profile ?? null);
       } catch (err) {
         console.error("Failed to fetch status", err);
@@ -79,6 +84,15 @@ const Index = () => {
     } catch (err) {
       console.error(err);
       toast.error("Erro ao parar: " + (err instanceof Error ? err.message : "Erro desconhecido"));
+    }
+  };
+
+  const handleUpdateScheduler = async (config: any) => {
+    try {
+      await updateScheduler(apiKey, config);
+      toast.success("Agendamento sincronizado com o agente!");
+    } catch (err) {
+      toast.error("Erro ao atualizar agendamento");
     }
   };
 
@@ -167,6 +181,12 @@ const Index = () => {
               </motion.button>
             </div>
           </GlassCard>
+
+          <SchedulerConfig 
+            config={schedulerConfig}
+            status={schedulerStatus}
+            onUpdate={handleUpdateScheduler}
+          />
         </div>
 
         <div className="lg:col-span-7 flex flex-col gap-4">
