@@ -358,12 +358,15 @@ def check_notificacoes(driver, wait):
 
         if sino is None:
             for sel in [
+                "//a[contains(@href, '/notifications')]",
                 "//div[@aria-label='Notificações']",
                 "//div[@aria-label='Notifications']",
                 "//a[@aria-label='Notificações']",
                 "//a[@aria-label='Notifications']",
                 "//div[@aria-label='Notificaciones']",
                 "//a[@aria-label='Notificaciones']",
+                "//span[contains(text(), 'Notifica')]/ancestor::a[1]",
+                "//span[contains(text(), 'Notifica')]/ancestor::div[@role='button'][1]",
             ]:
                 try:
                     sino = WebDriverWait(driver, 3).until(
@@ -1324,7 +1327,10 @@ def task_postagem_status(driver, wait, resultados: dict, **_):
         for sel in [
             "//span[contains(text(), 'pensando')]",
             "//span[contains(text(), 'thinking')]",
+            "//span[contains(text(), 'Mande um alô')]",
+            "//span[contains(text(), 'Escribe algo')]",
             "//div[@aria-label='Criar publicação']",
+            "//div[@aria-label='Create a post']",
             "//div[@data-pagelet='FeedComposer']",
         ]:
             try:
@@ -1354,10 +1360,12 @@ def task_postagem_status(driver, wait, resultados: dict, **_):
             "//button[@aria-label='Publicar']",
             "//div[@aria-label='Post']",
             "//button[@aria-label='Post']",
+            "//div[@role='button']//span[text()='Postar' or text()='Publicar' or text()='Post']",
         ]:
             try:
                 btn_pub = driver.find_element(By.XPATH, sel)
-                break
+                if btn_pub.is_displayed():
+                    break
             except Exception:
                 continue
 

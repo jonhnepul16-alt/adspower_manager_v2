@@ -1,4 +1,5 @@
 {
-  "server_url": "ws://localhost:8000/ws/agent",
-  "dashboard_url": "https://stately-torrone-4253a1.netlify.app/"
+    "server_url": "wss://certo134-production.up.railway.app/ws/agent",
+    "dashboard_url": "https://stately-torrone-4253a1.netlify.app/",
+    "machine_id": "1542585cd8e97d2102587a4d45f280a800862afa94e1ed72"
 }

@@ -157,9 +157,13 @@ async def agent_tunnel(websocket: WebSocket, machine_id: str):
             msg_type = data.get("type")
             
             if msg_type == "LOG":
-                state.logs.append(data.get("message"))
-                if len(state.logs) > 500:
-                    state.logs = state.logs[-500:]
+                # Extract from nested data field
+                log_data = data.get("data", {})
+                msg = log_data.get("message") if isinstance(log_data, dict) else data.get("message")
+                if msg:
+                    state.logs.append(str(msg))
+                    if len(state.logs) > 500:
+                        state.logs = state.logs[-500:]
                     
             elif msg_type == "STATUS_UPDATE":
                 state.is_running = data.get("is_running", state.is_running)

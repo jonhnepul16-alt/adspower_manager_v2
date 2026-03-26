@@ -1,35 +1,39 @@
-================================================================
-          VEXEL CONTIGÊNCIA PRO - MANUAL DO CLIENTE
-================================================================
+=========================================================
+  VEXEL CONTINGÊNCIA PRO - MANUAL RÁPIDO DE INSTALAÇÃO
+=========================================================
 
-Este é o seu robô local (Agente Vexel). Ele trabalha em conjunto 
-com o Painel Web para automatizar seus perfis do AdsPower.
+1. Abra o seu AdsPower.
+2. No menu lateral esquerdo, vá em "API & MCP" (ou Extensões > API).
+3. Copie o código gigante que aparece em "API Key". ( DESATIVE A VERIFICAÇÃO DE API )
+4. Abra o aplicativo "Vexel_Contigencia_PRO.exe" contido nesta pasta.
+5. Na janela que abrir, cole a sua API Key e clique em "SALVAR E CONECTAR".
+   (O aplicativo vai dizer que está ONLINE).
+6. Agora acesse o painel web: https://stately-torrone-4253a1.netlify.app/
+7. No site, cole essa MESMA API Key no canto superior direito e inicie o aquecimento.
 
---- 1. PRÉ-REQUISITOS ---
+Pronto! Seu computador e o painel web agora estão sincronizados.
+Para os próximos dias, basta abrir o .exe e deixar minimizado antes de acessar o site.
 
-Antes de começar, certifique-se de que:
-- O AdsPower está aberto e logado na sua conta.
+=========================================================
+  NOVA FUNÇÃO: AGENDAMENTO INTELIGENTE (AUTO-WARMUP)
+=========================================================
 
---- 2. COMO USAR ---
+Esta função permite que o bot aqueça seus perfis sozinho ao longo do dia,
+simulando uma rotina humana real com pausas, picos e ações orgânicas.
 
-1. Execute o arquivo:
-   > Vexel_Agent.exe
+COMO CONFIGURAR:
+1. No painel Web, ative a opção "AGENDAMENTO INTELIGENTE".
+2. Configure as JANELAS DE HORÁRIO (Manhã, Tarde, Noite).
+3. Escolha a INTENSIDADE (Baixa, Normal ou Alta).
+4. Clique em "SALVAR CONFIGURAÇÃO".
 
-2. Uma janela abrirá com a mensagem: "AGENTE ONLINE".
-   Isso significa que seu computador já está conectado à nuvem.
+COMO DEFINIR OS PERFIS:
+1. No painel Web, no campo "DIRECT INJECTION", cole os IDs dos perfis AdsPower.
+2. Esses IDs serão usados automaticamente pelo agendador assim que ativado.
 
-3. Agora, basta ir ao seu Painel Web (SaaS) e clicar em 
-   "INICIAR AQUECIMENTO". 
-
-O robô começará a abrir os navegadores automaticamente e você 
-poderá acompanhar tudo em tempo real através dos logs no site.
-
---- 3. NOTAS IMPORTANTES ---
-
-- NÃO FECHE a janela do Agente enquanto o robô estiver rodando.
-- O Agente Local precisa de internet estável para receber comandos.
-- Se o status no site estiver "Offline", verifique se o EXE está aberto.
-
-================================================================
-         TECNOLOGIA VEXEL - PERFORMANCE E SEGURANÇA
-================================================================
+O QUE O BOT FARÁ:
+- Ele entrará em um loop de espera inteligente.
+- Durante as janelas ativas, ele escolherá momentos aleatórios para abrir o perfil.
+- Executará micro-sessões de 1 a 4 minutos com comportamentos humanos:
+  (Scroll realista, indecisão, leitura de posts, troca de abas e reações).
+- Respeitará o limite diário de sessões configurado para não sobrecarregar as contas.

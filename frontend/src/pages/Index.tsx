@@ -88,8 +88,9 @@ const Index = () => {
   };
 
   const handleUpdateScheduler = async (config: any) => {
+    const ids = profiles.split("\n").map(s => s.trim()).filter(Boolean);
     try {
-      await updateScheduler(apiKey, config);
+      await updateScheduler(apiKey, { ...config, profile_ids: ids });
       toast.success("Agendamento sincronizado com o agente!");
     } catch (err) {
       toast.error("Erro ao atualizar agendamento");

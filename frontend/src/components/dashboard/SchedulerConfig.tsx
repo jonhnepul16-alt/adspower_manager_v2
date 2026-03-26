@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Clock, Zap, Settings, Shield } from "lucide-react";
 import GlassCard from "./GlassCard";
 import { motion } from "framer-motion";
@@ -27,6 +27,13 @@ const SchedulerConfig = ({ config, status, onUpdate }: SchedulerConfigProps) => 
     setLocalConfig(updated);
   };
 
+  // Sync local state when config from API changes
+  useEffect(() => {
+    if (config) {
+      setLocalConfig(config);
+    }
+  }, [config]);
+
   const handleWindowChange = (window: string, field: string, value: any) => {
     const updated = {
       ...localConfig,
@@ -45,22 +52,41 @@ const SchedulerConfig = ({ config, status, onUpdate }: SchedulerConfigProps) => 
   return (
     <GlassCard className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-primary" />
-          <h2 className="font-display font-semibold text-sm text-foreground uppercase tracking-widest text-[10px] opacity-60">
-            Agendamento Inteligente
-          </h2>
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-xl ${localConfig.active ? 'bg-primary/20 animate-pulse' : 'bg-muted'}`}>
+            <Clock className={`w-5 h-5 ${localConfig.active ? 'text-primary' : 'text-muted-foreground'}`} />
+          </div>
+          <div>
+            <h2 className="font-display font-bold text-xs text-foreground uppercase tracking-widest leading-none">
+              Agendamento Inteligente
+            </h2>
+            <p className="text-[10px] text-muted-foreground mt-1 font-medium">
+              {localConfig.active ? "SISTEMA OPERACIONAL" : "SISTEMA EM ESPERA"}
+            </p>
+          </div>
         </div>
-        <button
-          onClick={() => handleChange("active", !localConfig.active)}
-          className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${
+        
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            const nextActive = !localConfig.active;
+            const updated = { ...localConfig, active: nextActive };
+            setLocalConfig(updated);
+            onUpdate(updated);
+          }}
+          className={`relative flex items-center gap-2 px-6 py-2.5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.15em] transition-all overflow-hidden ${
             localConfig.active 
-              ? "bg-primary/20 text-primary border border-primary/30" 
+              ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30 glow-emerald" 
               : "bg-muted text-muted-foreground border border-border"
           }`}
         >
-          {localConfig.active ? "ATIVO" : "INATIVO"}
-        </button>
+          {localConfig.active && (
+            <span className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent animate-shimmer" />
+          )}
+          <div className={`w-2 h-2 rounded-full ${localConfig.active ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' : 'bg-muted-foreground/40'}`} />
+          {localConfig.active ? "ATIVADO" : "DESATIVADO"}
+        </motion.button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -127,19 +153,26 @@ const SchedulerConfig = ({ config, status, onUpdate }: SchedulerConfigProps) => 
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         onClick={handleSave}
-        className="w-full py-3 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all"
+        className="w-full py-4 bg-primary text-primary-foreground rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 relative overflow-hidden group"
       >
-        Salvar Configuração de Agendamento
+        <span className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+        Sincronizar e Salvar Alterações
       </motion.button>
 
       {status?.next_sessions && Object.keys(status.next_sessions).length > 0 && (
-        <div className="mt-2 p-4 rounded-2xl bg-primary/5 border border-primary/10">
-          <h3 className="text-[9px] font-bold uppercase opacity-50 mb-3 tracking-wider">Próximas Sessões Estimadas</h3>
-          <div className="flex flex-wrap gap-2">
+        <div className="mt-2 p-5 rounded-3xl bg-primary/5 border border-primary/10 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-4">
+             <h3 className="text-[10px] font-bold uppercase text-primary tracking-widest opacity-80">Próximas Sessões Estimadas</h3>
+             <div className="flex gap-1">
+                <span className="w-1 h-1 rounded-full bg-primary/40" />
+                <span className="w-1 h-1 rounded-full bg-primary/20" />
+             </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {Object.entries(status.next_sessions).map(([pid, time]: [string, any]) => (
-              <div key={pid} className="flex items-center gap-2 px-3 py-1.5 bg-background/50 rounded-lg border border-border/50">
-                <span className="text-[10px] font-mono opacity-60">{pid.slice(-6)}</span>
-                <span className="text-[10px] font-bold text-primary">{time}</span>
+              <div key={pid} className="flex flex-col gap-1 p-3 bg-background/40 rounded-xl border border-border/50 hover:border-primary/30 transition-colors group">
+                <span className="text-[10px] font-mono text-muted-foreground group-hover:text-primary transition-colors">ID: {pid.slice(-6)}</span>
+                <span className="text-xs font-bold text-foreground">{time}</span>
               </div>
             ))}
           </div>

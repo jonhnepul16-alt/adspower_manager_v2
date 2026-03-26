@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 interface LogEntry {
   id: number;
-  type: "success" | "error" | "info";
+  type: "success" | "error" | "info" | "scheduler";
   message: string;
   time: string;
 }
@@ -25,12 +25,14 @@ const typeColors: Record<string, string> = {
   success: "text-emerald-400",
   error: "text-red-400",
   info: "text-primary",
+  scheduler: "text-indigo-400",
 };
 
 const typePrefix: Record<string, string> = {
   success: "✓",
   error: "✗",
   info: "→",
+  scheduler: "⏰",
 };
 
 interface LogTerminalProps {
@@ -44,15 +46,21 @@ const LogTerminal = ({ isActive, liveLogs }: LogTerminalProps) => {
   const parsedLogs = liveLogs.map((line, i) => {
     const timeMatch = line.match(/\[(.*?)\]/);
     const time = timeMatch ? timeMatch[1] : new Date().toLocaleTimeString();
-    let type: "info" | "success" | "error" = "info";
-    if (line.includes("✓")) type = "success";
-    if (line.includes("✗") || line.toLowerCase().includes("erro")) type = "error";
+    let type: "info" | "success" | "error" | "scheduler" = "info";
+    
+    if (line.includes("[SCHEDULER]")) {
+      type = "scheduler";
+    } else if (line.includes("✓")) {
+      type = "success";
+    } else if (line.includes("✗") || line.toLowerCase().includes("erro")) {
+      type = "error";
+    }
     
     return {
       id: i,
       time,
       type,
-      message: line.replace(/\[.*?\]\s*/, "")
+      message: line.replace(/\[.*?\]\s*/g, "").replace("[SCHEDULER]", "").trim()
     };
   });
 
