@@ -425,8 +425,88 @@ def check_notificacoes(driver, wait):
 
 
 # ═══════════════════════════════════════════════════════════════
-#  HC-2 — SCROLL COM LEITURA SIMULADA
+#  ADVANCED HC HELPERS (POOL OF 9)
 # ═══════════════════════════════════════════════════════════════
+
+def ruido_humano(driver, intensidade="media"):
+    """HC-8: Simula distração e idle humano com movimentos orbitais leves."""
+    pausas = {"baixa": (3, 6), "media": (6, 12), "alta": (12, 25)}
+    t_min, t_max = pausas.get(intensidade, (5, 10))
+    duracao = random.uniform(t_min, t_max)
+    
+    print(f"    ⏳ [Distração] Pausa humana de {duracao:.1f}s...")
+    inicio = time.time()
+    while time.time() - inicio < duracao:
+        try:
+            # Pequenos movimentos orbitais para simular "mão no mouse"
+            off_x = random.randint(-2, 2)
+            off_y = random.randint(-2, 2)
+            ActionChains(driver).move_by_offset(off_x, off_y).perform()
+            time.sleep(random.uniform(0.5, 1.5))
+        except Exception:
+            time.sleep(1)
+            break
+
+def scroll_humano_avancado(driver, pixels_objetivo=None):
+    """HC-2: Scroll realista com variação de velocidade, pausa e reverso."""
+    if pixels_objetivo is None:
+        pixels_objetivo = random.randint(1500, 3000)
+    
+    print(f"    ↕  [Scroll] Realizando scroll avançado (~{pixels_objetivo}px)...")
+    scrollado = 0
+    while scrollado < pixels_objetivo:
+        # Define um passo (chunk) de scroll
+        passo = random.randint(300, 700)
+        # 15% de chance de ser um scroll rápido (puxada)
+        if random.random() < 0.15:
+            passo = random.randint(1000, 1500)
+            
+        driver.execute_script(f"window.scrollBy(0, {passo});")
+        scrollado += passo
+        time.sleep(random.uniform(1.0, 2.5))
+        
+        # 20% de chance de scroll reverso (releitura ou dúvida)
+        if random.random() < 0.20:
+            voltar = random.randint(200, 450)
+            print(f"      ↑ [Dúvida] Scroll reverso: -{voltar}px")
+            driver.execute_script(f"window.scrollBy(0, -{voltar});")
+            scrollado -= voltar
+            time.sleep(random.uniform(2.0, 4.0))
+            
+        # 30% de chance de "Parada Contemplativa" (olhando algo)
+        if random.random() < 0.30:
+            pausa = random.uniform(3.0, 6.0)
+            print(f"      👀 [Foco] Parada contemplativa ({pausa:.1f}s)")
+            time.sleep(pausa)
+
+def gestao_indecisao(driver, prob=0.15):
+    """HC-1: Simula indecisão (entrar e sair rápido ou quase clicar)."""
+    if random.random() < prob:
+        print("    🤔 [Indecisão] Usuário desistiu da ação rápido.")
+        time.sleep(random.uniform(1, 3))
+        try:
+            # Simula um clique fora ou tecla ESC para cancelar algo aberto
+            ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+        except: pass
+        return True
+    return False
+
+def simular_leitura_texto(driver, elemento):
+    """HC-5: Pausa o fluxo baseado na densidade de texto do elemento."""
+    try:
+        texto = elemento.text.strip()
+        if not texto: return
+        
+        # 1s para cada 70 caracteres, limitado a 15s
+        segundos = min(len(texto) / 70, 15)
+        if segundos < 2: return
+        
+        print(f"    📖 [Leitura] Focando em conteúdo por {segundos:.1f}s...")
+        # Move o mouse sobre o texto para simular leitura focada
+        micro_movimentos_sobre_elemento(driver, elemento, segundos)
+    except: pass
+
+
 
 def scroll_com_leitura_simulada(driver):
     print("\n  👁  [HC-2] Scroll com simulação de leitura...")
@@ -662,19 +742,14 @@ def task_curtir_feed(
         time.sleep(random.uniform(4, 7))
 
         while time.time() - inicio_feed < duracao_feed:
-
-            # ── PUXADA RÁPIDA ou scroll normal ──────────────────────────
-            if random.random() < 0.30:
-                px = random.randint(FAST_PULL_MIN_PX, FAST_PULL_MAX_PX)
-                driver.execute_script(f"window.scrollBy(0, {px});")
-                distancia_total += px
-                print(f"    ⚡ Puxada rápida: {px}px")
-                time.sleep(random.uniform(0.6, 1.2))
-            else:
-                px = random.randint(400, 700)
-                driver.execute_script(f"window.scrollBy(0, {px});")
-                distancia_total += px
-                time.sleep(random.uniform(0.8, 1.5))
+            # ── SCROLL AVANÇADO (HC-2) ──────────────────────────────────
+            pixels = random.randint(800, 1600)
+            scroll_humano_avancado(driver, pixels)
+            distancia_total += pixels
+            
+            # Chance de ruído humano aleatório (HC-8)
+            if random.random() < 0.25:
+                ruido_humano(driver, "baixa")
 
             scroll_contador += 1
 
@@ -774,10 +849,19 @@ def task_reels_watch(driver, wait, resultados: dict, **_):
         driver.get("https://www.facebook.com/reel/")
         time.sleep(random.uniform(7, 10))
 
-        qtd = random.randint(2, 4)
+        # 15% de chance de Indecisão (HC-1)
+        if gestao_indecisao(driver, 0.15):
+            return
+
+        qtd = random.randint(2, 5)
         for i in range(qtd):
-            watch_time = random.uniform(11, 20)
-            print(f"    ► Reel {i+1}/{qtd} — assistindo {watch_time:.0f}s...")
+            # 25% de chance de pular o reel rápido (indecisão) nos primeiros (HC-1)
+            if i < 2 and random.random() < 0.25:
+                watch_time = random.uniform(1, 3)
+                print(f"    ⏩ [Indecisão] Reel {i+1} pulado rápido ({watch_time:.1f}s)...")
+            else:
+                watch_time = random.uniform(11, 22)
+                print(f"    ► Reel {i+1}/{qtd} — assistindo {watch_time:.1f}s...")
 
             try:
                 like_reel = driver.find_elements(
@@ -1112,10 +1196,10 @@ def task_marketplace_browse(
 
         fim_mp = time.time() + duracao_mp
         while time.time() < fim_mp:
-            driver.execute_script(
-                f"window.scrollBy(0, {random.randint(200, 450)});"
-            )
-            time.sleep(random.uniform(2.0, 4.5))
+            scroll_humano_avancado(driver, random.randint(400, 900))
+            
+            if random.random() < 0.20:
+                ruido_humano(driver, "baixa")
 
             if random.random() < 0.25:
                 try:
@@ -1363,8 +1447,10 @@ def task_comentar_posts(driver, wait, resultados: dict, **_):
         driver.get("https://www.facebook.com/")
         time.sleep(random.uniform(4, 6))
 
-        driver.execute_script(f"window.scrollBy(0, {random.randint(600, 1000)});")
-        time.sleep(random.uniform(3, 5))
+        scroll_humano_avancado(driver, random.randint(800, 1500))
+        
+        # Chance de indecisão (HC-1)
+        if gestao_indecisao(driver, 0.15): return
 
         # Busca posts com texto longo o suficiente para comentar
         posts = driver.find_elements(By.XPATH, "//div[@data-ad-comet-preview='message' or @data-ad-preview='message']")
@@ -1376,7 +1462,10 @@ def task_comentar_posts(driver, wait, resultados: dict, **_):
 
         alvo_post = random.choice(candidatos[:2])
         driver.execute_script("arguments[0].scrollIntoView({behavior:'smooth',block:'center'});", alvo_post)
-        time.sleep(random.uniform(4, 7)) # Simulando leitura
+        
+        # Simula leitura do post antes de comentar (HC-5)
+        simular_leitura_texto(driver, alvo_post)
+        time.sleep(random.uniform(2, 4)) 
 
         try:
             # Tenta achar o campo de comentário
@@ -1604,11 +1693,144 @@ def task_facebook_gaming(driver, wait, resultados: dict, nome_modo: str = "Padr�
 
 
 # ═══════════════════════════════════════════════════════════════
+#  HC-A — EXPLORAÇÃO ORGÂNICA E CURIOSIDADE
+# ═══════════════════════════════════════════════════════════════
+
+def task_explorar_organico(driver, wait, resultados: dict, **_):
+    """HC-4: Navega por hashtags, aba explorar e sugestões."""
+    print("\n  ▶ [HC-A] Exploração Orgânica...")
+    try:
+        # 1. Tenta ir para a aba Explorar
+        driver.get("https://www.facebook.com/explore/")
+        time.sleep(random.uniform(5, 8))
+        scroll_humano_avancado(driver, random.randint(1000, 2000))
+        
+        # 2. Busca uma hashtag aleatória de um post visível
+        tags = driver.find_elements(By.XPATH, "//a[contains(@href, '/hashtag/')]")
+        if tags and random.random() < 0.5:
+            escolhida = random.choice(tags[:3])
+            print(f"    #  Clicando na hashtag: {escolhida.text}")
+            _clicar_robusto(driver, escolhida)
+            time.sleep(random.uniform(4, 7))
+            scroll_humano_avancado(driver, random.randint(800, 1500))
+
+        # 3. Sugestões do Algoritmo (Pessoas que talvez conheça)
+        if random.random() < 0.4:
+            print("    👥 Espiando sugestões de amizade...")
+            driver.get("https://www.facebook.com/friends/suggestions")
+            time.sleep(random.uniform(5, 8))
+            scroll_humano_avancado(driver, random.randint(500, 1200))
+            # Entra em um perfil e sai rápido (indecisão)
+            perfil_links = driver.find_elements(By.XPATH, "//a[contains(@href, '/user/') or contains(@href, 'profile.php')]")
+            if perfil_links:
+                alvo = random.choice(perfil_links[:3])
+                _clicar_robusto(driver, alvo)
+                time.sleep(random.uniform(2, 5))
+                print("    🤔 [Indecisão] Perfil visto por 3s e abandonado.")
+                driver.back()
+                time.sleep(random.uniform(2, 4))
+                
+    except Exception as e:
+        print(f"    ✗ Falha na exploração orgânica: {e}")
+
+# ═══════════════════════════════════════════════════════════════
+#  HC-B — TROCA DE CONTEXTO E RITUAIS
+# ═══════════════════════════════════════════════════════════════
+
+def task_troca_contexto(driver, wait, resultados: dict, **_):
+    """HC-6: Alterna entre feed, perfil e notificações."""
+    print("\n  ▶ [HC-B] Troca de Contexto...")
+    try:
+        # Ritual: Feed -> Ver Próprio Perfil -> Voltar
+        print("    👤 Visitando próprio perfil...")
+        perfil_btn = driver.find_element(By.XPATH, "//a[contains(@href, '/me/') or contains(@href, 'profile.php')]")
+        _clicar_robusto(driver, perfil_btn)
+        time.sleep(random.uniform(4, 7))
+        scroll_humano_avancado(driver, random.randint(400, 900))
+        
+        ruido_humano(driver, "baixa")
+        
+        # Volta para Home
+        print("    🏠 Voltando para o Feed...")
+        home_btn = driver.find_element(By.XPATH, "//a[@aria-label='Facebook' or @aria-label='Página inicial']")
+        _clicar_robusto(driver, home_btn)
+        time.sleep(random.uniform(3, 5))
+        
+        # Check de notificações (mesmo se vazio)
+        if random.random() < 0.6:
+            check_notificacoes(driver, wait)
+
+    except Exception as e:
+        print(f"    ✗ Falha na troca de contexto: {e}")
+
+# ═══════════════════════════════════════════════════════════════
+#  HC-C — AÇÕES INCOMPLETAS E GHOSTING
+# ═══════════════════════════════════════════════════════════════
+
+def task_acoes_incompletas(driver, wait, resultados: dict, **_):
+    """HC-7: Simula interações que não são concluídas (Comentário fantasma, inbox peek)."""
+    print("\n  ▶ [HC-C] Ações Incompletas...")
+    try:
+        # 1. Inbox Peek (Messenger)
+        if random.random() < 0.5:
+            print("    💬 Espiando o Messenger Inbox...")
+            msg_btn = driver.find_element(By.XPATH, "//div[@aria-label='Messenger']")
+            _clicar_robusto(driver, msg_btn)
+            time.sleep(random.uniform(4, 8))
+            # Apenas olha e clica fora (ou dá ESC)
+            ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+            print("    ✓ Inbox visualizado e fechado (sem mensagens enviadas).")
+            time.sleep(random.uniform(2, 4))
+
+        # 2. Ghost Comment
+        # Procura um campo de comentário visível
+        caixas = driver.find_elements(By.XPATH, "//div[@role='textbox' and contains(@aria-label, 'escreva um comentário')]")
+        if caixas:
+            alvo = random.choice(caixas[:2])
+            driver.execute_script("arguments[0].scrollIntoView({behavior:'smooth',block:'center'});", alvo)
+            time.sleep(random.uniform(2, 4))
+            
+            # Digita ago e apaga
+            msg = random.choice(["Top!", "Legal!", "Muito bom", "Show"])
+            print(f"    ⌨️  Digitando comentário fantasma: '{msg}'")
+            for char in msg:
+                alvo.send_keys(char)
+                time.sleep(random.uniform(0.1, 0.3))
+            
+            time.sleep(random.uniform(2, 4))
+            print("    ⌨️  [Ghosting] Apagando comentário e desistindo...")
+            for _ in range(len(msg)):
+                alvo.send_keys(Keys.BACKSPACE)
+                time.sleep(random.uniform(0.05, 0.15))
+            
+            ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+            time.sleep(random.uniform(1, 3))
+
+        # 3. Cancel Share
+        if random.random() < 0.4:
+            print("    ↪️  [Ação Incompleta] Abrindo menu de compartilhamento...")
+            try:
+                share_btns = driver.find_elements(By.XPATH, "//div[@aria-label='Enviar esta publicação para amigos ou publique-a no seu mural.' or @aria-label='Share' or @aria-label='Compartilhar']")
+                if share_btns:
+                    alvo_s = random.choice(share_btns[:2])
+                    micro_move_before_click(driver, alvo_s)
+                    time.sleep(random.uniform(3, 5))
+                    # Simula indecisão e cancela
+                    print("    ↪️  [Indecisão] Desistiu de compartilhar. Fechando menu.")
+                    ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+                    time.sleep(random.uniform(1.5, 3))
+            except: pass
+
+    except Exception as e:
+        print(f"    ✗ Falha nas ações incompletas: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════
 #  LOOP PRINCIPAL DE AQUECIMENTO POR TEMPO
 # ═══════════════════════════════════════════════════════════════
 
 def facebook_warmup_por_tempo(
-    controller, duracao_segundos: int, nome_modo: str
+    controller, duracao_original: int, nome_modo: str
 ):
     """
     Orquestra todas as tarefas em ciclos embaralhados até o tempo esgotar.
@@ -1630,6 +1852,19 @@ def facebook_warmup_por_tempo(
     """
     driver = extrair_driver(controller)
     wait   = WebDriverWait(driver, 25)
+
+    # ── DETERMINAR PROFUNDIDADE DA SESSÃO ─────────────────
+    tipo_sessao = random.choices(
+        ["rasa", "media", "longa"], weights=[20, 70, 10], k=1
+    )[0]
+    
+    duracao_segundos = duracao_original
+    if tipo_sessao == "rasa":
+        duracao_segundos = random.randint(40, 80)
+        print(f"    ⚠️  [Sessão Rasa] Comportamento de 'pressa' ativado ({duracao_segundos}s).")
+    elif tipo_sessao == "longa":
+        duracao_segundos = int(duracao_original * 1.25)
+        print(f"    🌟 [Sessão Longa] Comportamento 'imersivo' ativado (+25% tempo).")
 
     resultados: dict = {
         "curtidas_feed": 0,
@@ -1671,6 +1906,9 @@ def facebook_warmup_por_tempo(
         task_comentar_posts,
         task_entrar_grupo,
         task_adicionar_amigos,
+        task_explorar_organico,
+        task_troca_contexto,
+        task_acoes_incompletas,
     ]
 
     postagem_feita = False
@@ -1702,7 +1940,12 @@ def facebook_warmup_por_tempo(
                     break
                 barra_progresso(elapsed, duracao_segundos)
                 tarefa(driver, wait, resultados, **ctx)
-                time.sleep(random.uniform(3, 8))
+                
+                # 30% de chance de ruído humano entre tarefas
+                if random.random() < 0.30:
+                    ruido_humano(driver, "baixa")
+                else:
+                    time.sleep(random.uniform(3, 8))
 
             # Postagem única nos últimos 20% do tempo
             elapsed = time.time() - inicio
