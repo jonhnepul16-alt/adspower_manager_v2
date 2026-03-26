@@ -18,18 +18,15 @@ def print(*args, **kwargs):
     if AGENT_LOG_CALLBACK:
         try:
             msg = " ".join(map(str, args))
-            import asyncio
-            try:
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    loop.create_task(AGENT_LOG_CALLBACK(msg))
-                else:
-                    AGENT_LOG_CALLBACK(msg)
-            except:
-                AGENT_LOG_CALLBACK(msg)
-        except:
+            AGENT_LOG_CALLBACK(msg)
+        except Exception:
             pass
-    _original_print(*args, **kwargs)
+            
+    try:
+        if sys.stdout is not None:
+            _original_print(*args, **kwargs)
+    except Exception:
+        pass
 # ────────────────────────────────────────────────────────────────────────
 
 from core.account_manager import AccountManager  # type: ignore
@@ -127,6 +124,52 @@ LEITURA_LONGA_MIN         = 3.0    # pausa mínima de leitura (s)
 LEITURA_LONGA_MAX         = 5.0    # pausa máxima de leitura (s)
 PROB_CURTIR_FAST          = 0.10   # 10 % de chance de curtir no scroll
 
+# ── REAÇÕES (distribuição baseada em dados reais — Quintly/Facebook) ──────────
+# Like ~50%, Love ~30%, Haha ~10%, Wow ~5%, Sad ~3%, Angry ~2%
+REACOES_POPULACAO = (
+    ["Like"]  * 50 +
+    ["Love"]  * 30 +
+    ["Haha"]  * 10 +
+    ["Wow"]   * 5  +
+    ["Sad"]   * 3  +
+    ["Angry"] * 2
+)
+
+# aria-label do botão de cada reação (PT-BR, EN, ES)
+REACAO_ARIA = {
+    "Like":  ["Curtir",   "Like",   "Me gusta"],
+    "Love":  ["Amei",     "Love",   "Me encanta"],
+    "Haha":  ["Haha",     "Haha",   "Haha"],
+    "Wow":   ["Uau",      "Wow",    "Asombrado"],
+    "Sad":   ["Triste",   "Sad",    "Triste"],
+    "Angry": ["Grr",      "Angry",  "Enfadado"],
+}
+
+# ── COMENTÁRIOS ────────────────────────────────────────────────────────────────
+COMENTARIOS_POSTS = [
+    "Que incrível! 😍", "Adorei isso!", "Muito bom mesmo! 👏",
+    "Hahaha que situação kkkk", "Que coisa linda!", "Top demais! 🔥",
+    "Isso é real demais 😂", "Mandou bem!", "Que legal isso!",
+    "Perfeito! ✨", "Vai fundo! 💪", "Sensacional!", "Que momento lindo!",
+    "Não tava preparado pra isso kkkk", "Amei! ❤️", "Muito fofo!",
+    "Que notícia boa!", "Isso mesmo! 👊", "Compartilhei com os amigos!",
+    "Boa sorte! 🍀", "Demais! 😄", "Que saudade dessa época 😅",
+    "Perfeito, exatamente o que eu precisava ver hoje!", "Kkkkk que exagero 😂",
+]
+
+# ── GRUPOS ─────────────────────────────────────────────────────────────────────
+GRUPOS_NICHO = [
+    "empreendedorismo brasil", "receitas caseiras", "fitness e saúde",
+    "tecnologia brasil", "viagens baratas", "mães de primeira viagem",
+    "games brasil", "música independente", "fotografia digital",
+    "finanças pessoais", "culinária saudável", "carros e motos brasil",
+]
+
+GRUPOS_TEMPO_POR_MODO = {
+    "Rápido":  (40,  80),
+    "Padrão":  (90,  150),
+    "Intenso": (180, 240),
+}
 
 # ═══════════════════════════════════════════════════════════════
 #  UTILITÁRIOS BASE
@@ -262,6 +305,8 @@ def salvar_relatorio(pid: str, resultado: dict, modo: str):
         "-" * 56,
         f"  Tempo total no Feed      : {feed_fmt}",
         f"  Curtidas no Feed         : {resultado.get('curtidas_feed', 0)}",
+        f"  Reações no Feed          : {resultado.get('reacoes_dadas', 0)}",
+        f"  Comentários feitos       : {resultado.get('comentarios_feitos', 0)}",
         f"  Reels assistidos         : {resultado.get('reels_assistidos', 0)}",
         f"  Reels curtidos           : {resultado.get('reels_curtidos', 0)}",
         f"  Busca nicho concluída    : "
@@ -275,6 +320,8 @@ def salvar_relatorio(pid: str, resultado: dict, modo: str):
         f"  Distância total scrollada: {dist_px:,} px (~{dist_cm:.0f} cm)",
         f"  Itens Marketplace vistos : "
         f"{resultado.get('itens_marketplace_vistos', 0)}",
+        f"  Exploração de Grupos     : {resultado.get('grupos_visitados', 0)}",
+        f"  Amigos adicionados       : {resultado.get('amigos_adicionados', 0)}",
         f"  Interação Comercial      : "
         f"{'Sim' if resultado.get('interacao_comercial_messenger') else 'Não'}",
         f"  Postagem feita           : "
@@ -1217,9 +1264,12 @@ def task_postagem_status(driver, wait, resultados: dict, **_):
 
         btn_pub = None
         for sel in [
+            "//div[@aria-label='Postar']",
+            "//button[@aria-label='Postar']",
             "//div[@aria-label='Publicar']",
-            "//div[@aria-label='Post']",
             "//button[@aria-label='Publicar']",
+            "//div[@aria-label='Post']",
+            "//button[@aria-label='Post']",
         ]:
             try:
                 btn_pub = driver.find_element(By.XPATH, sel)
@@ -1232,11 +1282,236 @@ def task_postagem_status(driver, wait, resultados: dict, **_):
             resultados["postagem"] = True
             print(f'    ✓ Status publicado: "{texto}"')
         else:
-            print("    ✗ Botão Publicar não encontrado.")
+            print("    ✗ Botão 'Postar' não encontrado.")
 
         time.sleep(random.uniform(4, 7))
     except Exception as e:
         print(f"    ✗ Falha na postagem: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════
+#  TAREFA I — REAÇÕES VARIADAS (HUMANIZADAS)
+# ═══════════════════════════════════════════════════════════════
+
+def task_reagir_posts(driver, wait, resultados: dict, **_):
+    """Tarefa I — Reage a posts no feed com distribuição natural (35% prob)."""
+    if random.random() > 0.35:
+        return
+
+    print("\n  ▶ [I] Reagindo a posts no feed...")
+    try:
+        driver.get("https://www.facebook.com/")
+        time.sleep(random.uniform(4, 6))
+
+        for _ in range(random.randint(1, 3)):
+            driver.execute_script(f"window.scrollBy(0, {random.randint(400, 800)});")
+            time.sleep(random.uniform(2, 4))
+
+            try:
+                # Encontra botões de Curtir visíveis
+                like_btns = driver.find_elements(
+                    By.XPATH,
+                    "//div[@aria-label='Curtir' or @aria-label='Like' or @aria-label='Me gusta']"
+                )
+                visiveis = [b for b in like_btns if b.is_displayed()]
+                if not visiveis:
+                    continue
+
+                alvo = random.choice(visiveis[:2])
+                reacao = random.choice(REACOES_POPULACAO)
+                
+                print(f"    → Escolhendo reação: {reacao}...")
+                
+                if reacao == "Like":
+                    micro_move_before_click(driver, alvo)
+                else:
+                    # Hover para abrir menu de reações
+                    ActionChains(driver).move_to_element(alvo).perform()
+                    time.sleep(random.uniform(1.5, 2.5))
+                    
+                    # Procura o botão da reação específica
+                    nomes_reacao = REACAO_ARIA.get(reacao, [reacao])
+                    xpath_reacao = " or ".join([f"@aria-label='{n}'" for n in nomes_reacao])
+                    
+                    try:
+                        btn_reacao = wait.until(EC.element_to_be_clickable((By.XPATH, f"//div[{xpath_reacao}]")))
+                        micro_move_before_click(driver, btn_reacao)
+                    except Exception:
+                        # Fallback para Like se não achar o menu
+                        micro_move_before_click(driver, alvo)
+
+                resultados["reacoes_dadas"] = resultados.get("reacoes_dadas", 0) + 1
+                time.sleep(random.uniform(2, 4))
+            except Exception:
+                continue
+
+    except Exception as e:
+        print(f"    ✗ Falha ao reagir a posts: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════
+#  TAREFA J — COMENTÁRIOS EM POSTS
+# ═══════════════════════════════════════════════════════════════
+
+def task_comentar_posts(driver, wait, resultados: dict, **_):
+    """Tarefa J — Comenta em posts do feed (25% prob)."""
+    if random.random() > 0.25:
+        return
+
+    print("\n  ▶ [J] Comentando em posts no feed...")
+    try:
+        driver.get("https://www.facebook.com/")
+        time.sleep(random.uniform(4, 6))
+
+        driver.execute_script(f"window.scrollBy(0, {random.randint(600, 1000)});")
+        time.sleep(random.uniform(3, 5))
+
+        # Busca posts com texto longo o suficiente para comentar
+        posts = driver.find_elements(By.XPATH, "//div[@data-ad-comet-preview='message' or @data-ad-preview='message']")
+        candidatos = [p for p in posts if len(p.text.strip()) > 40]
+
+        if not candidatos:
+            print("    · Nenhum post adequado para comentar encontrado.")
+            return
+
+        alvo_post = random.choice(candidatos[:2])
+        driver.execute_script("arguments[0].scrollIntoView({behavior:'smooth',block:'center'});", alvo_post)
+        time.sleep(random.uniform(4, 7)) # Simulando leitura
+
+        try:
+            # Tenta achar o campo de comentário
+            cmt_box = alvo_post.find_element(By.XPATH, ".//div[@role='textbox' and contains(@aria-label, 'coment')]")
+        except Exception:
+            # Se não achar direto no post, tenta clicar no botão de comentar primeiro
+            try:
+                btn_cmt = alvo_post.find_element(By.XPATH, ".//div[@aria-label='Escrever um comentário' or @aria-label='Write a comment']")
+                micro_move_before_click(driver, btn_cmt)
+                time.sleep(random.uniform(1, 2))
+                cmt_box = driver.find_element(By.XPATH, "//div[@role='textbox' and contains(@aria-label, 'coment')]")
+            except Exception:
+                print("    ✗ Campo de comentário não encontrado.")
+                return
+
+        comentario = random.choice(COMENTARIOS_POSTS)
+        micro_move_before_click(driver, cmt_box)
+        time.sleep(random.uniform(1, 2))
+        
+        # 20% de chance de errar e apagar (humanizado)
+        if random.random() < 0.20:
+            human_type(cmt_box, "Muito bo")
+            time.sleep(random.uniform(0.5, 1.0))
+            for _ in range(8):
+                cmt_box.send_keys(Keys.BACKSPACE)
+                time.sleep(0.1)
+                
+        human_type(cmt_box, comentario)
+        time.sleep(random.uniform(1.5, 3))
+        cmt_box.send_keys(Keys.RETURN)
+        
+        resultados["comentarios_feitos"] = resultados.get("comentarios_feitos", 0) + 1
+        print(f"    ✓ Comentário enviado: {comentario}")
+        time.sleep(random.uniform(2, 4))
+
+    except Exception as e:
+        print(f"    ✗ Falha ao comentar posts: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════
+#  TAREFA K — ENTRAR E EXPLORAR GRUPOS
+# ═══════════════════════════════════════════════════════════════
+
+def task_entrar_grupo(driver, wait, resultados: dict, nome_modo: str = "Padrão", **_):
+    """Tarefa K — Busca nicho em grupos e explora (20% prob, 1x por sessão)."""
+    if resultados.get("grupos_visitados", 0) > 0:
+        return
+    if random.random() > 0.20:
+        return
+
+    nicho = random.choice(GRUPOS_NICHO)
+    print(f"\n  ▶ [K] Explorando grupos de '{nicho}'...")
+    try:
+        driver.get(f"https://www.facebook.com/search/groups/?q={nicho}")
+        time.sleep(random.uniform(5, 8))
+
+        # Pega o primeiro grupo da lista
+        grupos = driver.find_elements(By.XPATH, "//a[contains(@href, '/groups/')]")
+        if not grupos:
+            print("    ✗ Nenhum grupo encontrado.")
+            return
+
+        alvo_grupo = grupos[0]
+        micro_move_before_click(driver, alvo_grupo)
+        time.sleep(random.uniform(5, 8))
+
+        t_min, t_max = GRUPOS_TEMPO_POR_MODO.get(nome_modo, (60, 120))
+        duracao = random.uniform(t_min, t_max)
+        print(f"    ⏱  Navegando no grupo por {duracao/60:.1f} min...")
+
+        fim = time.time() + duracao
+        while time.time() < fim:
+            driver.execute_script(f"window.scrollBy(0, {random.randint(300, 700)});")
+            time.sleep(random.uniform(3, 6))
+            
+            # Chance de 30% de pedir para entrar se não for membro
+            if random.random() < 0.30:
+                try:
+                    btn_join = driver.find_element(By.XPATH, "//div[@aria-label='Participar do grupo' or @aria-label='Join group']")
+                    if btn_join:
+                        micro_move_before_click(driver, btn_join)
+                        print("    ✓ Pedido para participar do grupo enviado.")
+                        time.sleep(2)
+                except Exception:
+                    pass
+
+        resultados["grupos_visitados"] = resultados.get("grupos_visitados", 0) + 1
+        print("    ✓ Exploração de grupo concluída.")
+
+    except Exception as e:
+        print(f"    ✗ Falha ao explorar grupo: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════
+#  TAREFA L — ADICIONAR AMIGOS (SUGESTÕES)
+# ═══════════════════════════════════════════════════════════════
+
+def task_adicionar_amigos(driver, wait, resultados: dict, **_):
+    """Tarefa L — Vê sugestões de amizade e adiciona 1-2 (15% prob, 1x)."""
+    if resultados.get("amigos_adicionados", 0) > 0:
+        return
+    if random.random() > 0.15:
+        return
+
+    print("\n  ▶ [L] Vendo sugestões de amizade...")
+    try:
+        driver.get("https://www.facebook.com/friends/suggestions")
+        time.sleep(random.uniform(5, 8))
+
+        # Encontra perfis sugeridos
+        sugestoes = driver.find_elements(By.XPATH, "//div[@aria-label='Adicionar amigo' or @aria-label='Add Friend']/ancestor::div[4]")
+        if not sugestoes:
+            print("    · Nenhuma sugestão encontrada.")
+            return
+
+        qtd = random.randint(1, 2)
+        print(f"    → Analisando {len(sugestoes[:5])} sugestões...")
+        
+        for i in range(min(qtd, len(sugestoes))):
+            try:
+                perfil = sugestoes[i]
+                driver.execute_script("arguments[0].scrollIntoView({behavior:'smooth',block:'center'});", perfil)
+                time.sleep(random.uniform(2, 4))
+                
+                # Clica no botão "Adicionar amigo"
+                btn_add = perfil.find_element(By.XPATH, ".//div[@aria-label='Adicionar amigo' or @aria-label='Add Friend']")
+                micro_move_before_click(driver, btn_add)
+                resultados["amigos_adicionados"] = resultados.get("amigos_adicionados", 0) + 1
+                print(f"    ✓ Solicitação enviada ({i+1}).")
+                time.sleep(random.uniform(3, 6))
+            except Exception:
+                continue
+
+    except Exception as e:
+        print(f"    ✗ Falha ao adicionar amigos: {e}")
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -1358,6 +1633,8 @@ def facebook_warmup_por_tempo(
 
     resultados: dict = {
         "curtidas_feed": 0,
+        "reacoes_dadas": 0,
+        "comentarios_feitos": 0,
         "reels_assistidos": 0,
         "reels_curtidos": 0,
         "buscas": 0,
@@ -1371,6 +1648,8 @@ def facebook_warmup_por_tempo(
         "anuncios_clicados_na_varredura": 0,
         "distancia_total_scrollada": 0,
         "itens_marketplace_vistos": 0,
+        "grupos_visitados": 0,
+        "amigos_adicionados": 0,
         "interacao_comercial_messenger": False,
         "postagem": False,
         "ciclos": 0,
@@ -1388,6 +1667,10 @@ def facebook_warmup_por_tempo(
         task_interact_ad,
         task_deep_comments,
         task_facebook_gaming,
+        task_reagir_posts,
+        task_comentar_posts,
+        task_entrar_grupo,
+        task_adicionar_amigos,
     ]
 
     postagem_feita = False
@@ -1529,7 +1812,8 @@ def main():
             print(
                 f"\n  📊 Resumo"
                 f" | Feed: {int(feed_s//60)}m{int(feed_s%60):02d}s"
-                f" / {dados.get('curtidas_feed', 0)}❤"
+                f" / {dados.get('curtidas_feed', 0)}❤ / {dados.get('reacoes_dadas', 0)}👍"
+                f" / {dados.get('comentarios_feitos', 0)}💬"
                 f" | Scroll: {dist_px:,}px"
                 f" | Busca: {'✓' if dados.get('busca_nicho_concluida') else '✗'}"
                 f" {int(busca_s//60)}m{int(busca_s%60):02d}s"
@@ -1540,6 +1824,8 @@ def main():
                 f" | Ads CTA: {dados.get('ads_clicados_por_cta', 0)}"
                 f" | Ads varredura: {dados.get('anuncios_clicados_na_varredura', 0)}"
                 f" | Mktplace: {dados.get('itens_marketplace_vistos', 0)}"
+                f" | Grupos: {dados.get('grupos_visitados', 0)}👥"
+                f" | Amigos: {dados.get('amigos_adicionados', 0)}👤+"
                 f" | Msg: {'✓' if dados.get('interacao_comercial_messenger') else '✗'}"
                 f" | Post: {'✓' if dados.get('postagem') else '✗'}"
                 f" | Ciclos: {dados.get('ciclos', 0)}"

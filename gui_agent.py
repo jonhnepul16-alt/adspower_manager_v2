@@ -9,11 +9,14 @@ import os
 import time
 from typing import List, Dict, Any, Optional
 
-# Adjust paths for imports
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-# Reconfigure stdout for UTF-8 to handle special characters on Windows
 if sys.platform == "win32":
+    if sys.stdout is None:
+        sys.stdout = open(os.devnull, 'w', encoding='utf-8')
+    if sys.stderr is None:
+        sys.stderr = open(os.devnull, 'w', encoding='utf-8')
+    if sys.stdin is None:
+        sys.stdin = open(os.devnull, 'r', encoding='utf-8')
+        
     try:
         import io
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -24,14 +27,23 @@ from core.account_manager import AccountManager
 from main import facebook_warmup_por_tempo, MODOS_TEMPO, set_log_callback
 
 # Configuration
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+if getattr(sys, 'frozen', False):
+    application_path = os.path.dirname(sys.executable)
+else:
+    application_path = os.path.dirname(os.path.abspath(__file__))
+
+CONFIG_PATH = os.path.join(application_path, "config.json")
 DEFAULT_SERVER_URL = "wss://certo134-production.up.railway.app/ws/agent"
 DEFAULT_DASHBOARD_URL = "https://stately-torrone-4253a1.netlify.app/"
 MACHINE_ID = "default"
 
 def load_config():
-    """Load cloud URLs from config.json if it exists."""
-    config = {"server_url": DEFAULT_SERVER_URL, "dashboard_url": DEFAULT_DASHBOARD_URL}
+    """Load cloud URLs and machine ID from config.json if it exists."""
+    config = {
+        "server_url": DEFAULT_SERVER_URL, 
+        "dashboard_url": DEFAULT_DASHBOARD_URL,
+        "machine_id": "default"
+    }
     if os.path.exists(CONFIG_PATH):
         try:
             with open(CONFIG_PATH, 'r') as f:
@@ -43,6 +55,7 @@ def load_config():
 config_data = load_config()
 SERVER_URL = config_data.get("server_url", DEFAULT_SERVER_URL)
 DASHBOARD_URL = config_data.get("dashboard_url", DEFAULT_DASHBOARD_URL)
+MACHINE_ID = config_data.get("machine_id", "default")
 
 import webbrowser
 
@@ -87,18 +100,26 @@ class GUIApp:
 
         # Instruction
         self.instr = tk.Label(
-            root, text="Servidor ligado. Acesse o site para começar.", 
-            fg="#64748b", bg="#0f172a", 
+            root, text="Cole sua API Key do AdsPower abaixo para conectar:", 
+            fg="#94a3b8", bg="#0f172a", 
             font=("Segoe UI", 9)
         )
-        self.instr.pack(pady=(20, 10))
+        self.instr.pack(pady=(15, 5))
 
-        # Open Dashboard Button
+        # API Key Input
+        self.api_key_var = tk.StringVar(value=MACHINE_ID if MACHINE_ID != "default" else "")
+        self.api_entry = ttk.Entry(
+            root, textvariable=self.api_key_var, 
+            font=("Consolas", 9), width=45, justify="center"
+        )
+        self.api_entry.pack(pady=5, ipady=3)
+
+        # Connect Button
         self.btn = tk.Button(
-            root, text="ABRIR PAINEL WEB", 
-            command=self.open_dashboard,
-            fg="white", bg="#38bdf8", 
-            font=("Segoe UI", 10, "bold"),
+            root, text="SALVAR E CONECTAR", 
+            command=self.save_and_reconnect,
+            fg="white", bg="#0ea5e9", 
+            font=("Segoe UI", 9, "bold"),
             padx=20, pady=5,
             relief="flat", cursor="hand2"
         )
@@ -107,11 +128,30 @@ class GUIApp:
         # Periodic check for status updates from agent
         self.update_ui()
 
-    def open_dashboard(self):
-        webbrowser.open(DASHBOARD_URL)
+    def save_and_reconnect(self):
+        new_key = self.api_key_var.get().strip()
+        if not new_key: return
+
+        # Update config.json
+        config_data["machine_id"] = new_key
+        try:
+            with open(CONFIG_PATH, 'w') as f:
+                json.dump(config_data, f, indent=4)
+        except: pass
+
+        # Update running agent
+        self.agent.machine_id = new_key
+        self.agent.server_url = f"{SERVER_URL}/{new_key}"
+
+        # Force websocket to disconnect so the loop reconnects with new URL
+        if hasattr(self.agent, 'main_loop') and self.agent.ws:
+            import asyncio
+            try:
+                asyncio.run_coroutine_threadsafe(self.agent.ws.close(), self.agent.main_loop)
+            except Exception: pass
 
     def update_ui(self):
-        if self.agent.ws and self.agent.ws.open:
+        if self.agent.is_connected:
             self.status_dot.config(fg="#10b981") # Emerald-500
             self.status_text.config(text="AGENTE ONLINE", fg="#10b981")
         else:
@@ -126,10 +166,15 @@ class AgentWorker:
         self.server_url = f"{server_url}/{machine_id}"
         self.manager = AccountManager()
         self.ws = None
+        self.is_connected = False
         self.is_running = False
 
     async def log(self, message: str):
-        print(message)
+        try:
+            print(message)
+        except Exception:
+            pass
+            
         if self.ws:
             try:
                 await self.ws.send(json.dumps({"type": "LOG", "message": message}))
@@ -140,8 +185,9 @@ class AgentWorker:
         if self.ws:
             try:
                 await self.ws.send(json.dumps({
-                    "type": "STATUS_UPDATE", 
-                    "data": {"is_running": is_running, "current_profile": current_profile}
+                    "type": "STATUS_UPDATE",
+                    "is_running": is_running,
+                    "current_profile": current_profile
                 }))
             except: pass
 
@@ -165,8 +211,13 @@ class AgentWorker:
             if not session: continue
             
             try:
-                self.manager.run_task(pid, lambda ctrl: facebook_warmup_por_tempo(ctrl, duracao, nome_modo))
-                await self.ws.send(json.dumps({"type": "RESULT", "profile_id": pid, "data": {"ok": True}}))
+                # Execute in background thread to prevent blocking WebSocket PINGs
+                result = await asyncio.to_thread(
+                    self.manager.run_task,
+                    pid, 
+                    lambda ctrl: facebook_warmup_por_tempo(ctrl, duracao, nome_modo)
+                )
+                await self.ws.send(json.dumps({"type": "RESULT", "profile_id": pid, "data": result}))
             except Exception as e:
                 await self.log(f"Erro: {e}")
             finally:
@@ -179,11 +230,24 @@ class AgentWorker:
         await self.ws.send(json.dumps({"type": "FINISHED"}))
 
     async def connect(self):
-        set_log_callback(self.log)
+        self.main_loop = asyncio.get_event_loop()
+        def sync_log(msg):
+            try:
+                if not self.main_loop.is_closed():
+                    asyncio.run_coroutine_threadsafe(self.log(msg), self.main_loop)
+            except Exception:
+                pass
+                
+        set_log_callback(sync_log)
+        
         while True:
             try:
                 async with websockets.connect(self.server_url) as websocket:
                     self.ws = websocket
+                    self.is_connected = True
+                    # Sync real current state with server (don't reset if task is running)
+                    await self.update_status(self.is_running)
+                    
                     async for message in websocket:
                         data = json.loads(message)
                         if data.get("type") == "START":
@@ -192,9 +256,15 @@ class AgentWorker:
                                 data["data"].get("mode", "1")
                             ))
                         elif data.get("type") == "STOP":
+                            was_running = self.is_running
                             self.is_running = False
-            except:
+                            if was_running:
+                                self.manager.close_all()
+                    self.is_connected = False
+            except Exception as e:
+                print(f"Erro de conexão: {e}")
                 self.ws = None
+                self.is_connected = False
                 await asyncio.sleep(5)
 
 def run_async_loop(worker):

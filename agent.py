@@ -22,7 +22,7 @@ from core.account_manager import AccountManager
 from main import facebook_warmup_por_tempo, MODOS_TEMPO, salvar_relatorio, set_log_callback
 
 # Configuration
-SERVER_URL = "ws://localhost:8000/ws/agent"  # Change to your cloud domain later
+SERVER_URL = "wss://certo134-production.up.railway.app/ws/agent"  # Cloud domain
 MACHINE_ID = "default"
 
 class RemoteAgent:

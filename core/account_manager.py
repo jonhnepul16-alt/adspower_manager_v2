@@ -8,13 +8,20 @@ import json
 import os
 import time
 import logging
+import sys
 from datetime import datetime
 from typing import Callable, Optional
 
 from core.adspower_api import AdsPowerAPI
 from core.browser_controller import BrowserController
 
-LOG_DIR = os.path.join(os.path.dirname(__file__), "..", "logs")
+# Configure log saving safely for Pyinstaller environments
+if getattr(sys, 'frozen', False):
+    application_path = os.path.dirname(sys.executable)
+else:
+    application_path = os.path.join(os.path.dirname(__file__), "..")
+
+LOG_DIR = os.path.join(application_path, "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
 logging.basicConfig(
