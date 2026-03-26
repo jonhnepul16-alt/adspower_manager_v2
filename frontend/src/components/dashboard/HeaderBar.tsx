@@ -1,19 +1,21 @@
-import { Shield } from "lucide-react";
+import { Shield, KeyRound } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface HeaderBarProps {
   isActive: boolean;
   isAgentConnected?: boolean;
+  apiKey: string;
+  onApiKeyChange: (key: string) => void;
 }
 
-const HeaderBar = ({ isActive, isAgentConnected = false }: HeaderBarProps) => {
+const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange }: HeaderBarProps) => {
 
   return (
     <motion.header
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="flex items-center justify-between"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
     >
       <div className="flex items-center gap-4">
         <div className="relative p-3 rounded-2xl bg-primary/10 border border-primary/20">
@@ -30,7 +32,19 @@ const HeaderBar = ({ isActive, isAgentConnected = false }: HeaderBarProps) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
+        {/* API Key Input */}
+        <div className="flex items-center gap-2 bg-muted/20 border border-border/40 rounded-full px-3 py-1.5 focus-within:border-primary/50 transition-colors">
+          <KeyRound className="w-4 h-4 text-muted-foreground" />
+          <input 
+            type="text" 
+            value={apiKey} 
+            onChange={(e) => onApiKeyChange(e.target.value)}
+            placeholder="Chave de Acesso..."
+            className="bg-transparent border-none outline-none text-xs font-mono text-foreground w-36 placeholder:text-muted-foreground/50"
+          />
+        </div>
+
         {/* Agent Connection Status */}
         <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border transition-all duration-500 ${
           isAgentConnected

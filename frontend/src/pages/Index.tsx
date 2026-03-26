@@ -8,12 +8,17 @@ import StrategySelector from "@/components/dashboard/StrategySelector";
 import EngineCore from "@/components/dashboard/EngineCore";
 import LogTerminal from "@/components/dashboard/LogTerminal";
 import { fetchStatus, startWarmup, stopWarmup } from "@/lib/api";
+import { toast } from "sonner";
 
 type ProfileResult = {
   ok: boolean;
   curtidas_feed?: number;
+  reacoes_dadas?: number;
+  comentarios_feitos?: number;
   reels_assistidos?: number;
   postagem?: boolean;
+  grupos_visitados?: number;
+  amigos_adicionados?: number;
 };
 
 const Index = () => {
@@ -24,13 +29,19 @@ const Index = () => {
   const [logs, setLogs] = useState<string[]>([]);
   const [results, setResults] = useState<Record<string, ProfileResult>>({});
   const [currentProfile, setCurrentProfile] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem("vexel_api_key") || "default");
 
   const safeResults = results ?? {};
+
+  // Persist API Key changes
+  useEffect(() => {
+    localStorage.setItem("vexel_api_key", apiKey);
+  }, [apiKey]);
 
   useEffect(() => {
     const check = async () => {
       try {
-        const status = await fetchStatus("default");
+        const status = await fetchStatus(apiKey);
         if (!status) return;
         setIsActive(status.is_running ?? false);
         setIsAgentConnected(status.agent_connected ?? false);
@@ -51,37 +62,51 @@ const Index = () => {
     const ids = profiles.split("\n").map(s => s.trim()).filter(Boolean);
     if (!ids.length) return;
     try {
-      await startWarmup(ids, selectedMode);
+      await startWarmup(ids, selectedMode, apiKey);
       setIsActive(true);
+      toast.success("Comando de inicialização enviado!");
     } catch (err) {
       console.error(err);
+      toast.error("Erro ao iniciar: " + (err instanceof Error ? err.message : "Erro desconhecido"));
     }
   };
 
   const handleStop = async () => {
     try {
-      await stopWarmup();
+      await stopWarmup(apiKey);
       setIsActive(false);
+      toast.success("Comando de parada enviado!");
     } catch (err) {
       console.error(err);
+      toast.error("Erro ao parar: " + (err instanceof Error ? err.message : "Erro desconhecido"));
     }
   };
 
-  const totalLikes = Object.values(safeResults).reduce((acc, r) => acc + (r.curtidas_feed || 0), 0);
+  const totalLikes = Object.values(safeResults).reduce((acc, r) => acc + (r.curtidas_feed || 0) + (r.reacoes_dadas || 0), 0);
+  const totalComments = Object.values(safeResults).reduce((acc, r) => acc + (r.comentarios_feitos || 0), 0);
   const totalReels = Object.values(safeResults).reduce((acc, r) => acc + (r.reels_assistidos || 0), 0);
+  const totalGroupsFriends = Object.values(safeResults).reduce((acc, r) => acc + (r.grupos_visitados || 0) + (r.amigos_adicionados || 0), 0);
   const totalPosts = Object.values(safeResults).reduce((acc, r) => acc + (r.postagem ? 1 : 0), 0);
   const totalProfilesCount = profiles.split("\n").filter(Boolean).length;
 
   return (
-    <div className="min-h-screen p-4 md:p-6 lg:p-8 max-w-[1440px] mx-auto flex flex-col gap-6">
-      <HeaderBar isActive={isActive} isAgentConnected={isAgentConnected} />
+    <div className="min-h-screen p-4 md:p-6 lg:p-8 flex flex-col gap-6">
+      <div className="max-w-[1400px] mx-auto space-y-8">
+        <HeaderBar
+          isActive={isActive}
+          isAgentConnected={isAgentConnected}
+          apiKey={apiKey}
+          onApiKeyChange={setApiKey}
+        />
 
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Users} label="Perfis Carregados" value={totalProfilesCount.toString()} delay={0.1} />
-        <StatCard icon={Heart} label="Likes Gerados" value={totalLikes.toString()} delay={0.15} />
-        <StatCard icon={Play} label="Reels Assistidos" value={totalReels.toString()} delay={0.2} />
-        <StatCard icon={MessageSquare} label="Status Publicados" value={totalPosts.toString()} delay={0.25} />
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <StatCard icon={Users} label="Perfis" value={totalProfilesCount.toString()} delay={0.1} />
+          <StatCard icon={Heart} label="Likes/Reações" value={totalLikes.toString()} delay={0.15} />
+          <StatCard icon={MessageSquare} label="Comentários" value={totalComments.toString()} delay={0.2} />
+          <StatCard icon={Play} label="Reels" value={totalReels.toString()} delay={0.25} />
+          <StatCard icon={Users} label="Grupos/Amigos" value={totalGroupsFriends.toString()} delay={0.3} />
+          <StatCard icon={MessageSquare} label="Status" value={totalPosts.toString()} delay={0.35} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">

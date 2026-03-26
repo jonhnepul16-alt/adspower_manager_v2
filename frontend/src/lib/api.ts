@@ -24,7 +24,7 @@ export const startWarmup = async (profile_ids: string[], mode: string, machine_i
 };
 
 export const stopWarmup = async (machine_id: string = "default") => {
-  const res = await api.post('/warmup/stop', { params: { machine_id } });
+  const res = await api.post('/warmup/stop', null, { params: { machine_id } });
   return res.data;
 };
 
