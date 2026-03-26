@@ -151,6 +151,7 @@ else:
     application_path = os.path.dirname(os.path.abspath(__file__))
 
 CONFIG_PATH = os.path.join(application_path, "config.json")
+PERFIS_PATH = os.path.join(application_path, "perfis_agendamento.txt")
 DEFAULT_SERVER_URL = "wss://certo134-production.up.railway.app/ws/agent"
 DEFAULT_DASHBOARD_URL = "https://stately-torrone-4253a1.netlify.app/"
 MACHINE_ID = "default"
@@ -405,6 +406,17 @@ class AgentWorker:
 
     async def connect(self):
         self.main_loop = asyncio.get_event_loop()
+        
+        # Load profiles from file if exists
+        if os.path.exists(PERFIS_PATH):
+            try:
+                with open(PERFIS_PATH, 'r') as f:
+                    pids = [line.strip() for line in f if line.strip()]
+                    if pids:
+                        self.target_profiles = pids
+                        print(f"    [Agent] {len(pids)} perfis carregados do arquivo para agendamento.")
+            except: pass
+            
         def sync_log(msg):
             try:
                 if not self.main_loop.is_closed():
