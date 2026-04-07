@@ -31,6 +31,7 @@ const Index = () => {
   const [results, setResults] = useState<Record<string, ProfileResult>>({});
   const [schedulerConfig, setSchedulerConfig] = useState<any>(null);
   const [schedulerStatus, setSchedulerStatus] = useState<any>(null);
+  const [schedulerActive, setSchedulerActive] = useState(false);
   const [currentProfile, setCurrentProfile] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("vexel_api_key") || "default");
 
@@ -48,20 +49,26 @@ const Index = () => {
         if (!status) return;
         setIsActive(status.is_running ?? false);
         setIsAgentConnected(status.agent_connected ?? false);
-        setLogs(status.logs ?? []);
+        // Logs: pull real messages from backend
+        if (Array.isArray(status.logs)) setLogs(status.logs);
         setResults(status.results ?? {});
-        setSchedulerConfig(status.scheduler_config ?? null);
+        const cfg = status.scheduler_config ?? null;
+        setSchedulerConfig(cfg);
         setSchedulerStatus(status.scheduler_status ?? null);
         setCurrentProfile(status.current_profile ?? null);
+        // Sync scheduler active state from server
+        if (cfg && cfg.active !== undefined) {
+          setSchedulerActive(!!cfg.active);
+        }
       } catch (err) {
         console.error("Failed to fetch status", err);
       }
     };
 
     check();
-    const interval = setInterval(check, 2000);
+    const interval = setInterval(check, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [apiKey]);
 
   const handleStart = async () => {
     const ids = profiles.split("\n").map(s => s.trim()).filter(Boolean);
@@ -91,9 +98,23 @@ const Index = () => {
     const ids = profiles.split("\n").map(s => s.trim()).filter(Boolean);
     try {
       await updateScheduler(apiKey, { ...config, profile_ids: ids });
-      toast.success("Agendamento sincronizado com o agente!");
+      toast.success("Agendamento sincronizado!");
     } catch (err) {
       toast.error("Erro ao atualizar agendamento");
+    }
+  };
+
+  const handleToggleScheduler = async () => {
+    const newActive = !schedulerActive;
+    setSchedulerActive(newActive);
+    const ids = profiles.split("\n").map(s => s.trim()).filter(Boolean);
+    const cfg = { ...(schedulerConfig || {}), active: newActive, profile_ids: ids };
+    try {
+      await updateScheduler(apiKey, cfg);
+      toast.success(newActive ? "Agendamento ATIVADO!" : "Agendamento PAUSADO!");
+    } catch (err) {
+      setSchedulerActive(!newActive); // rollback on error
+      toast.error("Erro ao alterar estado do agendamento");
     }
   };
 
@@ -253,9 +274,29 @@ const Index = () => {
         {/* Right Column */}
         <div className="lg:col-span-1 flex flex-col gap-5">
           <div className="glass p-6">
-            <h2 className="font-display font-bold text-lg tracking-tight text-foreground mb-6">
-               Agendamento
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display font-bold text-lg tracking-tight text-foreground">
+                Agendamento
+              </h2>
+              {/* Master Scheduler Toggle */}
+              <div className="flex items-center gap-2">
+                <span className={`text-[9px] font-bold uppercase tracking-widest ${schedulerActive ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                  {schedulerActive ? 'Ativo' : 'Pausado'}
+                </span>
+                <button
+                  onClick={handleToggleScheduler}
+                  className={`w-12 h-6 rounded-full transition-colors relative flex items-center px-1 ${
+                    schedulerActive ? 'bg-emerald-500' : 'bg-muted-foreground/30'
+                  }`}
+                >
+                  <motion.div
+                    animate={{ x: schedulerActive ? 24 : 0 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="w-4 h-4 bg-white rounded-full shadow-sm"
+                  />
+                </button>
+              </div>
+            </div>
             <SchedulerConfig 
               config={schedulerConfig}
               status={schedulerStatus}
