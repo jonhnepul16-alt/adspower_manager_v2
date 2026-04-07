@@ -116,7 +116,9 @@ def extrair_driver(controller):
 
 
 def human_type(element, texto: str, delay_min=0.05, delay_max=0.22):
-    for char in texto:
+    # Filtra caracteres fora do range BMP (Chrome/Selenium limit)
+    safe_text = "".join(c for c in texto if ord(c) <= 0xFFFF)
+    for char in safe_text:
         element.send_keys(char)
         time.sleep(random.uniform(delay_min, delay_max))
 

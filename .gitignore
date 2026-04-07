@@ -24,3 +24,10 @@ backend_production.zip
 # OS
 .DS_Store
 Thumbs.db
+
+# Project-specific ignores
+logs/
+relatorios/
+*.exe
+debug_connection.py
+vxbulker_v1/

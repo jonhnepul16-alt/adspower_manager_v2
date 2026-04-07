@@ -149,3 +149,38 @@ Traceback (most recent call last):
     return codecs.charmap_encode(input,self.errors,encoding_table)[0]
            ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 UnicodeEncodeError: 'charmap' codec can't encode character '\u25b6' in position 0: character maps to <undefined>
+2026-03-25 15:19:06,367 [INFO] Abrindo perfil k1aqyjy5 ()...
+2026-03-25 15:19:08,260 [INFO] Perfil k1aqyjy5 conectado. Título: (20+) Facebook
+2026-03-25 15:30:28,774 [INFO] [k1aqyjy5] Tarefa concluída: {'curtidas_feed': 9, 'reels_assistidos': 0, 'reels_curtidos': 0, 'buscas': 0, 'busca_nicho_concluida': False, 'tempo_gasto_na_busca': 0, 'tempo_live_total': 99.53782105445862, 'tempo_gaming_real': 67.61757779121399, 'tempo_total_feed': 277.93115854263306, 'ads_clicados': 0, 'ads_clicados_por_cta': 0, 'anuncios_clicados_na_varredura': 0, 'distancia_total_scrollada': 123959, 'itens_marketplace_vistos': 1, 'interacao_comercial_messenger': False, 'postagem': False, 'ciclos': 1, 'ok': True}
+2026-03-25 15:30:39,604 [INFO] Perfil k1aqyjy5 fechado.
+2026-03-31 15:05:17,582 [ERROR] AdsPower não está rodando. Inicie o AdsPower antes de continuar.
+2026-03-31 15:06:01,517 [INFO] AdsPower detectado e ativo.
+2026-03-31 15:06:11,763 [INFO] AdsPower detectado e ativo.
+2026-03-31 15:06:22,960 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-03-31 15:06:32,967 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-03-31 15:06:57,783 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-03-31 15:07:07,273 [INFO] Perfil k1aq7vt0 conectado. Título: 
+2026-03-31 18:45:58,408 [INFO] AdsPower detectado e ativo.
+2026-03-31 18:46:18,005 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-03-31 18:46:28,012 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-03-31 18:46:43,415 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-03-31 18:46:43,998 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-03-31 19:22:16,585 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 4, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'buscas': 1, 'busca_nicho_concluida': True, 'tempo_gasto_na_busca': 58.539469957351685, 'tempo_live_total': 725.7258408069611, 'tempo_gaming_real': 314.7299840450287, 'tempo_total_feed': 792.980801820755, 'ads_clicados': 0, 'ads_clicados_por_cta': 0, 'anuncios_clicados_na_varredura': 0, 'distancia_total_scrollada': 65697, 'itens_marketplace_vistos': 0, 'grupos_visitados': 0, 'amigos_adicionados': 0, 'interacao_comercial_messenger': False, 'postagem': True, 'ciclos': 1, 'ok': True}
+2026-03-31 19:22:27,023 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-01 12:53:04,580 [INFO] AdsPower detectado e ativo.
+2026-04-01 12:54:50,080 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-01 12:54:50,710 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-01 13:05:44,550 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 3, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'buscas': 0, 'busca_nicho_concluida': False, 'tempo_gasto_na_busca': 0, 'tempo_live_total': 112.40328931808472, 'tempo_gaming_real': 78.4219286441803, 'tempo_total_feed': 280.1264500617981, 'ads_clicados': 0, 'ads_clicados_por_cta': 0, 'anuncios_clicados_na_varredura': 0, 'distancia_total_scrollada': 25905, 'itens_marketplace_vistos': 0, 'grupos_visitados': 0, 'amigos_adicionados': 0, 'interacao_comercial_messenger': False, 'postagem': False, 'ciclos': 1, 'ok': True}
+2026-04-01 13:05:54,985 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-07 13:52:38,013 [INFO] AdsPower detectado e ativo.
+2026-04-07 13:53:42,622 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-07 13:54:11,719 [INFO] Perfil k1aq7vt0 conectado. Título: 
+2026-04-07 13:54:11,721 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'buscas': 0, 'busca_nicho_concluida': False, 'tempo_gasto_na_busca': 0, 'tempo_live_total': 0, 'tempo_gaming_real': 0, 'tempo_total_feed': 0, 'ads_clicados': 0, 'ads_clicados_por_cta': 0, 'anuncios_clicados_na_varredura': 0, 'distancia_total_scrollada': 0, 'itens_marketplace_vistos': 0, 'grupos_visitados': 0, 'amigos_adicionados': 0, 'interacao_comercial_messenger': False, 'postagem': False, 'ciclos': 0, 'ok': False, 'error': 'Message: no such window: target window already closed\nfrom unknown error: web view not found\n  (Session info: chrome=145.0.7632.117)\nStacktrace:\nSymbols not available. Dumping unresolved backtrace:\n\t0x7ff7867b3745\n\t0x7ff786602977\n\t0x7ff78623c1be\n\t0x7ff78621411d\n\t0x7ff7862c7437\n\t0x7ff7862e1e3a\n\t0x7ff78628686e\n\t0x7ff78628552f\n\t0x7ff78628658c\n\t0x7ff7867d5a15\n\t0x7ff786afa531\n\t0x7ff786af9f24\n\t0x7ff786af49f9\n\t0x7ff786afae18\n\t0x7ff78662068e\n\t0x7ff7866117e4\n\t0x7ff786611996\n\t0x7ff7865ee68f\n\t0x7ff92c16e8d7\n\t0x7ff92cdec48c\n'}
+2026-04-07 13:54:13,753 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-07 13:54:24,032 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-07 13:54:38,954 [INFO] Perfil k1aq7vt0 conectado. Título: Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-07 14:21:26,764 [INFO] AdsPower detectado e ativo.
+2026-04-07 14:21:44,991 [INFO] Abrindo perfil k1aq7vt0& C:/Users/nepul/AppData/Local/Programs/Python/Python310/python.exe c:/Users/nepul/Downloads/adspower_manager/adspower_manager/main.py ()...
+2026-04-07 14:21:48,395 [ERROR] Falha ao abrir perfil k1aq7vt0& C:/Users/nepul/AppData/Local/Programs/Python/Python310/python.exe c:/Users/nepul/Downloads/adspower_manager/adspower_manager/main.py.
+2026-04-07 14:21:57,228 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-07 14:22:05,813 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google

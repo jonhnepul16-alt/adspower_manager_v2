@@ -207,6 +207,63 @@ class AgentWorker:
         finally:
             self.is_running = False
             await self.update_status(False)
+    async def execute_manual_warmup(self, pids: List[str], mode: str):
+        if self.is_running: 
+            await self.log("⚠ Agente já está executando uma tarefa.")
+            return
+        
+        self.is_running = True
+        await self.update_status(True, pids[0] if pids else None)
+        
+        try:
+            for idx, pid in enumerate(pids):
+                if not self.is_running: 
+                    await self.log("🛑 Operação interrompida pelo usuário.")
+                    break
+                
+                await self.update_status(True, pid)
+                session = self.manager.open_account(pid)
+                if session:
+                    try:
+                        nome_modo, dur = MODOS_TEMPO.get(mode, ("Padrão", 1800))
+                        await self.log(f"🚀 [AUTO] Perfil {idx+1}/{len(pids)}: {pid} ({nome_modo})")
+                        
+                        # Executa em thread para não travar o loop de eventos
+                        res = await asyncio.to_thread(
+                            self.manager.run_task, 
+                            pid, 
+                            lambda ctrl: facebook_warmup_por_tempo(
+                                ctrl, dur, nome_modo, stop_check=lambda: not self.is_running
+                            )
+                        )
+                        
+                        if self.ws:
+                            await self.ws.send(json.dumps({
+                                "type": "RESULT", 
+                                "profile_id": pid, 
+                                "data": res
+                            }))
+                    except Exception as e:
+                        await self.log(f"❌ Erro ao processar {pid}: {e}")
+                    finally:
+                        self.manager.close_account(pid)
+                else:
+                    await self.log(f"❌ Falha ao abrir AdsPower para o perfil {pid}")
+                
+                # Pequena pausa entre perfis
+                if idx < len(pids) - 1 and self.is_running:
+                    await self.log("⏳ Aguardando 15s para o próximo perfil...")
+                    await asyncio.sleep(15)
+                    
+        except Exception as e:
+            await self.log(f"❌ Erro crítico no worker: {e}")
+            crash_report(f"Erro no execute_manual_warmup: {e}")
+        finally:
+            self.is_running = False
+            await self.update_status(False)
+            if self.ws:
+                await self.ws.send(json.dumps({"type": "FINISHED"}))
+            await self.log("✅ Fila manual concluída.")
 
     async def scheduler_loop(self):
         while True:
@@ -250,7 +307,9 @@ class AgentWorker:
                             if mtype == "START":
                                 config = data.get("data", {})
                                 pids = config.get("profile_ids", [])
-                                # Rodar tarefa manual aqui se necessário
+                                mode = config.get("mode", "2")
+                                await self.log(f"📥 Comando recebido: Iniciar {len(pids)} perfis no modo {mode}")
+                                asyncio.create_task(self.execute_manual_warmup(pids, mode))
                             elif mtype == "SCHEDULER_UPDATE":
                                 cfg = data.get("data", {})
                                 old_active = self.scheduler.active_flag
@@ -262,6 +321,7 @@ class AgentWorker:
                                     await self.log("⚙️ Dashboard sincronizado.")
                             elif mtype == "STOP":
                                 self.is_running = False
+                                await self.log("🛑 Comando de parada recebido. Encerrando fila...")
                         except Exception as e:
                             self.log_to_file(f"Erro ao processar mensagem: {e}")
             except Exception as e:

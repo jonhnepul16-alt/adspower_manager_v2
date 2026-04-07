@@ -4,6 +4,7 @@ import sys
 import time
 import random
 import datetime
+from typing import Callable
 
 # ── GLOBAL CLOUD BRIDGE (v4.0 Hybrid) ──────────────────────────────────
 _original_print = print
@@ -190,7 +191,9 @@ def extrair_driver(controller):
 
 def human_type(element, texto: str, delay_min=0.05, delay_max=0.22):
     """Digita letra por letra com pausas aleatórias (anti-ban)."""
-    for char in texto:
+    # Filtra caracteres fora do range BMP (Chrome/Selenium limit)
+    safe_text = "".join(c for c in texto if ord(c) <= 0xFFFF)
+    for char in safe_text:
         element.send_keys(char)
         time.sleep(random.uniform(delay_min, delay_max))
 
@@ -1838,7 +1841,7 @@ def task_acoes_incompletas(driver, wait, resultados: dict, **_):
 # ═══════════════════════════════════════════════════════════════
 
 def facebook_warmup_por_tempo(
-    controller, duracao_original: int, nome_modo: str
+    controller, duracao_original: int, nome_modo: str, stop_check: Callable[[], bool] = None
 ):
     """
     Orquestra todas as tarefas em ciclos embaralhados até o tempo esgotar.
@@ -1934,6 +1937,9 @@ def facebook_warmup_por_tempo(
 
         # ── CICLO PRINCIPAL ───────────────────────────────────
         while True:
+            if stop_check and stop_check():
+                print("\n🛑 Interrupção detectada pelo Agente.")
+                break
             elapsed = time.time() - inicio
             if elapsed >= duracao_segundos:
                 break
@@ -1943,6 +1949,7 @@ def facebook_warmup_por_tempo(
             resultados["ciclos"] += 1
 
             for tarefa in tarefas_ciclicas:
+                if stop_check and stop_check(): break
                 elapsed = time.time() - inicio
                 if elapsed >= duracao_segundos:
                     break

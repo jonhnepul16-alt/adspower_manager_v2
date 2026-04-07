@@ -149,6 +149,12 @@ async def update_scheduler(machine_id: str, config: Dict[str, Any]):
 async def agent_tunnel(websocket: WebSocket, machine_id: str):
     await manager.connect(machine_id, websocket)
     state = get_state(machine_id)
+    
+    # Sincroniza configuração inicial assim que o agente conecta
+    await manager.send_command(machine_id, {
+        "type": "SCHEDULER_UPDATE",
+        "data": state.scheduler_config
+    })
     try:
         while True:
             data = await websocket.receive_json()
