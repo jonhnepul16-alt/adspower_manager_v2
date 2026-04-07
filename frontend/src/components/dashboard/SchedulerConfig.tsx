@@ -30,8 +30,8 @@ const SchedulerConfig = ({ config, status, onUpdate }: Props) => {
                 <Clock className="w-4 h-4" />
              </div>
              <div>
-                <h4 className={`text-[11px] font-bold ${enabled ? 'text-foreground' : 'text-foreground/70'}`}>Time Window</h4>
-                <p className="text-[10px] text-muted-foreground/60 leading-tight">09:00 - 18:00<br/>(UTC)</p>
+                <h4 className={`text-[11px] font-bold ${enabled ? 'text-foreground' : 'text-foreground/70'}`}>Horário Comercial</h4>
+                <p className="text-[10px] text-muted-foreground/60 leading-tight">09:00 - 18:00<br/>(BRT)</p>
              </div>
           </div>
           <button 
@@ -52,8 +52,8 @@ const SchedulerConfig = ({ config, status, onUpdate }: Props) => {
                 <Key className="w-4 h-4" />
              </div>
              <div>
-                <h4 className={`text-[11px] font-bold ${weekendMode ? 'text-foreground' : 'text-foreground/70'}`}>Weekend Mode</h4>
-                <p className="text-[10px] text-muted-foreground/60 leading-tight">Reduced<br/>frequency</p>
+                <h4 className={`text-[11px] font-bold ${weekendMode ? 'text-foreground' : 'text-foreground/70'}`}>Final de Semana</h4>
+                <p className="text-[10px] text-muted-foreground/60 leading-tight">Frequência<br/>reduzida</p>
              </div>
           </div>
           <button 

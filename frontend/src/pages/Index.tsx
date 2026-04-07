@@ -122,14 +122,14 @@ const Index = () => {
             <div className="flex items-center gap-2 mb-3">
               <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground'}`} />
               <span className={`text-[10px] font-bold tracking-widest uppercase ${isActive ? 'text-emerald-500' : 'text-muted-foreground'}`}>
-                {isActive ? 'ENGINE LIVE' : 'ENGINE STANDBY'}
+                {isActive ? 'MOTOR ATIVO' : 'MOTOR EM ESPERA'}
               </span>
             </div>
             <h1 className="font-display text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-none mb-3">
-              Facebook Profile Warmup <br/>Engine
+              Motor de Aquecimento <br/>de Perfis
             </h1>
             <p className="text-sm text-foreground/60 font-medium">
-              Intelligent automated activity simulation for elite profile health management.
+              Simulação de atividades automatizadas inteligentes para perfis de elite.
             </p>
           </div>
           
@@ -148,7 +148,7 @@ const Index = () => {
               `}
             >
               {!isActive && <Zap className="w-4 h-4" />}
-              {isActive ? "STOP ENGINE" : "INITIALIZE ENGINE"}
+              {isActive ? "DESLIGAR MOTOR" : "INICIALIZAR MOTOR"}
             </motion.button>
           </div>
         </div>
@@ -160,20 +160,20 @@ const Index = () => {
                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <Users className="w-5 h-5 text-primary" />
                  </div>
-                 <span className="text-[9px] font-bold tracking-widest text-muted-foreground bg-card px-2 py-1 border border-border/50 rounded-full uppercase">Global Status</span>
+                 <span className="text-[9px] font-bold tracking-widest text-muted-foreground bg-card px-2 py-1 border border-border/50 rounded-full uppercase">Status Global</span>
               </div>
               <div>
                  <h3 className="font-display text-5xl font-bold tracking-tight text-foreground mb-1">{totalProfilesCount.toLocaleString()}</h3>
-                 <p className="text-sm text-foreground/60 mb-6">Total Active Profiles</p>
+                 <p className="text-sm text-foreground/60 mb-6">Total de Perfis Ativos</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                  <div className="bg-card border border-border/40 rounded-xl p-3">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Health</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Saúde</p>
                     <p className="font-mono text-emerald-500 font-bold text-sm">98.2%</p>
                  </div>
                  <div className="bg-card border border-border/40 rounded-xl p-3">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Activity</p>
-                    <p className="font-mono text-primary font-bold text-sm">High</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Atividade</p>
+                    <p className="font-mono text-primary font-bold text-sm">Alta</p>
                  </div>
               </div>
            </div>
@@ -185,7 +185,7 @@ const Index = () => {
               </div>
               <div className="mt-auto">
                  <h3 className="font-display text-4xl font-bold tracking-tight text-foreground mb-1">{(totalLikes/1000).toFixed(1)}K</h3>
-                 <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest">Reactions</p>
+                 <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest">Reações</p>
               </div>
            </div>
 
@@ -196,7 +196,7 @@ const Index = () => {
               </div>
               <div className="mt-auto">
                  <h3 className="font-display text-4xl font-bold tracking-tight text-foreground mb-1">{(totalComments/1000).toFixed(1)}K</h3>
-                 <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest">Comments</p>
+                 <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest">Comentários</p>
               </div>
            </div>
         </div>
@@ -210,10 +210,10 @@ const Index = () => {
           <GlassCard delay={0.1} className="flex-none p-6">
             <div className="flex justify-between items-center mb-6">
                <h2 className="font-display font-bold text-lg tracking-tight text-foreground">
-                 Warmup Strategy Control
+                 Estratégias de Aquecimento
                </h2>
                <button className="text-[10px] font-bold text-primary uppercase tracking-widest hover:text-primary/80 transition-colors">
-                  View All Presets
+                  Ver Perfis Ativos
                </button>
             </div>
             <StrategySelector value={selectedMode} onChange={setSelectedMode} />
@@ -224,19 +224,19 @@ const Index = () => {
                <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
                <div className="z-10 flex flex-col items-center gap-2 transform transition-transform group-hover:scale-105">
                   <Play className="w-6 h-6 text-primary" />
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Real-time Feed Active</span>
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Feed em Tempo Real</span>
                </div>
             </div>
           </GlassCard>
 
           <GlassCard delay={0.2} className="flex-1 p-6">
             <h2 className="font-display font-bold text-lg tracking-tight text-foreground mb-4">
-               Direct Profile Injection (IDs)
+               Injeção Direta (IDs)
             </h2>
             <textarea
               value={profiles}
               onChange={(e) => setProfiles(e.target.value)}
-              placeholder="Ex: 1000123456...&#10;Paste target IDs here"
+              placeholder="Ex: 1000123456...&#10;Cole os IDs dos alvos aqui"
               rows={4}
               className="w-full bg-card border border-border/50 rounded-xl px-4 py-3 text-sm font-mono text-foreground placeholder:text-muted-foreground/30 resize-none focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all custom-scrollbar"
             />
@@ -248,7 +248,7 @@ const Index = () => {
         <div className="lg:col-span-1 flex flex-col gap-5">
           <div className="glass p-6">
             <h2 className="font-display font-bold text-lg tracking-tight text-foreground mb-6">
-               Smart Scheduling
+               Agendamento
             </h2>
             <SchedulerConfig 
               config={schedulerConfig}
@@ -256,13 +256,13 @@ const Index = () => {
               onUpdate={handleUpdateScheduler}
             />
             <button className="mt-6 w-full py-4 border border-border/50 rounded-2xl border-dashed text-xs font-bold text-muted-foreground tracking-widest uppercase hover:border-primary/50 hover:text-primary transition-colors flex items-center justify-center gap-2">
-               <span className="text-lg leading-none">+</span> Add Custom Rule
+               <span className="text-lg leading-none">+</span> Adicionar Regra
             </button>
           </div>
 
           <GlassCard delay={0.3} className="flex-1 flex flex-col p-6 min-h-[300px]">
             <h2 className="font-display font-bold text-lg tracking-tight text-foreground mb-4">
-               Output Logs
+               Logs de Automação
             </h2>
             <LogTerminal isActive={isActive} liveLogs={logs} />
           </GlassCard>

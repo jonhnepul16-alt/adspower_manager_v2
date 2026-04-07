@@ -12,8 +12,8 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
 
   const navLinks = [
     { label: "DASHBOARD", active: true },
-    { label: "PROFILES", active: false },
-    { label: "STRATEGY", active: false },
+    { label: "PERFIS", active: false },
+    { label: "ESTRATÉGIA", active: false },
     { label: "LOGS", active: false },
   ];
 

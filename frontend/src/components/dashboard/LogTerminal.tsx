@@ -26,7 +26,7 @@ const LogTerminal = ({ isActive, liveLogs }: LogTerminalProps) => {
         {liveLogs.length === 0 ? (
           <div className="flex flex-col items-center gap-2 text-muted-foreground/30 h-full justify-center">
             <Terminal className="w-5 h-5" />
-            <span className="uppercase tracking-widest text-[9px] font-bold">Awaiting system initialization...</span>
+            <span className="uppercase tracking-widest text-[9px] font-bold">Aguardando inicialização do sistema...</span>
           </div>
         ) : (
           <AnimatePresence initial={false}>

@@ -10,14 +10,14 @@ const StrategySelector = ({ value, onChange }: Props) => {
   const modes = [
     {
       id: "1",
-      name: "Organic Growth",
-      desc: "Recommended for new accounts",
+      name: "Crescimento Orgânico",
+      desc: "Recomendado para perfis novos",
       icon: Target,
     },
     {
       id: "2",
-      name: "Aggressive Scaling",
-      desc: "High-volume established profiles",
+      name: "Engajamento Agressivo",
+      desc: "Perfis farmados em alto volume",
       icon: Zap,
     },
   ];

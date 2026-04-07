@@ -6,11 +6,11 @@ const Sidebar = () => {
   const [activeItem, setActiveItem] = useState("COMMAND");
 
   const menuItems = [
-    { id: "COMMAND", label: "COMMAND", icon: Target },
-    { id: "OPERATIONS", label: "OPERATIONS", icon: Shield },
-    { id: "LOGISTICS", label: "LOGISTICS", icon: Shield }, // using generic shield temporarily
-    { id: "INTELLIGENCE", label: "INTELLIGENCE", icon: Shield },
-    { id: "ARCHIVE", label: "ARCHIVE", icon: Shield },
+    { id: "COMMAND", label: "COMANDOS", icon: Target },
+    { id: "OPERATIONS", label: "OPERAÇÕES", icon: Shield },
+    { id: "LOGISTICS", label: "LOGÍSTICA", icon: Shield },
+    { id: "INTELLIGENCE", label: "INTELIGÊNCIA", icon: Shield },
+    { id: "ARCHIVE", label: "ARQUIVO", icon: Shield },
   ];
 
   return (
@@ -20,8 +20,8 @@ const Sidebar = () => {
       </div>
 
       <div className="mb-4 px-4">
-        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1 opacity-60">COMMAND CENTER</p>
-        <p className="text-sm font-semibold text-foreground">Active Session</p>
+        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1 opacity-60">CENTRAL DE COMANDO</p>
+        <p className="text-sm font-semibold text-foreground">Sessão Ativa</p>
       </div>
 
       <nav className="flex-1 space-y-2 mt-4">
@@ -44,11 +44,11 @@ const Sidebar = () => {
       <div className="mt-auto space-y-2 pt-8 border-t border-border/10">
         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-muted-foreground hover:bg-card hover:text-foreground transition-all duration-300">
           <HelpCircle className="w-[18px] h-[18px] text-muted-foreground/70" />
-          <span className="text-xs uppercase tracking-widest font-medium">HELP</span>
+          <span className="text-xs uppercase tracking-widest font-medium">AJUDA</span>
         </button>
         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-muted-foreground hover:bg-card hover:text-foreground transition-all duration-300">
           <LogOut className="w-[18px] h-[18px] text-muted-foreground/70" />
-          <span className="text-xs uppercase tracking-widest font-medium">LOGOUT</span>
+          <span className="text-xs uppercase tracking-widest font-medium">SAIR</span>
         </button>
       </div>
     </div>
