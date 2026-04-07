@@ -42,7 +42,18 @@ const SchedulerConfig = ({ config, status, onUpdate }: Props) => {
 
   const pushUpdate = (newRules: Rule[]) => {
     setRules(newRules);
-    onUpdate({ ...config, rules: newRules });
+    
+    // Convert rules array to 'windows' dictionary to perfectly match the Python agent's (gui_agent.py) expected format
+    const windowsObj: Record<string, any> = {};
+    newRules.forEach((rule, index) => {
+       windowsObj[rule.id || String(index)] = {
+          enabled: rule.enabled,
+          start: rule.start,
+          end: rule.end
+       };
+    });
+
+    onUpdate({ ...config, rules: newRules, windows: windowsObj });
   };
 
   const handleToggleRule = (id: string) => {
