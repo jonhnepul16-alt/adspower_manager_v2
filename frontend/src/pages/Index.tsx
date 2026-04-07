@@ -168,12 +168,12 @@ const Index = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                  <div className="bg-card border border-border/40 rounded-xl p-3">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Saúde</p>
-                    <p className="font-mono text-emerald-500 font-bold text-sm">98.2%</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Amigos & Grupos</p>
+                    <p className="font-mono text-emerald-500 font-bold text-sm">+{totalGroupsFriends}</p>
                  </div>
                  <div className="bg-card border border-border/40 rounded-xl p-3">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Atividade</p>
-                    <p className="font-mono text-primary font-bold text-sm">Alta</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Reels Vistos</p>
+                    <p className="font-mono text-primary font-bold text-sm">{totalReels}</p>
                  </div>
               </div>
            </div>
