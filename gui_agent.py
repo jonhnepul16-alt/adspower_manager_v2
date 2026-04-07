@@ -131,15 +131,16 @@ if not os.path.exists(CONFIG_PATH) and os.path.exists(os.path.join(app_path, "cl
     LOGS_PATH = os.path.join(app_path, "cliente", "logs")
     CONFIG_PATH = os.path.join(app_path, "cliente", "config.json")
 
-def get_simple_id():
-    import platform
+def get_machine_id():
     import hashlib
-    # Nome do PC + um sufixo curto do hardware para segurança básica
-    name = platform.node()
-    return f"{name}".strip().replace(" ", "_")
+    import platform
+    import uuid
+    # Combinar o nome do PC e o UUID da rede para um ID único
+    unique_str = platform.node() + str(uuid.getnode())
+    return hashlib.sha1(unique_str.encode()).hexdigest()
 
 DEFAULT_SERVER = "wss://web-production-373eb.up.railway.app/ws/agent"
-MACHINE_ID = get_simple_id()
+MACHINE_ID = get_machine_id()
 
 if os.path.exists(CONFIG_PATH):
     try:
