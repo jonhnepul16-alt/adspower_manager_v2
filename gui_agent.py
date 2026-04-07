@@ -131,14 +131,22 @@ if not os.path.exists(CONFIG_PATH) and os.path.exists(os.path.join(app_path, "cl
     LOGS_PATH = os.path.join(app_path, "cliente", "logs")
     CONFIG_PATH = os.path.join(app_path, "cliente", "config.json")
 
+def get_simple_id():
+    import platform
+    import hashlib
+    # Nome do PC + um sufixo curto do hardware para segurança básica
+    name = platform.node()
+    return f"{name}".strip().replace(" ", "_")
+
 DEFAULT_SERVER = "wss://web-production-373eb.up.railway.app/ws/agent"
-MACHINE_ID = "default"
+MACHINE_ID = get_simple_id()
 
 if os.path.exists(CONFIG_PATH):
     try:
         with open(CONFIG_PATH, 'r') as f:
             c = json.load(f)
-            MACHINE_ID = c.get("machine_id", "default")
+            # Se já existir um ID salvo, usa ele, senão usa o padrão do PC
+            MACHINE_ID = c.get("machine_id", MACHINE_ID)
     except: pass
 
 # ═══════════════════════════════════════════════════════════════
@@ -345,10 +353,11 @@ class GUIApp:
         self.root = root
         self.worker = worker
         self.root.title("Vexel Contigência PRO")
-        self.root.geometry("400x250")
+        self.root.geometry("500x300")
         self.root.configure(bg="#0f172a")
         
-        tk.Label(root, text="VEXEL CONTIGÊNCIA", fg="#38bdf8", bg="#0f172a", font=("Segoe UI", 16, "bold")).pack(pady=(30, 10))
+        tk.Label(root, text="VEXEL CONTIGÊNCIA", fg="#38bdf8", bg="#0f172a", font=("Segoe UI", 16, "bold")).pack(pady=(20, 5))
+        tk.Label(root, text="ID DA SUA MÁQUINA:", fg="#94a3b8", bg="#0f172a", font=("Segoe UI", 8, "bold")).pack()
         self.sf = tk.Frame(root, bg="#1e293b", padx=20, pady=10)
         self.sf.pack(pady=10)
         self.dot = tk.Label(self.sf, text="●", fg="#ef4444", bg="#1e293b", font=("Segoe UI", 14))
@@ -357,7 +366,8 @@ class GUIApp:
         self.txt.pack(side="left")
         
         self.kv = tk.StringVar(value=worker.machine_id)
-        tk.Entry(root, textvariable=self.kv, font=("Consolas", 9), width=45, justify="center").pack(pady=5, ipady=3)
+        self.entry = tk.Entry(root, textvariable=self.kv, font=("Consolas", 11, "bold"), width=40, justify="center", bg="#1e293b", fg="#f8fafc", insertbackground="white", bd=0)
+        self.entry.pack(pady=10, ipady=8)
         
         btn_frame = tk.Frame(root, bg="#0f172a")
         btn_frame.pack(pady=10)
