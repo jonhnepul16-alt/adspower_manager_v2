@@ -377,7 +377,7 @@ class GUIApp:
         
         # Botão para abrir o site novo
         import webbrowser
-        tk.Button(root, text="ABRIR O SITE", command=lambda: webbrowser.open("https://fascinating-crumble-8c15d8.netlify.app/"), fg="white", bg="#10b981", font=("Segoe UI", 9, "bold", "underline"), bd=0, cursor="hand2", activebackground="#059669").pack(pady=(5,0))
+        tk.Button(root, text="ABRIR O SITE", command=lambda: webbrowser.open("https://statuesque-kringle-df0a32.netlify.app/"), fg="white", bg="#10b981", font=("Segoe UI", 9, "bold", "underline"), bd=0, cursor="hand2", activebackground="#059669").pack(pady=(5,0))
         
         self.up()
 
