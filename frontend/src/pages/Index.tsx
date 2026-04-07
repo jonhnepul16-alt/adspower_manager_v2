@@ -255,9 +255,6 @@ const Index = () => {
               status={schedulerStatus}
               onUpdate={handleUpdateScheduler}
             />
-            <button className="mt-6 w-full py-4 border border-border/50 rounded-2xl border-dashed text-xs font-bold text-muted-foreground tracking-widest uppercase hover:border-primary/50 hover:text-primary transition-colors flex items-center justify-center gap-2">
-               <span className="text-lg leading-none">+</span> Adicionar Regra
-            </button>
           </div>
 
           <GlassCard delay={0.3} className="flex-1 flex flex-col p-6 min-h-[300px]">
