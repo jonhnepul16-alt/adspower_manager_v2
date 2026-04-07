@@ -12,7 +12,9 @@ const Sidebar = () => {
   return (
     <div className="w-64 h-screen bg-[#0F0F10] border-r border-border/10 flex flex-col pt-8 pb-6 px-4 sticky top-0">
       <div className="mb-12 px-4">
-        <h1 className="font-display text-2xl font-black text-primary tracking-tight">Vexel</h1>
+        <h1 className="font-display text-2xl font-black text-primary tracking-tight">
+           Vexel <span className="text-foreground">Pulse</span>
+        </h1>
       </div>
 
       <div className="mb-4 px-4">

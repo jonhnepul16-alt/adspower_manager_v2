@@ -353,11 +353,11 @@ class GUIApp:
     def __init__(self, root, worker):
         self.root = root
         self.worker = worker
-        self.root.title("Vexel Contigência PRO")
+        self.root.title("Vexel Pulse")
         self.root.geometry("500x300")
         self.root.configure(bg="#0f172a")
         
-        tk.Label(root, text="VEXEL CONTIGÊNCIA", fg="#38bdf8", bg="#0f172a", font=("Segoe UI", 16, "bold")).pack(pady=(20, 5))
+        tk.Label(root, text="VEXEL PULSE", fg="#38bdf8", bg="#0f172a", font=("Segoe UI", 16, "bold")).pack(pady=(20, 5))
         tk.Label(root, text="ID DA SUA MÁQUINA:", fg="#94a3b8", bg="#0f172a", font=("Segoe UI", 8, "bold")).pack()
         self.sf = tk.Frame(root, bg="#1e293b", padx=20, pady=10)
         self.sf.pack(pady=10)
