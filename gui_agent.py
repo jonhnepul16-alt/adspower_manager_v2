@@ -358,9 +358,18 @@ class GUIApp:
         
         self.kv = tk.StringVar(value=worker.machine_id)
         tk.Entry(root, textvariable=self.kv, font=("Consolas", 9), width=45, justify="center").pack(pady=5, ipady=3)
-        tk.Button(root, text="SALVAR E CONECTAR", command=self.save, fg="white", bg="#0ea5e9", font=("Segoe UI", 9, "bold"), padx=20, pady=5, relief="flat", cursor="hand2").pack(pady=10)
+        
+        btn_frame = tk.Frame(root, bg="#0f172a")
+        btn_frame.pack(pady=10)
+        tk.Button(btn_frame, text="SALVAR E CONECTAR", command=self.save, fg="white", bg="#0ea5e9", font=("Segoe UI", 9, "bold"), padx=10, pady=5, relief="flat", cursor="hand2").pack(side="left", padx=5)
+        tk.Button(btn_frame, text="COPIAR ID", command=self.copy_id, fg="white", bg="#475569", font=("Segoe UI", 9, "bold"), padx=10, pady=5, relief="flat", cursor="hand2").pack(side="left", padx=5)
         
         self.up()
+
+    def copy_id(self):
+        self.root.clipboard_clear()
+        self.root.clipboard_append(self.kv.get().strip())
+        messagebox.showinfo("Copiado", "ID da Máquina copiado para a área de transferência!")
 
     def save(self):
         k = self.kv.get().strip()

@@ -41,7 +41,7 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
             value={apiKey} 
             onChange={(e) => onApiKeyChange(e.target.value)}
             placeholder="Chave de Acesso..."
-            className="bg-transparent border-none outline-none text-xs font-mono text-foreground w-36 placeholder:text-muted-foreground/50"
+            className="bg-transparent border-none outline-none text-[10px] font-mono text-foreground w-64 placeholder:text-muted-foreground/50"
           />
         </div>
 
