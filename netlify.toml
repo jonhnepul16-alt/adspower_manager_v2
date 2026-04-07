@@ -1,4 +1,6 @@
 [build]
+  # Configura a pasta do frontend como diretório principal para o Netlify
+  base = "frontend"
   # Comando para instalar e gerar o site
   command = "npm run build"
   # Pasta que o Netlify deve servir (onde o Vite coloca o código pronto)
