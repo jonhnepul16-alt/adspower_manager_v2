@@ -1,4 +1,4 @@
-import { Shield, KeyRound } from "lucide-react";
+import { Bell, Settings, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface HeaderBarProps {
@@ -10,79 +10,47 @@ interface HeaderBarProps {
 
 const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange }: HeaderBarProps) => {
 
+  const navLinks = [
+    { label: "DASHBOARD", active: true },
+    { label: "PROFILES", active: false },
+    { label: "STRATEGY", active: false },
+    { label: "LOGS", active: false },
+  ];
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      className="flex items-center justify-between w-full pb-8 pt-2"
     >
-      <div className="flex items-center gap-4">
-        <div className="relative p-3 rounded-2xl bg-primary/10 border border-primary/20">
-          <Shield className="w-7 h-7 text-primary" />
-          <div className="absolute inset-0 rounded-2xl bg-primary/10 breathe -z-10" />
-        </div>
-        <div>
-          <h1 className="font-display text-xl font-bold tracking-tight text-foreground">
-            Vexel Contigência
-          </h1>
-          <p className="text-xs text-muted-foreground font-body">
-            Facebook Profile Warmup Engine
-          </p>
-        </div>
+      <div className="flex bg-card/40 rounded-full border border-border/40 p-1.5 px-6 gap-8">
+        {navLinks.map((link) => (
+           <button key={link.label} className={`text-[10px] font-bold tracking-widest uppercase transition-colors ${link.active ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+             {link.label}
+           </button>
+        ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        {/* API Key Input */}
-        <div className="flex items-center gap-2 bg-muted/20 border border-border/40 rounded-full px-3 py-1.5 focus-within:border-primary/50 transition-colors">
-          <KeyRound className="w-4 h-4 text-muted-foreground" />
+      <div className="flex items-center gap-4">
+        {/* Connection status hidden in desktop, using a cleaner API input here */}
+        <div className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 focus-within:border-primary/50 transition-colors">
           <input 
-            type="text" 
-            value={apiKey} 
-            onChange={(e) => onApiKeyChange(e.target.value)}
-            placeholder="Chave de Acesso..."
-            className="bg-transparent border-none outline-none text-[10px] font-mono text-foreground w-64 placeholder:text-muted-foreground/50"
+             type="password" 
+             value={apiKey} 
+             onChange={(e) => onApiKeyChange(e.target.value)}
+             placeholder="Machine ID..."
+             className="bg-transparent border-none outline-none text-[10px] font-mono text-muted-foreground w-24 placeholder:text-muted-foreground/30 focus:text-foreground transition-all focus:w-48"
           />
+           <div className={`w-2 h-2 rounded-full ${isAgentConnected ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-destructive/50"}`} title={isAgentConnected ? "Agent Online" : "Agent Offline"} />
         </div>
 
-        {/* Agent Connection Status */}
-        <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border transition-all duration-500 ${
-          isAgentConnected
-            ? "border-primary/30 bg-primary/5 text-primary"
-            : "border-destructive/20 bg-destructive/5 text-destructive/60"
-        }`}>
-          <div className="relative flex h-1.5 w-1.5">
-            {isAgentConnected && (
-               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-40" />
-            )}
-            <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${
-              isAgentConnected ? "bg-primary" : "bg-destructive/40"
-            }`} />
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <button className="p-2 hover:bg-card rounded-full transition-colors"><Bell className="w-4 h-4" /></button>
+          <button className="p-2 hover:bg-card rounded-full transition-colors"><Settings className="w-4 h-4" /></button>
+          <div className="w-8 h-8 rounded-full bg-border overflow-hidden border border-border/50 ml-2">
+            <User className="w-full h-full p-1.5 text-muted-foreground/50 bg-card" />
           </div>
-          <span className="text-[10px] font-display font-bold uppercase tracking-widest">
-            {isAgentConnected ? "Cloud Link Active" : "Local Agent Offline"}
-          </span>
-        </div>
-
-        {/* Operation Status */}
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border ${
-          isActive
-            ? "border-emerald-500/30 bg-emerald-500/10"
-            : "border-border bg-muted/30"
-        }`}>
-          <span className={`relative flex h-2.5 w-2.5`}>
-            {isActive && (
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            )}
-            <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-              isActive ? "bg-emerald-400" : "bg-muted-foreground/40"
-            }`} />
-          </span>
-          <span className={`text-xs font-body font-medium ${
-            isActive ? "text-emerald-400" : "text-muted-foreground"
-          }`}>
-            {isActive ? "Active" : "Idle"}
-          </span>
         </div>
       </div>
     </motion.header>

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { Users, Heart, Play, MessageSquare } from "lucide-react";
+import { Users, Heart, Play, MessageSquare, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import HeaderBar from "@/components/dashboard/HeaderBar";
-import StatCard from "@/components/dashboard/StatCard";
 import GlassCard from "@/components/dashboard/GlassCard";
 import StrategySelector from "@/components/dashboard/StrategySelector";
-import EngineCore from "@/components/dashboard/EngineCore";
 import LogTerminal from "@/components/dashboard/LogTerminal";
 import SchedulerConfig from "@/components/dashboard/SchedulerConfig";
+import Sidebar from "@/components/dashboard/Sidebar";
 import { fetchStatus, startWarmup, stopWarmup, updateScheduler } from "@/lib/api";
 import { toast } from "sonner";
+
 
 type ProfileResult = {
   ok: boolean;
@@ -105,8 +105,10 @@ const Index = () => {
   const totalProfilesCount = profiles.split("\n").filter(Boolean).length;
 
   return (
-    <div className="min-h-screen p-4 md:p-6 lg:p-8 flex flex-col gap-6">
-      <div className="max-w-[1400px] mx-auto space-y-8">
+    <div className="min-h-screen flex bg-background">
+      <Sidebar />
+      <div className="flex-1 flex flex-col p-6 lg:px-12 max-w-[1600px] overflow-y-auto">
+        
         <HeaderBar
           isActive={isActive}
           isAgentConnected={isAgentConnected}
@@ -114,100 +116,158 @@ const Index = () => {
           onApiKeyChange={setApiKey}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <StatCard icon={Users} label="Perfis" value={totalProfilesCount.toString()} delay={0.1} />
-          <StatCard icon={Heart} label="Likes/Reações" value={totalLikes.toString()} delay={0.15} />
-          <StatCard icon={MessageSquare} label="Comentários" value={totalComments.toString()} delay={0.2} />
-          <StatCard icon={Play} label="Reels" value={totalReels.toString()} delay={0.25} />
-          <StatCard icon={Users} label="Grupos/Amigos" value={totalGroupsFriends.toString()} delay={0.3} />
-          <StatCard icon={MessageSquare} label="Status" value={totalPosts.toString()} delay={0.35} />
+        {/* Hero Section */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mt-2 mb-8">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground'}`} />
+              <span className={`text-[10px] font-bold tracking-widest uppercase ${isActive ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                {isActive ? 'ENGINE LIVE' : 'ENGINE STANDBY'}
+              </span>
+            </div>
+            <h1 className="font-display text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-none mb-3">
+              Facebook Profile Warmup <br/>Engine
+            </h1>
+            <p className="text-sm text-foreground/60 font-medium">
+              Intelligent automated activity simulation for elite profile health management.
+            </p>
+          </div>
+          
+          <div className="mt-6 lg:mt-0 flex flex-col items-end gap-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={isActive ? handleStop : handleStart}
+              disabled={!profiles && !isActive}
+              className={`flex items-center justify-center gap-3 px-8 py-4 rounded-full font-display font-bold text-[11px] uppercase tracking-[0.2em] transition-all
+                  ${!profiles && !isActive ? 'opacity-50 cursor-not-allowed bg-muted text-muted-foreground' : ''}
+                  ${isActive 
+                    ? "bg-transparent border border-destructive/40 text-destructive hover:bg-destructive/10"
+                    : "bg-primary text-primary-foreground shadow-[0_0_30px_-5px_rgba(251,191,36,0.4)] hover:shadow-[0_0_40px_0px_rgba(251,191,36,0.6)]"
+                  }
+              `}
+            >
+              {!isActive && <Zap className="w-4 h-4" />}
+              {isActive ? "STOP ENGINE" : "INITIALIZE ENGINE"}
+            </motion.button>
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
-        <div className="lg:col-span-5 flex flex-col gap-4">
-          <GlassCard delay={0.3}>
-            <h2 className="font-display font-semibold text-sm text-foreground mb-3 uppercase tracking-widest text-[10px] opacity-60">
-               Direct Injection
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+           {/* Global Status Card */}
+           <div className="md:col-span-1 glass p-6 flex flex-col justify-between min-h-[220px]">
+              <div className="flex justify-between items-start mb-6">
+                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-primary" />
+                 </div>
+                 <span className="text-[9px] font-bold tracking-widest text-muted-foreground bg-card px-2 py-1 border border-border/50 rounded-full uppercase">Global Status</span>
+              </div>
+              <div>
+                 <h3 className="font-display text-5xl font-bold tracking-tight text-foreground mb-1">{totalProfilesCount.toLocaleString()}</h3>
+                 <p className="text-sm text-foreground/60 mb-6">Total Active Profiles</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                 <div className="bg-card border border-border/40 rounded-xl p-3">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Health</p>
+                    <p className="font-mono text-emerald-500 font-bold text-sm">98.2%</p>
+                 </div>
+                 <div className="bg-card border border-border/40 rounded-xl p-3">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Activity</p>
+                    <p className="font-mono text-primary font-bold text-sm">High</p>
+                 </div>
+              </div>
+           </div>
+
+           {/* Reactions Mini Card */}
+           <div className="glass p-6 flex flex-col justify-between min-h-[220px]">
+              <div className="w-10 h-10 flex items-center justify-center mb-6">
+                 <Heart className="w-6 h-6 text-primary" />
+              </div>
+              <div className="mt-auto">
+                 <h3 className="font-display text-4xl font-bold tracking-tight text-foreground mb-1">{(totalLikes/1000).toFixed(1)}K</h3>
+                 <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest">Reactions</p>
+              </div>
+           </div>
+
+           {/* Comments Mini Card */}
+           <div className="glass p-6 flex flex-col justify-between min-h-[220px]">
+              <div className="w-10 h-10 flex items-center justify-center mb-6">
+                 <MessageSquare className="w-6 h-6 text-primary" />
+              </div>
+              <div className="mt-auto">
+                 <h3 className="font-display text-4xl font-bold tracking-tight text-foreground mb-1">{(totalComments/1000).toFixed(1)}K</h3>
+                 <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest">Comments</p>
+              </div>
+           </div>
+        </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 flex-1">
+        
+        {/* Center/Left Column */}
+        <div className="lg:col-span-2 flex flex-col gap-5">
+           
+          {/* Strategy Control */}
+          <GlassCard delay={0.1} className="flex-none p-6">
+            <div className="flex justify-between items-center mb-6">
+               <h2 className="font-display font-bold text-lg tracking-tight text-foreground">
+                 Warmup Strategy Control
+               </h2>
+               <button className="text-[10px] font-bold text-primary uppercase tracking-widest hover:text-primary/80 transition-colors">
+                  View All Presets
+               </button>
+            </div>
+            <StrategySelector value={selectedMode} onChange={setSelectedMode} />
+            
+            {/* Fake Graph Area mimicking the mock */}
+            <div className="mt-6 h-40 bg-card rounded-2xl border border-border/30 relative overflow-hidden flex items-center justify-center group">
+               {/* Background grid lines */}
+               <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+               <div className="z-10 flex flex-col items-center gap-2 transform transition-transform group-hover:scale-105">
+                  <Play className="w-6 h-6 text-primary" />
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Real-time Feed Active</span>
+               </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard delay={0.2} className="flex-1 p-6">
+            <h2 className="font-display font-bold text-lg tracking-tight text-foreground mb-4">
+               Direct Profile Injection (IDs)
             </h2>
             <textarea
               value={profiles}
               onChange={(e) => setProfiles(e.target.value)}
-              placeholder="Ex: 1000123456...&#10;One ID per line"
-              rows={5}
-              className="w-full bg-muted/30 border border-border rounded-2xl px-6 py-4 text-sm font-mono text-foreground placeholder:text-muted-foreground/30 resize-none focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all custom-scrollbar"
+              placeholder="Ex: 1000123456...&#10;Paste target IDs here"
+              rows={4}
+              className="w-full bg-card border border-border/50 rounded-xl px-4 py-3 text-sm font-mono text-foreground placeholder:text-muted-foreground/30 resize-none focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all custom-scrollbar"
             />
-            <div className="flex items-center justify-between mt-3 px-1">
-               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">
-                  {totalProfilesCount} Targets Detected
-               </p>
-               <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
-            </div>
           </GlassCard>
 
-          <GlassCard delay={0.35}>
-            <h2 className="font-display font-semibold text-sm text-foreground mb-4 uppercase tracking-widest text-[10px] opacity-60">
-              Warmup Strategy Control
-            </h2>
-            <StrategySelector value={selectedMode} onChange={setSelectedMode} />
-          </GlassCard>
-
-          <GlassCard delay={0.4} hover={false}>
-            <div className="flex gap-4">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleStart}
-                disabled={isActive || !profiles}
-                className={`flex-1 py-4 rounded-2xl font-display font-bold text-xs uppercase tracking-[0.2em] transition-all shimmer ${
-                  isActive
-                    ? "bg-muted/50 text-muted-foreground cursor-not-allowed"
-                    : "bg-gradient-to-r from-primary to-accent text-primary-foreground glow-blue"
-                }`}
-              >
-                {isActive ? "Engine Engaged" : "Initialize Engine"}
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleStop}
-                disabled={!isActive}
-                className={`px-8 py-4 rounded-2xl font-display font-bold text-xs border transition-all ${
-                  !isActive
-                    ? "border-border text-muted-foreground/20 cursor-not-allowed"
-                    : "border-destructive/40 text-destructive hover:bg-destructive/10"
-                }`}
-              >
-                Stop
-              </motion.button>
-            </div>
-          </GlassCard>
-
-          <SchedulerConfig 
-            config={schedulerConfig}
-            status={schedulerStatus}
-            onUpdate={handleUpdateScheduler}
-          />
         </div>
 
-        <div className="lg:col-span-7 flex flex-col gap-4">
-          <GlassCard delay={0.3}>
-            <h2 className="font-display font-semibold text-sm text-foreground mb-1 uppercase tracking-widest text-[10px] opacity-60">
-               Core Monitor
+        {/* Right Column */}
+        <div className="lg:col-span-1 flex flex-col gap-5">
+          <div className="glass p-6">
+            <h2 className="font-display font-bold text-lg tracking-tight text-foreground mb-6">
+               Smart Scheduling
             </h2>
-            <EngineCore isActive={isActive} currentProfile={currentProfile} />
-          </GlassCard>
+            <SchedulerConfig 
+              config={schedulerConfig}
+              status={schedulerStatus}
+              onUpdate={handleUpdateScheduler}
+            />
+            <button className="mt-6 w-full py-4 border border-border/50 rounded-2xl border-dashed text-xs font-bold text-muted-foreground tracking-widest uppercase hover:border-primary/50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+               <span className="text-lg leading-none">+</span> Add Custom Rule
+            </button>
+          </div>
 
-          <GlassCard delay={0.35} className="flex-1 flex flex-col">
-            <div className="flex items-center justify-between mb-4 mt-2">
-               <h2 className="font-display font-semibold text-sm text-foreground uppercase tracking-widest text-[10px] opacity-60">
-                  Automation Output logs
-               </h2>
-               <div className="w-2 h-2 rounded-full bg-emerald-500/40 animate-pulse" />
-            </div>
+          <GlassCard delay={0.3} className="flex-1 flex flex-col p-6 min-h-[300px]">
+            <h2 className="font-display font-bold text-lg tracking-tight text-foreground mb-4">
+               Output Logs
+            </h2>
             <LogTerminal isActive={isActive} liveLogs={logs} />
           </GlassCard>
         </div>
+      </div>
       </div>
     </div>
   );

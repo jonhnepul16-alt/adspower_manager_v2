@@ -6,55 +6,51 @@
 
 @layer base {
   :root {
-    --background: 220 67% 2%;
-    --foreground: 210 40% 92%;
+    --background: 240 5% 6%;      /* #0F0F10 Very dark almost black */
+    --foreground: 210 40% 98%;
 
-    --card: 220 40% 6%;
-    --card-foreground: 210 40% 92%;
+    --card: 240 4% 10%;            /* #18181A */
+    --card-foreground: 210 40% 98%;
 
-    --popover: 220 40% 6%;
-    --popover-foreground: 210 40% 92%;
+    --popover: 240 4% 10%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 220 67% 2%;
+    --primary: 48 96% 53%;         /* #ffcc00 Vibrant Vexel Gold/Yellow */
+    --primary-foreground: 240 10% 4%;
 
-    --secondary: 265 60% 50%;
+    --secondary: 240 5% 16%;       /* #27272A */
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 220 30% 12%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 240 5% 16%;
+    --muted-foreground: 240 5% 65%;
 
-    --accent: 187 94% 43%;
-    --accent-foreground: 220 67% 2%;
+    --accent: 48 96% 53%;
+    --accent-foreground: 240 10% 4%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 220 30% 14%;
-    --input: 220 30% 12%;
-    --ring: 217 91% 60%;
+    --border: 240 5% 16%;
+    --input: 240 5% 16%;
+    --ring: 48 96% 53%;
 
-    --radius: 2.5rem;
+    --radius: 1.5rem;
 
-    --sidebar-background: 220 40% 4%;
-    --sidebar-foreground: 210 40% 92%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 30% 12%;
-    --sidebar-accent-foreground: 210 40% 92%;
-    --sidebar-border: 220 30% 14%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-background: 240 5% 6%;
+    --sidebar-foreground: 240 5% 65%;
+    --sidebar-primary: 48 96% 53%;
+    --sidebar-primary-foreground: 240 10% 4%;
+    --sidebar-accent: 240 5% 12%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 240 5% 16%;
+    --sidebar-ring: 48 96% 53%;
 
-    --glass-bg: 220 40% 8%;
-    --glass-border: 220 30% 16%;
-    --glass-highlight: 217 91% 60%;
+    --glass-bg: 240 4% 10%;
+    --glass-border: 240 5% 16%;
+    --glass-highlight: 48 96% 53%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(217, 91%, 60%), hsl(187, 94%, 43%));
-    --gradient-glow: linear-gradient(135deg, hsl(217, 91%, 60% / 0.3), hsl(187, 94%, 43% / 0.3));
-    --gradient-purple: linear-gradient(135deg, hsl(265, 60%, 50% / 0.15), hsl(217, 91%, 60% / 0.1));
-
-    --shadow-glow: 0 0 40px -10px hsl(217 91% 60% / 0.4);
-    --shadow-card: 0 8px 32px -8px hsl(220 67% 2% / 0.6);
+    --shadow-glow: 0 0 25px -5px hsl(48 96% 53% / 0.15);
+    --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.5);
   }
 }
 
@@ -64,11 +60,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-body antialiased;
-    background-image: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(217 91% 60% / 0.08), transparent),
-      radial-gradient(ellipse 60% 40% at 80% 80%, hsl(265 60% 50% / 0.06), transparent),
-      radial-gradient(ellipse 40% 30% at 10% 60%, hsl(187 94% 43% / 0.04), transparent);
+    @apply bg-background text-foreground font-body antialiased selection:bg-primary/30 selection:text-primary;
   }
 }
 
@@ -86,8 +78,8 @@
   }
 
   .glass {
-    @apply bg-card/60 backdrop-blur-xl border border-glass-border/50 rounded-[var(--radius)];
-    box-shadow: var(--shadow-card), inset 0 1px 0 0 hsl(var(--glass-border) / 0.3);
+    @apply bg-card border border-glass-border/40 rounded-[1.25rem];
+    box-shadow: var(--shadow-card);
   }
 
   .glass-hover {
@@ -95,41 +87,17 @@
   }
 
   .glass-hover:hover {
-    @apply -translate-y-1 scale-[1.02];
-    box-shadow: var(--shadow-glow), var(--shadow-card), inset 0 1px 0 0 hsl(var(--glass-border) / 0.4);
-    border-color: hsl(var(--glass-highlight) / 0.3);
+    @apply -translate-y-[2px];
+    box-shadow: var(--shadow-glow), var(--shadow-card);
+    border-color: hsl(var(--primary) / 0.3);
   }
 
-  .gradient-text {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .glow-yellow {
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.4);
   }
-
-  .gradient-border {
-    position: relative;
-  }
-
-  .gradient-border::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: var(--gradient-primary);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0.5;
-  }
-
-  .glow-blue {
-    box-shadow: 0 0 20px -5px hsl(217 91% 60% / 0.5), 0 0 60px -15px hsl(187 94% 43% / 0.3);
-  }
-
-  .glow-pulse {
-    animation: glow-pulse 2s ease-in-out infinite;
+  
+  .glow-yellow:hover {
+    box-shadow: 0 0 30px 0px hsl(var(--primary) / 0.6);
   }
 
   .shimmer {
@@ -144,55 +112,15 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      hsl(217 91% 60% / 0.1) 50%,
+      hsl(0 0% 100% / 0.1) 50%,
       transparent 100%
     );
-    animation: shimmer 3s ease-in-out infinite;
+    animation: shimmer 2s ease-in-out infinite;
   }
 
-  .ghost-pulse {
-    animation: ghost-pulse 4s ease-in-out infinite;
-  }
-
-  .breathe {
-    animation: breathe 3s ease-in-out infinite;
-  }
-
-  .spin-slow {
-    animation: spin 8s linear infinite;
-  }
-
-  .pulse-ring {
-    animation: pulse-ring 2s ease-out infinite;
-  }
-}
-
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px -5px hsl(217 91% 60% / 0.4); }
-  50% { box-shadow: 0 0 30px -5px hsl(217 91% 60% / 0.7), 0 0 60px -15px hsl(187 94% 43% / 0.4); }
 }
 
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   50%, 100% { transform: translateX(100%); }
-}
-
-@keyframes ghost-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
-}
-
-@keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.15); opacity: 1; }
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 0.8; }
-  100% { transform: scale(2); opacity: 0; }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
