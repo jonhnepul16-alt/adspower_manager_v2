@@ -118,8 +118,14 @@ const Index = () => {
 
         {/* Hero Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mt-2 mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
+          <div className="w-full relative flex flex-col items-center text-center">
+            {/* Logo Centralized Laser Effect */}
+            <div className="relative w-32 h-20 mb-8 bg-black mix-blend-screen overflow-hidden flex items-center justify-center">
+               <img src="/logo.png" alt="Vexel Pulse" className="absolute w-full h-full object-contain filter invert opacity-90 scale-125" />
+               <div className="absolute top-0 left-[-100%] w-[60%] h-full bg-gradient-to-r from-transparent via-amber-400 to-transparent mix-blend-multiply animate-laser skew-x-[-20deg]" />
+            </div>
+
+            <div className="flex items-center justify-center gap-2 mb-3">
               <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground'}`} />
               <span className={`text-[10px] font-bold tracking-widest uppercase ${isActive ? 'text-emerald-500' : 'text-muted-foreground'}`}>
                 {isActive ? 'MOTOR ATIVO' : 'MOTOR EM ESPERA'}
@@ -128,7 +134,7 @@ const Index = () => {
             <h1 className="font-display text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-none mb-3">
               Motor de Aquecimento <br/>de Perfis
             </h1>
-            <p className="text-sm text-foreground/60 font-medium">
+            <p className="text-sm text-foreground/60 font-medium max-w-md mx-auto">
               Simulação de atividades automatizadas inteligentes para perfis de elite.
             </p>
           </div>
