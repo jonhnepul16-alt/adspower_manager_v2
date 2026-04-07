@@ -17,6 +17,3 @@
   to = "/index.html"
   status = 200
 
-[context.production]
-  # Garante que no deploy de produção o cache seja otimizado
-  environment = { NODE_ENV = "production" }
