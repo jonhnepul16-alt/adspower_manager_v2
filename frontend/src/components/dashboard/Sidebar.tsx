@@ -7,10 +7,6 @@ const Sidebar = () => {
 
   const menuItems = [
     { id: "COMMAND", label: "COMANDOS", icon: Target },
-    { id: "OPERATIONS", label: "OPERAÇÕES", icon: Shield },
-    { id: "LOGISTICS", label: "LOGÍSTICA", icon: Shield },
-    { id: "INTELLIGENCE", label: "INTELIGÊNCIA", icon: Shield },
-    { id: "ARCHIVE", label: "ARQUIVO", icon: Shield },
   ];
 
   return (
