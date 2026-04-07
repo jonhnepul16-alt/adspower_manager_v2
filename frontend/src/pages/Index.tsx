@@ -119,10 +119,10 @@ const Index = () => {
         {/* Hero Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mt-2 mb-8">
           <div className="w-full relative flex flex-col items-center text-center">
-            {/* Logo Centralized Laser Effect */}
-            <div className="relative w-32 h-20 mb-8 bg-black mix-blend-screen overflow-hidden flex items-center justify-center">
-               <img src="/logo.png" alt="Vexel Pulse" className="absolute w-full h-full object-contain filter invert opacity-90 scale-125" />
-               <div className="absolute top-0 left-[-100%] w-[60%] h-full bg-gradient-to-r from-transparent via-amber-400 to-transparent mix-blend-multiply animate-laser skew-x-[-20deg]" />
+            {/* Logo Hover Laser Effect */}
+            <div className="group cursor-pointer relative w-20 h-16 mb-6 bg-black mix-blend-screen overflow-hidden flex items-center justify-center">
+               <img src="/logo.png" alt="Vexel Pulse" className="absolute w-full h-full object-contain filter invert opacity-70 group-hover:opacity-100 transition-opacity duration-700" />
+               <div className="absolute top-0 w-[120%] h-full bg-gradient-to-r from-transparent via-amber-400 to-transparent mix-blend-multiply skew-x-[-20deg] left-[-150%] group-hover:left-[200%] transition-[left] duration-700 ease-out" />
             </div>
 
             <div className="flex items-center justify-center gap-2 mb-3">
