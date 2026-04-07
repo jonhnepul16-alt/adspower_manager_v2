@@ -131,7 +131,7 @@ if not os.path.exists(CONFIG_PATH) and os.path.exists(os.path.join(app_path, "cl
     LOGS_PATH = os.path.join(app_path, "cliente", "logs")
     CONFIG_PATH = os.path.join(app_path, "cliente", "config.json")
 
-DEFAULT_SERVER = "wss://web-production-373eb.up.railway.app/ws/agent"
+DEFAULT_SERVER = "wss://certo134-production-db15.up.railway.app/ws/agent"
 MACHINE_ID = "default"
 
 if os.path.exists(CONFIG_PATH):

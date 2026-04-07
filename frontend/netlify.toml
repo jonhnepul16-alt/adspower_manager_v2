@@ -6,7 +6,7 @@
 
 [build.environment]
   # Configura a URL do seu backend no Railway para o Vite usar durante o build
-  VITE_API_URL = "https://web-production-373eb.up.railway.app"
+  VITE_API_URL = "https://certo134-production-db15.up.railway.app"
   NODE_VERSION = "20"
 
 [[redirects]]
