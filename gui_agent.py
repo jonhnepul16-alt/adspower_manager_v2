@@ -48,10 +48,10 @@ class SchedulerEngine:
         self.last_reset = datetime.datetime.now().date()
 
     def update_config(self, new_config):
-        was_active = self.active_flag
         self.config.update(new_config)
         self.active_flag = bool(self.config.get("active", False))
-        if self.active_flag and not was_active:
+        # Sempre forçar execução imediata na primeira vez que trocar config se ativo
+        if self.active_flag:
             self.force_immediate = True
         print(f"    [Scheduler] Atualizado. Ativo: {self.active_flag}")
 
@@ -165,6 +165,7 @@ class AgentWorker:
         self.scheduler = SchedulerEngine()
         self.target_profiles = []
         self.main_loop = None
+        self.scheduler_trigger = asyncio.Event()
         
         # Bridge automation logs to dashboard and file
         def bridge(msg):
@@ -302,7 +303,12 @@ class AgentWorker:
                 
             # Se tiver ativação pendente, checa mais rápido. Máximo 30s para o heartbeat.
             sleep_time = 5 if self.scheduler.force_immediate else 30
-            await asyncio.sleep(sleep_time)
+            try:
+                # Aguarda o próximo ciclo ou um sinal imediato
+                await asyncio.wait_for(self.scheduler_trigger.wait(), timeout=sleep_time)
+                self.scheduler_trigger.clear()
+            except asyncio.TimeoutError:
+                pass
 
     async def connect(self):
         self.main_loop = asyncio.get_event_loop()
@@ -327,13 +333,14 @@ class AgentWorker:
                                 asyncio.create_task(self.execute_manual_warmup(pids, mode))
                             elif mtype == "SCHEDULER_UPDATE":
                                 cfg = data.get("data", {})
-                                old_active = self.scheduler.active_flag
                                 self.target_profiles = cfg.get("profile_ids", self.target_profiles)
                                 self.scheduler.update_config(cfg)
-                                if self.scheduler.active_flag and not old_active:
-                                    await self.log(f"⏰ [SCHEDULER] Agendamento iniciado para {len(self.target_profiles)} perfis.")
+                                # Acorda o loop do scheduler IMEDIATAMENTE
+                                self.scheduler_trigger.set()
+                                if self.scheduler.active_flag:
+                                    await self.log(f"⏰ [SCHEDULER] Agendamento sincronizado e ATIVO.")
                                 else:
-                                    await self.log("⚙️ Dashboard sincronizado.")
+                                    await self.log("⚙️ Agendamento pausado pelo dashboard.")
                             elif mtype == "STOP":
                                 self.is_running = False
                                 await self.log("🛑 Comando de parada recebido. Encerrando fila...")
