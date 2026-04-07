@@ -131,7 +131,7 @@ if not os.path.exists(CONFIG_PATH) and os.path.exists(os.path.join(app_path, "cl
     LOGS_PATH = os.path.join(app_path, "cliente", "logs")
     CONFIG_PATH = os.path.join(app_path, "cliente", "config.json")
 
-DEFAULT_SERVER = "wss://certo134-production.up.railway.app/ws/agent"
+DEFAULT_SERVER = "wss://web-production-373eb.up.railway.app/ws/agent"
 MACHINE_ID = "default"
 
 if os.path.exists(CONFIG_PATH):
@@ -285,8 +285,14 @@ class AgentWorker:
             except Exception as e:
                 crash_report(f"Erro no scheduler_loop: {e}")
             
-            # Se tiver ativação pendente, checa mais rápido
-            sleep_time = 5 if self.scheduler.force_immediate else 60
+            # Envia Heartbeat para manter WebSocket vivo no Railway
+            if self.ws and getattr(self.ws, 'open', False):
+                try:
+                    await self.ws.send(json.dumps({"type": "HEARTBEAT", "machine_id": self.machine_id}))
+                except: pass
+                
+            # Se tiver ativação pendente, checa mais rápido. Máximo 30s para o heartbeat.
+            sleep_time = 5 if self.scheduler.force_immediate else 30
             await asyncio.sleep(sleep_time)
 
     async def connect(self):
@@ -327,7 +333,7 @@ class AgentWorker:
             except Exception as e:
                 self.is_connected = False
                 self.ws = None
-                self.log_to_file(f"Falha de conexão: {e}")
+                self.log_to_file(f"Conexão encerrada: {e}")
                 await asyncio.sleep(10)
 
 # ═══════════════════════════════════════════════════════════════

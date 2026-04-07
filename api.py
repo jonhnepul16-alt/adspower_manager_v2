@@ -183,6 +183,9 @@ async def agent_tunnel(websocket: WebSocket, machine_id: str):
             elif msg_type == "SCHEDULER_STATUS":
                 state.scheduler_status = data
 
+            elif msg_type == "HEARTBEAT":
+                pass
+
             elif msg_type == "FINISHED":
                 state.is_running = False
                 state.current_profile = None

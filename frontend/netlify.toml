@@ -1,0 +1,20 @@
+[build]
+  # Comando para instalar e gerar o site
+  command = "npm run build"
+  # Pasta que o Netlify deve servir (onde o Vite coloca o código pronto)
+  publish = "dist"
+
+[build.environment]
+  # Configura a URL do seu backend no Railway para o Vite usar durante o build
+  VITE_API_URL = "https://web-production-373eb.up.railway.app"
+  NODE_VERSION = "20"
+
+[[redirects]]
+  # Garante que as rotas do React (SPA) funcionem corretamente sem dar 404
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production]
+  # Garante que no deploy de produção o cache seja otimizado
+  environment = { NODE_ENV = "production" }
