@@ -375,6 +375,10 @@ class GUIApp:
         tk.Button(btn_frame, text="SALVAR E CONECTAR", command=self.save, fg="white", bg="#0ea5e9", font=("Segoe UI", 9, "bold"), padx=10, pady=5, relief="flat", cursor="hand2").pack(side="left", padx=5)
         tk.Button(btn_frame, text="COPIAR ID", command=self.copy_id, fg="white", bg="#475569", font=("Segoe UI", 9, "bold"), padx=10, pady=5, relief="flat", cursor="hand2").pack(side="left", padx=5)
         
+        # Botão para abrir o site novo
+        import webbrowser
+        tk.Button(root, text="ABRIR O SITE", command=lambda: webbrowser.open("https://fascinating-crumble-8c15d8.netlify.app/"), fg="white", bg="#10b981", font=("Segoe UI", 9, "bold", "underline"), bd=0, cursor="hand2", activebackground="#059669").pack(pady=(5,0))
+        
         self.up()
 
     def copy_id(self):
