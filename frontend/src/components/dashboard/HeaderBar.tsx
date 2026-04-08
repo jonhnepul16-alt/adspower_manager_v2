@@ -31,15 +31,21 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
 
       <div className="flex items-center gap-4">
         {/* Connection status hidden in desktop, using a cleaner API input here */}
-        <div className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-2 focus-within:border-primary/50 transition-colors">
+        <div className="flex items-center gap-3 bg-card/60 border border-border/60 rounded-full px-5 py-2.5 focus-within:border-primary/50 transition-all shadow-inner">
+          <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em] hidden sm:block">ID</span>
           <input 
-             type="password" 
+             type="text" 
              value={apiKey} 
-             onChange={(e) => onApiKeyChange(e.target.value)}
-             placeholder="Machine ID..."
-             className="bg-transparent border-none outline-none text-[10px] font-mono text-muted-foreground w-24 placeholder:text-muted-foreground/30 focus:text-foreground transition-all focus:w-48"
+             onChange={(e) => onApiKeyChange(e.target.value.trim())}
+             placeholder="Seu Machine ID..."
+             className="bg-transparent border-none outline-none text-[10px] font-mono text-foreground w-40 sm:w-64 placeholder:text-muted-foreground/30 focus:text-primary transition-all"
           />
-           <div className={`w-2 h-2 rounded-full ${isAgentConnected ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-destructive/50"}`} title={isAgentConnected ? "Agent Online" : "Agent Offline"} />
+          <div className="flex items-center gap-2 border-l border-border/40 pl-3">
+             <div className={`w-2 h-2 rounded-full ${isAgentConnected ? "bg-emerald-500 animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.8)]" : "bg-destructive/30"}`} title={isAgentConnected ? "Agente Online" : "Agente Offline"} />
+             <span className={`text-[8px] font-bold uppercase tracking-widest ${isAgentConnected ? "text-emerald-500" : "text-muted-foreground"}`}>
+               {isAgentConnected ? "Online" : "Offline"}
+             </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 text-muted-foreground">

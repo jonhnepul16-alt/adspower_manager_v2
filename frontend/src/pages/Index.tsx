@@ -66,7 +66,7 @@ const Index = () => {
     };
 
     check();
-    const interval = setInterval(check, 3000);
+    const interval = setInterval(check, 2000);
     return () => clearInterval(interval);
   }, [apiKey]);
 

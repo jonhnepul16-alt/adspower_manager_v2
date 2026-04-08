@@ -25,8 +25,11 @@ const LogTerminal = ({ isActive, liveLogs }: LogTerminalProps) => {
       >
         {liveLogs.length === 0 ? (
           <div className="flex flex-col items-center gap-2 text-muted-foreground/30 h-full justify-center">
-            <Terminal className="w-5 h-5" />
-            <span className="uppercase tracking-widest text-[9px] font-bold">Aguardando inicialização do sistema...</span>
+            <div className="p-3 rounded-full bg-card/50 border border-border/20 mb-2">
+              <Terminal className="w-5 h-5 text-primary/40" />
+            </div>
+            <span className="uppercase tracking-[0.2em] text-[9px] font-black text-primary/40 text-center">Sistema Sincronizado</span>
+            <span className="text-[8px] font-medium opacity-40 text-center">Aguardando telemetria da nuvem...</span>
           </div>
         ) : (
           <AnimatePresence initial={false}>
