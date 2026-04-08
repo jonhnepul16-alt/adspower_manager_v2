@@ -1,4 +1,4 @@
-import { Bell, Settings, User, X, Lock, Eye, EyeOff } from "lucide-react";
+import { Bell, LogOut, User, X, Lock, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -95,7 +95,7 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
               title="Sair da conta"
               className="p-2 hover:bg-card hover:text-destructive rounded-full transition-colors"
             >
-              <Settings className="w-4 h-4" />
+              <LogOut className="w-4 h-4" />
             </button>
             {/* Ícone de usuário = Alterar Senha */}
             <button
