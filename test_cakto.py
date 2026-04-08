@@ -5,7 +5,7 @@ payload = {
     "event": "payment.approved",
     "data": {
         "customer": {
-            "email": "contato.warmads@gmail.com"
+            "email": "jcmendes608@gmail.com"
         }
     }
 }
