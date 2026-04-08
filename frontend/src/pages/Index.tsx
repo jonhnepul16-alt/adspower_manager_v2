@@ -34,7 +34,15 @@ const Index = () => {
   const [schedulerStatus, setSchedulerStatus] = useState<any>(null);
   const [schedulerActive, setSchedulerActive] = useState(false);
   const [currentProfile, setCurrentProfile] = useState<string | null>(null);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem("vexel_api_key") || "default");
+  const [apiKey, setApiKey] = useState(() => {
+    // 1. Tenta pegar da URL (?id=... ou ?machine_id=...)
+    const params = new URLSearchParams(window.location.search);
+    const urlId = params.get("id") || params.get("machine_id");
+    if (urlId) return urlId;
+    
+    // 2. Fallback para o localStorage ou "default"
+    return localStorage.getItem("vexel_api_key") || "default";
+  });
 
   const safeResults = results ?? {};
 
