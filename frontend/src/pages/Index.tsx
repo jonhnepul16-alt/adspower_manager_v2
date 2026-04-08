@@ -25,6 +25,7 @@ type ProfileResult = {
 const Index = () => {
   const [isActive, setIsActive] = useState(false);
   const [isAgentConnected, setIsAgentConnected] = useState(false);
+  const [isCloudOnline, setIsCloudOnline] = useState(true);
   const [profiles, setProfiles] = useState("");
   const [selectedMode, setSelectedMode] = useState("1");
   const [logs, setLogs] = useState<string[]>([]);
@@ -46,7 +47,11 @@ const Index = () => {
     const check = async () => {
       try {
         const status = await fetchStatus(apiKey);
-        if (!status) return;
+        if (!status) {
+          setIsCloudOnline(false);
+          return;
+        }
+        setIsCloudOnline(true);
         setIsActive(status.is_running ?? false);
         setIsAgentConnected(status.agent_connected ?? false);
         // Logs: pull real messages from backend
@@ -146,11 +151,19 @@ const Index = () => {
                <div className="absolute top-0 w-[120%] h-full bg-gradient-to-r from-transparent via-amber-400 to-transparent mix-blend-multiply skew-x-[-20deg] left-[-150%] group-hover:left-[200%] transition-[left] duration-700 ease-out" />
             </div>
 
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground'}`} />
-              <span className={`text-[10px] font-bold tracking-widest uppercase ${isActive ? 'text-emerald-500' : 'text-muted-foreground'}`}>
-                {isActive ? 'MOTOR ATIVO' : 'MOTOR EM ESPERA'}
-              </span>
+            <div className="flex items-center justify-center gap-4 mb-3">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${isCloudOnline ? 'bg-emerald-500' : 'bg-red-500 animate-pulse'}`} />
+                <span className={`text-[10px] font-bold tracking-widest uppercase ${isCloudOnline ? 'text-emerald-500/70' : 'text-red-500'}`}>
+                  {isCloudOnline ? 'Servidor Cloud ON' : 'Servidor Cloud OFF'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground'}`} />
+                <span className={`text-[10px] font-bold tracking-widest uppercase ${isActive ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                  {isActive ? 'MOTOR ATIVO' : 'MOTOR EM ESPERA'}
+                </span>
+              </div>
             </div>
             <h1 className="font-display text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-none mb-3">
               Motor de Aquecimento <br/>de Perfis

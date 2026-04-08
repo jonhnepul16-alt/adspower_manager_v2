@@ -327,20 +327,21 @@ class AgentWorker:
             except asyncio.TimeoutError:
                 pass
 
-    async def connect(self):
-        self.main_loop = asyncio.get_event_loop()
-        print(f"✅ Conectado à Nuvem Vexel.")
-        print(f"🆔 Seu Machine ID: \033[93m{self.machine_id}\033[0m")
-        print(f"🔗 Link do Dashboard: \033[94mhttps://statuesque-kringle-df0a32.netlify.app/?id={self.machine_id}\033[0m")
-        print("─" * 50)
         while True:
             try:
                 self.server_url = f"{DEFAULT_SERVER}/{self.machine_id.strip()}"
                 uri = self.server_url
-                self.log_to_file(f"Conectando a {uri}")
+                print(f"📡 Tentando conectar ao Cloud: {uri}...")
+                
                 async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
                     self.ws = websocket
                     self.is_connected = True
+                    
+                    print(f"\n✅ CONEXÃO ESTABELECIDA COM SUCESSO!")
+                    print(f"🆔 Seu Machine ID: \033[93m{self.machine_id}\033[0m")
+                    print(f"🔗 Link do Dashboard: \033[94mhttps://statuesque-kringle-df0a32.netlify.app/?id={self.machine_id}\033[0m")
+                    print("─" * 50)
+                    
                     self.log_to_file("Conectado com sucesso.")
                     async for message in websocket:
                         try:
@@ -370,8 +371,22 @@ class AgentWorker:
             except Exception as e:
                 self.is_connected = False
                 self.ws = None
+                err_msg = f"❌ FALHA NA CONEXÃO: {e}"
+                print(err_msg)
+                
+                # Ajuda técnica específica
+                if "ssl" in str(e).lower():
+                    print("   💡 Dica: Parece um erro de certificado SSL. Verifique sua data/hora ou VPN.")
+                elif "timeout" in str(e).lower() or "10060" in str(e):
+                    print("   💡 Dica: Tempo limite esgotado. Verifique se sua internet bloqueia o servidor Vexel.")
+                
+                with open("DEBUG_CONNECTION.txt", "w", encoding="utf-8") as f:
+                    f.write(f"Data: {datetime.datetime.now()}\n")
+                    f.write(f"URL: {self.server_url}\n")
+                    f.write(f"Erro: {traceback.format_exc()}\n")
+                
                 self.log_to_file(f"Conexão encerrada: {e}")
-                await asyncio.sleep(10)
+                await asyncio.sleep(8)
 
 # ═══════════════════════════════════════════════════════════════
 #  GUI & MAIN
