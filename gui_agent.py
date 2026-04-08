@@ -154,20 +154,21 @@ class CloudLogger:
     def write(self, message):
         self.terminal.write(message)
         self.terminal.flush()
-        if message.strip():
-            # Envia para o Cloud via WebSocket
-            if self.worker.ws and getattr(self.worker.ws, 'open', False):
+        msg = message.strip()
+        if msg and self.worker.ws:
+            # Tenta pegar o loop do worker ou o loop atual da thread
+            loop = self.worker.main_loop
+            if loop and loop.is_running():
                 try:
                     asyncio.run_coroutine_threadsafe(
                         self.worker.ws.send(json.dumps({
                             "type": "LOG",
                             "machine_id": self.machine_id,
-                            "data": {"message": message.strip()}
+                            "data": {"message": msg}
                         })),
-                        self.worker.main_loop
+                        loop
                     )
-                except:
-                    pass
+                except: pass
 
     def flush(self):
         self.terminal.flush()
@@ -470,6 +471,7 @@ class GUIApp:
 def start_loop(w):
     l = asyncio.new_event_loop()
     asyncio.set_event_loop(l)
+    w.main_loop = l # Define o loop IMEDIATAMENTE para o CloudLogger usar
     l.create_task(w.scheduler_loop())
     l.run_until_complete(w.connect())
 
