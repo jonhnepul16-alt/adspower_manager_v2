@@ -142,6 +142,36 @@ def get_machine_id():
 DEFAULT_SERVER = "wss://web-production-373eb.up.railway.app/ws/agent"
 MACHINE_ID = get_machine_id()
 
+# Guardamos o stdout original para imprimir no terminal sem loop infinito
+ORIGINAL_STDOUT = sys.stdout
+
+class CloudLogger:
+    def __init__(self, machine_id, agent_worker):
+        self.machine_id = machine_id
+        self.worker = agent_worker
+        self.terminal = ORIGINAL_STDOUT
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.terminal.flush()
+        if message.strip():
+            # Envia para o Cloud via WebSocket
+            if self.worker.ws and getattr(self.worker.ws, 'open', False):
+                try:
+                    asyncio.run_coroutine_threadsafe(
+                        self.worker.ws.send(json.dumps({
+                            "type": "LOG",
+                            "machine_id": self.machine_id,
+                            "data": {"message": message.strip()}
+                        })),
+                        self.worker.main_loop
+                    )
+                except:
+                    pass
+
+    def flush(self):
+        self.terminal.flush()
+
 if os.path.exists(CONFIG_PATH):
     try:
         with open(CONFIG_PATH, 'r') as f:
@@ -189,18 +219,10 @@ class AgentWorker:
         
         # Bridge automation logs to dashboard and file
         def bridge(msg):
-            """Allows main.py's print to reach the cloud."""
-            if not msg: return
-            try:
-                # Envia para o console do robô e tenta disparar pro WebSocket
-                if self.main_loop and self.main_loop.is_running():
-                    self.main_loop.call_soon_threadsafe(
-                        lambda: asyncio.create_task(self.log(msg))
-                    )
-                else:
-                    self.log_to_file(msg)
-            except:
-                self.log_to_file(msg)
+            # O print() agora já manda pro cloud via CloudLogger!
+            print(msg)
+            self.log_to_file(msg)
+            
         set_log_callback(bridge)
 
     def log_to_file(self, msg):
@@ -211,12 +233,9 @@ class AgentWorker:
         except: pass
 
     async def log(self, message: str):
-        print(f"    [Agent] {message}")
+        # Apenas log_to_file e print. O CloudLogger cuida do WebSocket.
+        print(message)
         self.log_to_file(message)
-        if self.ws and getattr(self.ws, 'open', False):
-            try:
-                await self.ws.send(json.dumps({"type": "LOG", "machine_id": self.machine_id, "data": {"message": str(message)}}))
-            except: pass
 
     async def update_status(self, running: bool, profile: Optional[str] = None):
         if self.ws and getattr(self.ws, 'open', False):
@@ -456,6 +475,11 @@ def start_loop(w):
 
 if __name__ == "__main__":
     w = AgentWorker(MACHINE_ID)
+    
+    # Redireciona TUDO (print) para o CloudLogger
+    sys.stdout = CloudLogger(MACHINE_ID, w)
+    sys.stderr = sys.stdout
+    
     threading.Thread(target=start_loop, args=(w,), daemon=True).start()
     r = tk.Tk()
     GUIApp(r, w)

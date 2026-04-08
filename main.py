@@ -6,28 +6,12 @@ import random
 import datetime
 from typing import Callable
 
-# ── GLOBAL CLOUD BRIDGE (v4.0 Hybrid) ──────────────────────────────────
-_original_print = print
-AGENT_LOG_CALLBACK = None
+# ── GLOBAL CLOUD BRIDGE (v5.0 Native Redirect) ──────────────────────────
+# O print agora é capturado globalmente pelo gui_agent.py via sys.stdout redirect.
 
 def set_log_callback(callback):
-    """Allows the Local Agent to hook into all internal print statements."""
-    global AGENT_LOG_CALLBACK
-    AGENT_LOG_CALLBACK = callback
-
-def print(*args, **kwargs):
-    if AGENT_LOG_CALLBACK:
-        try:
-            msg = " ".join(map(str, args))
-            AGENT_LOG_CALLBACK(msg)
-        except Exception:
-            pass
-            
-    try:
-        if sys.stdout is not None:
-            _original_print(*args, **kwargs)
-    except Exception:
-        pass
+    """Mantido apenas para compatibilidade, mas o log agora é nativo."""
+    pass
 # ────────────────────────────────────────────────────────────────────────
 
 from core.account_manager import AccountManager  # type: ignore

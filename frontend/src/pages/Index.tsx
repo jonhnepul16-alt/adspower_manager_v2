@@ -79,7 +79,7 @@ const Index = () => {
     };
 
     check();
-    const interval = setInterval(check, 2000);
+    const interval = setInterval(check, 1000);
     return () => clearInterval(interval);
   }, [apiKey]);
 
