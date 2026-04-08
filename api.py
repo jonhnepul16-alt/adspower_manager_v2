@@ -185,7 +185,20 @@ async def cakto_webhook(request: Request):
             raise HTTPException(status_code=500, detail="Database config missing")
         
         try:
-            # Atualiza o is_premium para conta do cara
+            # 1. Tenta criar o usuário automaticamente caso não exista
+            default_password = "Warmads123"
+            try:
+                db.auth.admin.create_user({
+                    "email": customer_email,
+                    "password": default_password,
+                    "email_confirm": True
+                })
+                print(f"Cakto Webhook: Conta VIP nova criada para {customer_email}.")
+            except Exception as auth_err:
+                # Se falhar, na maioria das vezes é porque a conta já existe, o que é ótimo!
+                pass
+
+            # 2. Atualiza o is_premium para conta do cara
             response = db.table("subscriptions").update({
                 "is_premium": True,
                 "status": "active"
