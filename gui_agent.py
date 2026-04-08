@@ -10,7 +10,7 @@ import time
 import datetime
 import random
 import traceback
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Callable
 
 # Previne bugs de stdout em Windows congelado (EXE)
 if sys.platform == "win32":
@@ -154,6 +154,26 @@ if os.path.exists(CONFIG_PATH):
 #  AGENT WORKER
 # ═══════════════════════════════════════════════════════════════
 
+class ProxyResult(dict):
+    """A dictionary that notifies the agent of any changes in real-time."""
+    def __init__(self, initial_data, profile_id, agent):
+        super().__init__(initial_data)
+        self.profile_id = profile_id
+        self.agent = agent
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        # Quando um valor muda (ex: reacoes_dadas), avisa o servidor na hora
+        if self.agent.ws:
+            asyncio.run_coroutine_threadsafe(
+                self.agent.ws.send(json.dumps({
+                    "type": "RESULT",
+                    "profile_id": self.profile_id,
+                    "data": dict(self)
+                })),
+                self.agent.main_loop
+            )
+
 class AgentWorker:
     def __init__(self, machine_id: str):
         self.machine_id = machine_id.strip()
@@ -213,11 +233,10 @@ class AgentWorker:
             if session:
                 try:
                     await self.log(f"🚀 [SCHEDULER] Sessão curta iniciada: {pid} ({dur}s)")
-                    res = await asyncio.to_thread(self.manager.run_task, pid, lambda ctrl: facebook_warmup_por_tempo(ctrl, dur, "Rápido"))
+                    proxy_res = ProxyResult({"curtidas_feed": 0, "reacoes_dadas": 0, "comentarios_feitos": 0, "reels_assistidos": 0, "reels_curtidos": 0, "ok": True}, pid, self)
+                    await asyncio.to_thread(self.manager.run_task, pid, lambda ctrl: facebook_warmup_por_tempo(ctrl, dur, "Rápido", resultados=proxy_res))
                     self.scheduler.mark_executed(pid)
-                    if self.ws: await self.ws.send(json.dumps({"type": "RESULT", "profile_id": pid, "data": res}))
                 finally:
-                    # Desativado fechamento automático para manter navegador aberto
                     pass
             else:
                 await self.log(f"❌ Erro ao abrir perfil {pid}")
@@ -249,29 +268,20 @@ class AgentWorker:
                         nome_modo, dur = MODOS_TEMPO.get(mode, ("Padrão", 1800))
                         await self.log(f"🚀 [AUTO] Perfil {idx+1}/{len(pids)}: {pid} ({nome_modo})")
                         
-                        # Executa em thread para não travar o loop de eventos
-                        res = await asyncio.to_thread(
+                        proxy_res = ProxyResult({"curtidas_feed": 0, "reacoes_dadas": 0, "comentarios_feitos": 0, "reels_assistidos": 0, "reels_curtidos": 0, "ok": True}, pid, self)
+                        
+                        await asyncio.to_thread(
                             self.manager.run_task, 
                             pid, 
                             lambda ctrl: facebook_warmup_por_tempo(
-                                ctrl, dur, nome_modo, stop_check=lambda: not self.is_running
+                                ctrl, dur, nome_modo, stop_check=lambda: not self.is_running, resultados=proxy_res
                             )
                         )
-                        
-                        if self.ws:
-                            await self.ws.send(json.dumps({
-                                "type": "RESULT", 
-                                "profile_id": pid, 
-                                "data": res
-                            }))
                     except Exception as e:
-                        # O robô finalizou com sucesso. 
-                        # O fechamento automático foi desativado conforme solicitado para manter o Chrome aberto.
                         pass
                 else:
                     await self.log(f"❌ Falha ao abrir AdsPower para o perfil {pid}")
                 
-                # Pequena pausa entre perfis
                 if idx < len(pids) - 1 and self.is_running:
                     await self.log("⏳ Aguardando 15s para o próximo perfil...")
                     await asyncio.sleep(15)
@@ -290,7 +300,6 @@ class AgentWorker:
         while True:
             try:
                 if self.scheduler.active_flag:
-                    # Heartbeat do scheduler
                     if self.ws and getattr(self.ws, 'open', False):
                         try:
                             nxt = {p: t.strftime("%H:%M") for p, t in self.scheduler.next_sessions.items()}
@@ -306,16 +315,13 @@ class AgentWorker:
             except Exception as e:
                 crash_report(f"Erro no scheduler_loop: {e}")
             
-            # Envia Heartbeat para manter WebSocket vivo no Railway
             if self.ws and getattr(self.ws, 'open', False):
                 try:
                     await self.ws.send(json.dumps({"type": "HEARTBEAT", "machine_id": self.machine_id}))
                 except: pass
                 
-            # Se tiver ativação pendente, checa mais rápido. Máximo 30s para o heartbeat.
             sleep_time = 5 if self.scheduler.force_immediate else 30
             try:
-                # Aguarda o próximo ciclo ou um sinal imediato
                 await asyncio.wait_for(self.scheduler_trigger.wait(), timeout=sleep_time)
                 self.scheduler_trigger.clear()
             except asyncio.TimeoutError:
@@ -323,6 +329,10 @@ class AgentWorker:
 
     async def connect(self):
         self.main_loop = asyncio.get_event_loop()
+        print(f"✅ Conectado à Nuvem Vexel.")
+        print(f"🆔 Seu Machine ID: \033[93m{self.machine_id}\033[0m")
+        print(f"🔗 Link do Dashboard: \033[94mhttps://statuesque-kringle-df0a32.netlify.app/?id={self.machine_id}\033[0m")
+        print("─" * 50)
         while True:
             try:
                 self.server_url = f"{DEFAULT_SERVER}/{self.machine_id.strip()}"

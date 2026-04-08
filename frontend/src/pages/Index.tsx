@@ -158,6 +158,9 @@ const Index = () => {
             <p className="text-sm text-foreground/60 font-medium max-w-md mx-auto">
               Simulação de atividades automatizadas inteligentes para perfis de elite.
             </p>
+            <div className="mt-2 py-1 px-3 bg-card border border-border/40 rounded-lg text-[9px] font-mono text-primary/70">
+              <span className="opacity-50 text-foreground">API KEY:</span> {apiKey}
+            </div>
           </div>
           
           <div className="mt-6 lg:mt-0 flex flex-row items-center gap-4">

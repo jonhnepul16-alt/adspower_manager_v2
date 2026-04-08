@@ -1841,7 +1841,7 @@ def task_acoes_incompletas(driver, wait, resultados: dict, **_):
 # ═══════════════════════════════════════════════════════════════
 
 def facebook_warmup_por_tempo(
-    controller, duracao_original: int, nome_modo: str, stop_check: Callable[[], bool] = None
+    controller, duracao_original: int, nome_modo: str, stop_check: Callable[[], bool] = None, resultados: dict = None
 ):
     """
     Orquestra todas as tarefas em ciclos embaralhados até o tempo esgotar.
@@ -1877,30 +1877,39 @@ def facebook_warmup_por_tempo(
         duracao_segundos = int(duracao_original * 1.25)
         print(f"    🌟 [Sessão Longa] Comportamento 'imersivo' ativado (+25% tempo).")
 
-    resultados: dict = {
-        "curtidas_feed": 0,
-        "reacoes_dadas": 0,
-        "comentarios_feitos": 0,
-        "reels_assistidos": 0,
-        "reels_curtidos": 0,
-        "buscas": 0,
-        "busca_nicho_concluida": False,
-        "tempo_gasto_na_busca": 0,
-        "tempo_live_total": 0,
-        "tempo_gaming_real": 0,
-        "tempo_total_feed": 0,
-        "ads_clicados": 0,
-        "ads_clicados_por_cta": 0,
-        "anuncios_clicados_na_varredura": 0,
-        "distancia_total_scrollada": 0,
-        "itens_marketplace_vistos": 0,
-        "grupos_visitados": 0,
-        "amigos_adicionados": 0,
-        "interacao_comercial_messenger": False,
-        "postagem": False,
-        "ciclos": 0,
-        "ok": True,
-    }
+    if resultados is None:
+        resultados = {
+            "curtidas_feed": 0,
+            "reacoes_dadas": 0,
+            "comentarios_feitos": 0,
+            "reels_assistidos": 0,
+            "reels_curtidos": 0,
+            "buscas": 0,
+            "busca_nicho_concluida": False,
+            "tempo_gasto_na_busca": 0,
+            "tempo_live_total": 0,
+            "tempo_gaming_real": 0,
+            "tempo_total_feed": 0,
+            "ads_clicados": 0,
+            "ads_clicados_por_cta": 0,
+            "anuncios_clicados_na_varredura": 0,
+            "distancia_total_scrollada": 0,
+            "itens_marketplace_vistos": 0,
+            "grupos_visitados": 0,
+            "amigos_adicionados": 0,
+            "interacao_comercial_messenger": False,
+            "postagem": False,
+            "ciclos": 0,
+            "ok": True,
+        }
+    else:
+        # Garante que as chaves básicas existem no proxy
+        defaults = {
+            "curtidas_feed": 0, "reacoes_dadas": 0, "comentarios_feitos": 0,
+            "reels_assistidos": 0, "reels_curtidos": 0, "ok": True
+        }
+        for k, v in defaults.items():
+            if k not in resultados: resultados[k] = v
 
     ctx = {"nome_modo": nome_modo}
 
