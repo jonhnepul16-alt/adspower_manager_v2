@@ -3,7 +3,9 @@ import json
 import asyncio
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+import os
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request
+from supabase import create_client, Client
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Vexel Cloud API")
@@ -69,6 +71,15 @@ def get_state(machine_id: str) -> AgentState:
     return agent_states[machine_id]
 
 # --- API Endpoints ---
+
+# --- Supabase Config ---
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+
+def get_supabase() -> Optional[Client]:
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        return None
+    return create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 class WarmupRequest(BaseModel):
     machine_id: str = "default"  # Added machine_id to specify which agent to target
@@ -142,6 +153,54 @@ async def update_scheduler(machine_id: str, config: Dict[str, Any]):
     })
     
     return {"message": "Scheduler config updated", "config": state.scheduler_config}
+
+# --- Webhook Cakto ---
+@app.post("/api/webhook/cakto")
+async def cakto_webhook(request: Request):
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+    
+    event_status = payload.get("event") or payload.get("status")
+    customer_email = None
+
+    # Adaptando-se ao formato de payload da Cakto
+    if "data" in payload and "customer" in payload["data"]:
+        customer_email = payload["data"]["customer"].get("email")
+    elif "customer" in payload:
+        customer_email = payload["customer"].get("email")
+    elif "email" in payload:
+        customer_email = payload.get("email")
+
+    if not customer_email:
+        print("Cakto Webhook ignorado: Sem email atrelado à requisição.")
+        return {"status": "ignored", "reason": "no email provided"}
+
+    # Verifica se foi um pagamento aprovado/PIX finalizado
+    if event_status in ["payment.approved", "PAID", "approved", "paid"]:
+        db = get_supabase()
+        if not db:
+            print("Erro: SUPABASE chaves de ambiente não configuradas.")
+            raise HTTPException(status_code=500, detail="Database config missing")
+        
+        try:
+            # Atualiza o is_premium para conta do cara
+            response = db.table("subscriptions").update({
+                "is_premium": True,
+                "status": "active"
+            }).eq("email", customer_email).execute()
+
+            if len(response.data) == 0:
+                print(f"Cakto Webhook pago: Mas conta {customer_email} não foi encontrada no banco.")
+            else:
+                print(f"Cakto Webhook: Perfil {customer_email} atualizado para VIP/Premium com sucesso!")
+                
+        except Exception as e:
+            print(f"Cakto Webhook Falhou ao atualizar BD: {e}")
+            raise HTTPException(status_code=500, detail="Supabase error")
+
+    return {"status": "received"}
 
 # --- WebSocket Agent Tunnel ---
 
