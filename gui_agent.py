@@ -359,7 +359,7 @@ class AgentWorker:
                     
                     print(f"\n✅ CONEXÃO ESTABELECIDA COM SUCESSO!")
                     print(f"🆔 Seu Machine ID: \033[93m{self.machine_id}\033[0m")
-                    print(f"🔗 Link do Dashboard: \033[94mhttps://statuesque-kringle-df0a32.netlify.app/?id={self.machine_id}\033[0m")
+                    print(f"🔗 Link do Dashboard: \033[94mhttps://app.warmads.com/?id={self.machine_id}\033[0m")
                     print("─" * 50)
                     
                     self.log_to_file("Conectado com sucesso.")
@@ -440,7 +440,7 @@ class GUIApp:
         
         # Botão para abrir o site novo
         import webbrowser
-        tk.Button(root, text="ABRIR O SITE", command=lambda: webbrowser.open("https://statuesque-kringle-df0a32.netlify.app/"), fg="white", bg="#10b981", font=("Segoe UI", 9, "bold", "underline"), bd=0, cursor="hand2", activebackground="#059669").pack(pady=(5,0))
+        tk.Button(root, text="ABRIR O SITE", command=lambda: webbrowser.open("https://app.warmads.com/"), fg="white", bg="#10b981", font=("Segoe UI", 9, "bold", "underline"), bd=0, cursor="hand2", activebackground="#059669").pack(pady=(5,0))
         
         self.up()
 

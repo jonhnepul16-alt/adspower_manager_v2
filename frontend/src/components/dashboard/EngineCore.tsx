@@ -24,7 +24,7 @@ const EngineCore = ({ isActive, currentProfile }: EngineCoreProps) => {
           transition={isActive ? { duration: 8, repeat: Infinity, ease: "linear" } : {}}
           className={`relative z-10 p-6 rounded-full border-2 transition-all duration-500 ${
             isActive
-              ? "border-primary/60 bg-primary/10 glow-blue"
+              ? "border-primary/60 bg-primary/10 glow-orange"
               : "border-border bg-muted/30"
           }`}
         >
