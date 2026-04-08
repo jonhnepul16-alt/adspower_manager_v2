@@ -160,22 +160,37 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="mt-6 lg:mt-0 flex flex-col items-end gap-3">
+          <div className="mt-6 lg:mt-0 flex flex-row items-center gap-4">
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={isActive ? handleStop : handleStart}
-              disabled={!profiles && !isActive}
-              className={`flex items-center justify-center gap-3 px-8 py-4 rounded-full font-display font-bold text-[11px] uppercase tracking-[0.2em] transition-all
-                  ${!profiles && !isActive ? 'opacity-50 cursor-not-allowed bg-muted text-muted-foreground' : ''}
-                  ${isActive 
-                    ? "bg-transparent border border-destructive/40 text-destructive hover:bg-destructive/10"
-                    : "bg-primary text-primary-foreground shadow-[0_0_30px_-5px_rgba(251,191,36,0.4)] hover:shadow-[0_0_40px_0px_rgba(251,191,36,0.6)]"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleStart}
+              disabled={isActive || !profiles}
+              className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full font-display font-bold text-[10px] uppercase tracking-[0.2em] transition-all
+                  ${isActive || !profiles 
+                    ? 'opacity-40 cursor-not-allowed bg-muted text-muted-foreground' 
+                    : "bg-primary text-primary-foreground shadow-[0_0_20px_-5px_rgba(251,191,36,0.4)] hover:shadow-[0_0_30px_0px_rgba(251,191,36,0.6)]"
                   }
               `}
             >
-              {!isActive && <Zap className="w-4 h-4" />}
-              {isActive ? "DESLIGAR MOTOR" : "INICIALIZAR MOTOR"}
+              <Zap className="w-3.5 h-3.5" />
+              INICIALIZAR MOTOR
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleStop}
+              disabled={!isActive}
+              className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full font-display font-bold text-[10px] uppercase tracking-[0.2em] transition-all border
+                  ${!isActive 
+                    ? 'opacity-20 cursor-not-allowed border-border text-muted-foreground' 
+                    : "border-destructive/50 text-destructive hover:bg-destructive/10"
+                  }
+              `}
+            >
+              <div className="w-2 h-2 rounded-full bg-destructive animate-pulse mr-1" />
+              DESLIGAR MOTOR
             </motion.button>
           </div>
         </div>

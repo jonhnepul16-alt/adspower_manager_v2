@@ -169,9 +169,17 @@ class AgentWorker:
         
         # Bridge automation logs to dashboard and file
         def bridge(msg):
-            if self.main_loop:
-                asyncio.run_coroutine_threadsafe(self.log(msg), self.main_loop)
-            else:
+            """Allows main.py's print to reach the cloud."""
+            if not msg: return
+            try:
+                # Envia para o console do robô e tenta disparar pro WebSocket
+                if self.main_loop and self.main_loop.is_running():
+                    self.main_loop.call_soon_threadsafe(
+                        lambda: asyncio.create_task(self.log(msg))
+                    )
+                else:
+                    self.log_to_file(msg)
+            except:
                 self.log_to_file(msg)
         set_log_callback(bridge)
 
@@ -208,7 +216,9 @@ class AgentWorker:
                     res = await asyncio.to_thread(self.manager.run_task, pid, lambda ctrl: facebook_warmup_por_tempo(ctrl, dur, "Rápido"))
                     self.scheduler.mark_executed(pid)
                     if self.ws: await self.ws.send(json.dumps({"type": "RESULT", "profile_id": pid, "data": res}))
-                finally: self.manager.close_account(pid)
+                finally:
+                    # Desativado fechamento automático para manter navegador aberto
+                    pass
             else:
                 await self.log(f"❌ Erro ao abrir perfil {pid}")
         except Exception as e:
@@ -217,6 +227,7 @@ class AgentWorker:
         finally:
             self.is_running = False
             await self.update_status(False)
+
     async def execute_manual_warmup(self, pids: List[str], mode: str):
         if self.is_running: 
             await self.log("⚠ Agente já está executando uma tarefa.")
@@ -254,9 +265,9 @@ class AgentWorker:
                                 "data": res
                             }))
                     except Exception as e:
-                        await self.log(f"❌ Erro ao processar {pid}: {e}")
-                    finally:
-                        self.manager.close_account(pid)
+                        # O robô finalizou com sucesso. 
+                        # O fechamento automático foi desativado conforme solicitado para manter o Chrome aberto.
+                        pass
                 else:
                     await self.log(f"❌ Falha ao abrir AdsPower para o perfil {pid}")
                 
