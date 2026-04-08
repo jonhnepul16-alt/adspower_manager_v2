@@ -12,7 +12,12 @@
   NODE_VERSION = "20"
 
 [[redirects]]
-  # Garante que as rotas do React (SPA) funcionem corretamente sem dar 404
+  from = "/api/*"
+  to = "https://web-production-373eb.up.railway.app/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

@@ -1,0 +1,2 @@
+/api/*  https://web-production-373eb.up.railway.app/api/:splat  200!
+/*      /index.html                                     200
