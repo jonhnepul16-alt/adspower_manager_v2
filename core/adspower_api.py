@@ -47,13 +47,14 @@ class AdsPowerAPI:
     def open_browser(self, profile_id: str) -> Optional[dict]:
         """
         Abre o browser de um perfil.
-        Retorna dict com 'ws' (WebSocket URL) e 'webdriver' (caminho do chromedriver).
+        Retorna dict com 'ws' (WebSocket URL) e 'webdriver', ou o json de erro.
         """
         res = self._get("/api/v1/browser/start", {"user_id": profile_id})
         if res.get("code") == 0:
             return res.get("data")
         print(f"[ERRO] open_browser({profile_id}): {res.get('msg')}")
-        return None
+        # Return the error response to let account_manager handle specific fail-safes
+        return res
 
     def close_browser(self, profile_id: str) -> bool:
         """Fecha o browser de um perfil."""

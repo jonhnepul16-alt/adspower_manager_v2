@@ -33,11 +33,11 @@ const LogTerminal = ({ isActive, liveLogs }: LogTerminalProps) => {
         </div>
       </div>
 
-      <div className="flex-1 bg-black rounded-xl border border-border/10 p-4 font-mono text-[10px] overflow-hidden flex flex-col relative min-h-[180px] shadow-2xl">
+      <div className="h-[300px] bg-black rounded-xl border border-white/5 p-4 font-mono text-[10px] overflow-hidden flex flex-col relative shadow-2xl">
         <div className="absolute top-0 inset-x-0 h-4 bg-gradient-to-b from-black to-transparent z-10" />
         <div 
           ref={scrollRef}
-          className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-1.5 pb-4 pt-2"
+          className="flex-1 overflow-y-auto hide-scrollbar pr-2 space-y-1.5 pb-4 pt-2"
         >
           {liveLogs.length === 0 ? (
             <div className="flex flex-col items-center gap-2 text-primary/10 h-full justify-center">

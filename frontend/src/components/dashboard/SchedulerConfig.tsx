@@ -1,15 +1,6 @@
 import { useState, useEffect } from "react";
-import { Clock, Key, Trash2, Plus, CalendarDays } from "lucide-react";
+import { Clock, Repeat, Timer, CalendarClock, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-interface Rule {
-  id: string;
-  name: string;
-  start: string;
-  end: string;
-  enabled: boolean;
-  type: "time" | "weekend";
-}
 
 interface Props {
   config: any;
@@ -18,160 +9,181 @@ interface Props {
 }
 
 const SchedulerConfig = ({ config, status, onUpdate }: Props) => {
-  // Sync the external config if needed, otherwise use local state to handle rules
-  const [rules, setRules] = useState<Rule[]>(() => {
-     if (config && config.rules && Array.isArray(config.rules)) {
-        return config.rules;
-     }
-     return [
-        { id: "1", name: "Horário Comercial", start: "09:00", end: "18:00", enabled: true, type: "time" },
-        { id: "2", name: "Final de Semana", start: "10:00", end: "14:00", enabled: false, type: "weekend" }
-     ];
-  });
-  
-  const [isAdding, setIsAdding] = useState(false);
-  const [newRule, setNewRule] = useState<Partial<Rule>>({ name: "", start: "00:00", end: "23:59", type: "time" });
+  const [startTime, setStartTime] = useState("00:00");
+  const [endTime, setEndTime] = useState("06:00");
+  const [warmupDuration, setWarmupDuration] = useState(15);
+  const [repetitions, setRepetitions] = useState(1);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+  // Sync from server config
   useEffect(() => {
-     if (config && config.rules && Array.isArray(config.rules)) {
-        setRules(config.rules);
-     }
+    if (config) {
+      if (config.start_time) setStartTime(config.start_time);
+      if (config.end_time) setEndTime(config.end_time);
+      if (config.warmup_duration) setWarmupDuration(config.warmup_duration);
+      if (config.repetitions) setRepetitions(config.repetitions);
+    }
   }, [config]);
 
-  if (!config) return <div className="text-muted-foreground text-xs animate-pulse">Carregando Módulos...</div>;
+  if (!config) return <div className="text-muted-foreground text-xs animate-pulse">Carregando...</div>;
 
-  const pushUpdate = (newRules: Rule[]) => {
-    setRules(newRules);
-    
-    // Convert rules array to 'windows' dictionary to perfectly match the Python agent's (gui_agent.py) expected format
-    const windowsObj: Record<string, any> = {};
-    newRules.forEach((rule, index) => {
-       windowsObj[rule.id || String(index)] = {
-          enabled: rule.enabled,
-          start: rule.start,
-          end: rule.end
-       };
+  const isActive = !!config.active;
+
+  const markDirty = () => setHasUnsavedChanges(true);
+
+  const handleConfirm = () => {
+    onUpdate({
+      ...config,
+      start_time: startTime,
+      end_time: endTime,
+      warmup_duration: warmupDuration,
+      repetitions: repetitions,
     });
-
-    onUpdate({ ...config, rules: newRules, windows: windowsObj });
+    setHasUnsavedChanges(false);
   };
 
-  const handleToggleRule = (id: string) => {
-    const newRules = rules.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r);
-    pushUpdate(newRules);
-  };
+  const pendingSessions = status?.pending_sessions ?? 0;
+  const totalSessions = status?.total_sessions ?? 0;
 
-  const handleDeleteRule = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newRules = rules.filter(r => r.id !== id);
-    pushUpdate(newRules);
-  };
-
-  const handleSaveAdd = () => {
-     if (!newRule.name) return;
-     const newRules = [...rules, { ...newRule, id: Date.now().toString(), enabled: true } as Rule];
-     pushUpdate(newRules);
-     setIsAdding(false);
-     setNewRule({ name: "", start: "00:00", end: "23:59", type: "time" });
-  };
+  // When scheduler is OFF, show nothing (parent handles the toggle)
+  if (!isActive) {
+    return (
+      <p className="text-[9px] text-white/20 italic">
+        Ative o agendamento para configurar horários automáticos.
+      </p>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-4">
-       
-       <AnimatePresence>
-         {rules.map((rule) => (
-           <motion.div 
-              key={rule.id}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-              className={`relative p-4 rounded-2xl border transition-all duration-300 flex items-center justify-between group ${rule.enabled ? 'bg-card border-border shadow-lg' : 'bg-background/50 border-transparent hover:bg-card/50'}`}
-           >
-              <div className="flex items-center gap-4">
-                 <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${rule.enabled ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                    {rule.type === 'weekend' ? <Key className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
-                 </div>
-                 <div>
-                    <h4 className={`text-[11px] font-bold ${rule.enabled ? 'text-foreground' : 'text-foreground/70'}`}>{rule.name}</h4>
-                    <p className="text-[10px] text-muted-foreground/60 leading-tight">
-                       {rule.type === 'weekend' ? 'Frequência reduzida' : `${rule.start} - ${rule.end}`}<br/>{rule.type === 'weekend' ? '' : '(BRT)'}
-                    </p>
-                 </div>
-              </div>
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      className="flex flex-col gap-4"
+    >
+      {/* Time Window */}
+      <div className="space-y-2">
+        <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
+          <Clock className="w-3 h-3" />
+          Janela de Horário
+        </label>
+        <div className="flex items-center gap-2">
+          <input
+            type="time"
+            value={startTime}
+            onChange={(e) => { setStartTime(e.target.value); markDirty(); }}
+            className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2.5 text-xs text-foreground font-mono outline-none focus:border-primary/40 transition-all"
+          />
+          <span className="text-[9px] font-black text-white/15 uppercase">até</span>
+          <input
+            type="time"
+            value={endTime}
+            onChange={(e) => { setEndTime(e.target.value); markDirty(); }}
+            className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2.5 text-xs text-foreground font-mono outline-none focus:border-primary/40 transition-all"
+          />
+        </div>
+      </div>
 
-              <div className="flex items-center gap-3">
-                 <button 
-                   onClick={(e) => handleDeleteRule(rule.id, e)}
-                   className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-destructive/10 rounded-full text-destructive/60 hover:text-destructive"
-                 >
-                    <Trash2 className="w-4 h-4" />
-                 </button>
-                 
-                 <button 
-                    onClick={() => handleToggleRule(rule.id)}
-                    className={`w-12 h-6 rounded-full transition-colors relative flex items-center px-1 ${rule.enabled ? 'bg-emerald-500' : 'bg-muted-foreground/30'}`}
-                 >
-                    <motion.div 
-                      animate={{ x: rule.enabled ? 24 : 0 }}
-                      className="w-4 h-4 bg-white rounded-full shadow-sm"
-                    />
-                 </button>
-              </div>
-           </motion.div>
-         ))}
-       </AnimatePresence>
+      {/* Warmup Duration */}
+      <div className="space-y-2">
+        <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
+          <Timer className="w-3 h-3" />
+          Duração do Aquecimento
+        </label>
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-display font-black text-primary">{warmupDuration} min</span>
+          </div>
+          <input
+            type="range"
+            min={5}
+            max={60}
+            step={5}
+            value={warmupDuration}
+            onChange={(e) => { setWarmupDuration(parseInt(e.target.value)); markDirty(); }}
+            className="w-full accent-primary h-1 bg-white/10 rounded-full appearance-none cursor-pointer"
+          />
+          <div className="flex justify-between mt-1">
+            <span className="text-[8px] text-white/15 font-mono">5m</span>
+            <span className="text-[8px] text-white/15 font-mono">60m</span>
+          </div>
+        </div>
+      </div>
 
-       {isAdding ? (
-         <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="p-4 rounded-2xl border border-primary/40 bg-card shadow-[0_0_20px_-5px_rgba(251,191,36,0.1)] flex flex-col gap-3"
-         >
-            <input 
-              type="text" 
-              placeholder="Nome da Regra (ex: Madrugada)"
-              className="w-full bg-background/50 border border-border/50 rounded-lg px-3 py-2 text-xs font-medium text-foreground outline-none focus:border-primary/50 placeholder:text-muted-foreground/50 text-[10px]"
-              value={newRule.name}
-              onChange={e => setNewRule({...newRule, name: e.target.value})}
-            />
-            <div className="flex gap-2">
-               <input 
-                 type="time" 
-                 className="flex-1 bg-background/50 border border-border/50 rounded-lg px-3 py-2 text-xs text-foreground outline-none focus:border-primary/50 text-[10px]"
-                 value={newRule.start}
-                 onChange={e => setNewRule({...newRule, start: e.target.value})}
-               />
-               <input 
-                 type="time" 
-                 className="flex-1 bg-background/50 border border-border/50 rounded-lg px-3 py-2 text-xs text-foreground outline-none focus:border-primary/50 text-[10px]"
-                 value={newRule.end}
-                 onChange={e => setNewRule({...newRule, end: e.target.value})}
-               />
+      {/* Repetitions */}
+      <div className="space-y-2">
+        <label className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
+          <Repeat className="w-3 h-3" />
+          Aberturas por Perfil
+        </label>
+        <div className="flex gap-2">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <button
+              key={n}
+              onClick={() => { setRepetitions(n); markDirty(); }}
+              className={`flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border
+                ${repetitions === n
+                  ? "bg-primary/15 border-primary/40 text-primary shadow-[0_0_12px_rgba(240,90,40,0.15)]"
+                  : "bg-white/[0.02] border-white/[0.05] text-white/30 hover:border-white/10 hover:text-white/50"
+                }
+              `}
+            >
+              {n}x
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Confirm Button */}
+      <button
+        onClick={handleConfirm}
+        className={`w-full py-3.5 rounded-xl font-display font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2
+          ${hasUnsavedChanges
+            ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(240,90,40,0.3)] hover:shadow-[0_0_30px_rgba(240,90,40,0.5)] hover:-translate-y-0.5"
+            : "bg-white/[0.03] border border-white/[0.06] text-white/30 cursor-default"
+          }
+        `}
+      >
+        <Check className="w-3.5 h-3.5" />
+        {hasUnsavedChanges ? "CONFIRMAR AGENDAMENTO" : "AGENDAMENTO SALVO"}
+      </button>
+
+      {/* Status Preview */}
+      {totalSessions > 0 && !hasUnsavedChanges && (
+        <motion.div
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-emerald-500/[0.06] border border-emerald-500/20 rounded-xl p-3 space-y-1"
+        >
+          <div className="flex items-center gap-2">
+            <CalendarClock className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">
+              {pendingSessions} sessões restantes hoje
+            </span>
+          </div>
+
+          {/* Show next slots */}
+          {config._slots && config._slots.length > 0 && (
+            <div className="mt-2 space-y-1 max-h-24 overflow-y-auto hide-scrollbar">
+              {config._slots
+                .filter((s: any) => !s.executed)
+                .slice(0, 5)
+                .map((slot: any, i: number) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between px-2 py-1 bg-white/[0.02] rounded-md"
+                  >
+                    <span className="text-[9px] font-mono text-emerald-400/80">{slot.time}</span>
+                    <span className="text-[8px] font-bold text-white/20 uppercase truncate max-w-[100px]">
+                      {slot.profile_id}
+                    </span>
+                  </div>
+                ))}
             </div>
-            <div className="flex gap-2 mt-2">
-                <button 
-                  onClick={() => setIsAdding(false)} 
-                  className="flex-1 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest hover:text-foreground transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  onClick={handleSaveAdd} 
-                  className="flex-1 py-2 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-sm hover:brightness-110 transition-all"
-                >
-                  Salvar
-                </button>
-            </div>
-         </motion.div>
-       ) : (
-         <button 
-            onClick={() => setIsAdding(true)}
-            className="mt-2 w-full py-4 border border-border/50 rounded-2xl border-dashed text-xs font-bold text-muted-foreground tracking-widest uppercase hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2"
-         >
-            <span className="text-lg leading-none">+</span> ADICIONAR REGRA
-         </button>
-       )}
-    </div>
+          )}
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 

@@ -7,51 +7,42 @@
 @layer base {
 
   :root {
-    --background: 240 4% 5%;      /* #0B0B0C */
-    --foreground: 220 14% 91%;    /* #E5E7EB */
+    --background: 240 10% 4%;      /* #0A0A0B */
+    --foreground: 220 14% 96%;    /* #F3F4F6 */
 
-    --card: 240 6% 7%;            /* #111113 */
-    --card-foreground: 220 14% 91%;
+    --card: 240 8% 6%;            /* #0F0F11 */
+    --card-foreground: 220 14% 96%;
 
-    --popover: 240 6% 7%;
-    --popover-foreground: 220 14% 91%;
+    --popover: 240 8% 6%;
+    --popover-foreground: 220 14% 96%;
 
-    --primary: 15 88% 55%;         /* #F05A28 */
-    --primary-foreground: 240 4% 5%;
+    --primary: 16 100% 50%;        /* #FF4500 - True Orange Red */
+    --primary-foreground: 240 10% 4%;
 
-    --secondary: 14 84% 49%;       /* #D94E22 */
-    --secondary-foreground: 220 14% 91%;
+    --secondary: 16 100% 40%;
+    --secondary-foreground: 220 14% 96%;
 
-    --muted: 240 6% 7%;
-    --muted-foreground: 218 11% 65%; /* #9CA3AF */
+    --muted: 240 6% 8%;
+    --muted-foreground: 218 8% 50%;
 
-    --accent: 19 100% 62%;         /* #FF7A3D */
-    --accent-foreground: 240 4% 5%;
+    --accent: 16 100% 60%;
+    --accent-foreground: 240 10% 4%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 220 14% 91%;
 
-    --border: 240 3% 12%;          /* border and inactive icons */
-    --input: 240 3% 12%;
-    --ring: 15 88% 55%;
+    --border: 240 4% 12%;
+    --input: 240 4% 12%;
+    --ring: 16 100% 50%;
 
-    --radius: 1.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 240 4% 5%;
-    --sidebar-foreground: 218 11% 65%;
-    --sidebar-primary: 15 88% 55%;
-    --sidebar-primary-foreground: 240 4% 5%;
-    --sidebar-accent: 240 6% 7%;
-    --sidebar-accent-foreground: 220 14% 91%;
-    --sidebar-border: 240 3% 12%;
-    --sidebar-ring: 15 88% 55%;
+    --glass-bg: 240 8% 6%;
+    --glass-border: 240 4% 16%;
+    --glass-highlight: 16 100% 50%;
 
-    --glass-bg: 240 6% 7%;
-    --glass-border: 240 3% 12%;
-    --glass-highlight: 19 100% 62%;
-
-    --shadow-glow: 0 0 25px -5px rgba(240, 90, 40, 0.35);
-    --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.5);
+    --shadow-glow: 0 0 20px -5px rgba(255, 69, 0, 0.3);
+    --shadow-card: 0 8px 32px -8px rgba(0,0,0,0.6);
   }
 }
 
@@ -62,6 +53,25 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased selection:bg-primary/30 selection:text-primary;
+  }
+
+  /* Minimalist Dark Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border) / 0.8);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
   }
 }
 
@@ -117,6 +127,31 @@
       transparent 100%
     );
     animation: shimmer 2s ease-in-out infinite;
+  }
+
+  .segmented-control {
+    @apply flex bg-white/[0.03] border border-white/5 p-1 rounded-xl;
+  }
+
+  .segmented-item {
+    @apply flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all;
+  }
+
+  .segmented-item-active {
+    @apply bg-primary text-primary-foreground shadow-lg;
+  }
+
+  .segmented-item-inactive {
+    @apply text-muted-foreground hover:text-foreground hover:bg-white/5;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
 
 }

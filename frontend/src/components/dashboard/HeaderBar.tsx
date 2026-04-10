@@ -1,4 +1,4 @@
-import { Bell, LogOut, User, X, Lock, Eye, EyeOff } from "lucide-react";
+import { Bell, LogOut, User, X, Lock, Eye, EyeOff, Minus, Square, Copy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -11,6 +11,9 @@ interface HeaderBarProps {
   apiKey: string;
   onApiKeyChange: (key: string) => void;
 }
+
+const isElectron = typeof window !== 'undefined' && window.process && (window.process as any).type === 'renderer';
+const ipc = isElectron ? (window as any).require('electron').ipcRenderer : null;
 
 const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange }: HeaderBarProps) => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -50,8 +53,12 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
   };
 
   const navLinks = [
-    { label: "DASHBOARD", active: true },
+    { label: "DASHBOARD", path: "/" },
+    { label: "PERFIS", path: "/profiles" },
+    { label: "AGENDAMENTO", path: "/scheduler" },
   ];
+
+  const currentPath = window.location.pathname;
 
   return (
     <>
@@ -59,53 +66,75 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="flex items-center justify-between w-full pb-8 pt-2"
+        className="flex items-center justify-between w-full py-6 border-b border-white/5 bg-background/50 backdrop-blur-md sticky top-0 z-40 px-6 lg:px-8 select-none relative"
+        style={{ WebkitAppRegion: 'drag' } as any}
       >
-        <div className="flex bg-card/40 rounded-full border border-border/40 p-1.5 px-6 gap-8">
+        <div className="flex items-center gap-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
+          <div className="flex items-center gap-2 group cursor-pointer" onClick={() => navigate("/")}>
+            <h1 className="font-display text-sm font-black text-foreground tracking-tight">
+              WarmAds <span className="text-primary italic">Panel</span>
+            </h1>
+          </div>
+
+        <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
-             <button key={link.label} className={`text-[10px] font-bold tracking-widest uppercase transition-colors ${link.active ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+             <button 
+               key={link.label} 
+               onClick={() => navigate(link.path)}
+               className={`text-[9px] font-bold tracking-[0.15em] uppercase transition-all hover:text-primary ${currentPath === link.path ? "text-primary shadow-[0_2px_0_0_#FF4500]" : "text-muted-foreground"}`}
+             >
                {link.label}
              </button>
           ))}
         </div>
+        </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 bg-card/60 border border-border/60 rounded-full px-5 py-2.5 focus-within:border-primary/50 transition-all shadow-inner">
-            <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em] hidden sm:block">ID</span>
-            <input 
-               type="text" 
-               value={apiKey} 
-               onChange={(e) => onApiKeyChange(e.target.value.trim())}
-               placeholder="Seu Machine ID..."
-               className="bg-transparent border-none outline-none text-[10px] font-mono text-foreground w-40 sm:w-64 placeholder:text-muted-foreground/30 focus:text-primary transition-all"
-            />
-            <div className="flex items-center gap-2 border-l border-border/40 pl-3">
-               <div className={`w-2 h-2 rounded-full ${isAgentConnected ? "bg-emerald-500 animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.8)]" : "bg-destructive/30"}`} title={isAgentConnected ? "Agente Online" : "Agente Offline"} />
-               <span className={`text-[8px] font-bold uppercase tracking-widest ${isAgentConnected ? "text-emerald-500" : "text-muted-foreground"}`}>
-                 {isAgentConnected ? "Online" : "Offline"}
-               </span>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ WebkitAppRegion: 'no-drag' } as any}>
+           <img src="/logo2.png" alt="WarmAds" className="h-20 w-auto opacity-100 transition-opacity drop-shadow-[0_0_15px_rgba(255,69,0,0.3)]" />
+        </div>
+
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+             <div className="flex items-center gap-2">
+                <div className="w-1 h-1 rounded-full bg-primary animate-pulse shadow-[0_0_10px_#FF4500]" />
+                <span className="text-[9px] font-bold tracking-[0.1em] text-primary uppercase">MOTOR ONLINE</span>
+             </div>
+          </div>
+
+          <div className="h-4 w-px bg-white/10" />
+
+          <div className="flex items-center gap-4" style={{ WebkitAppRegion: 'no-drag' } as any}>
+             <button onClick={() => setShowPasswordModal(true)} className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary">
+                <User className="w-4 h-4" />
+             </button>
+             <button onClick={handleLogout} className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-destructive">
+                <LogOut className="w-4 h-4" />
+             </button>
+          </div>
+
+          {/* Window Controls (Electron Only) */}
+          {isElectron && (
+            <div className="flex items-center ml-4 gap-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
+              <button 
+                onClick={() => ipc?.send('window-minimize')}
+                className="p-2.5 text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all rounded-md"
+              >
+                <Minus className="w-3.5 h-3.5" />
+              </button>
+              <button 
+                onClick={() => ipc?.send('window-toggle-maximize')}
+                className="p-2.5 text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all rounded-md"
+              >
+                <Square className="w-3 h-3" />
+              </button>
+              <button 
+                onClick={() => ipc?.send('window-close')}
+                className="p-2.5 text-muted-foreground hover:bg-destructive hover:text-destructive-foreground transition-all rounded-md"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
-          </div>
-
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <button className="p-2 hover:bg-card rounded-full transition-colors"><Bell className="w-4 h-4" /></button>
-            {/* Engrenagem = Logout */}
-            <button 
-              onClick={handleLogout}
-              title="Sair da conta"
-              className="p-2 hover:bg-card hover:text-destructive rounded-full transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-            {/* Ícone de usuário = Alterar Senha */}
-            <button
-              onClick={() => setShowPasswordModal(true)}
-              title="Alterar senha"
-              className="w-8 h-8 rounded-full bg-border overflow-hidden border border-border/50 ml-2 hover:border-primary/50 transition-colors"
-            >
-              <User className="w-full h-full p-1.5 text-muted-foreground/50 bg-card hover:text-primary transition-colors" />
-            </button>
-          </div>
+          )}
         </div>
       </motion.header>
 

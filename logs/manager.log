@@ -184,3 +184,416 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\u25b6' in position 
 2026-04-07 14:21:48,395 [ERROR] Falha ao abrir perfil k1aq7vt0& C:/Users/nepul/AppData/Local/Programs/Python/Python310/python.exe c:/Users/nepul/Downloads/adspower_manager/adspower_manager/main.py.
 2026-04-07 14:21:57,228 [INFO] Abrindo perfil k1aq7vt0 ()...
 2026-04-07 14:22:05,813 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-09 01:14:46,619 [INFO] Assets path configured: C:\Users\nepul\Downloads\adspower_manager\adspower_manager\assets
+2026-04-09 01:14:46,621 [INFO] Starting up TCP server on localhost:59536
+2026-04-09 01:14:46,625 [INFO] Flet app has started...
+2026-04-09 01:14:46,629 [INFO] App URL: tcp://localhost:59536
+2026-04-09 01:14:46,629 [INFO] Starting Flet View app...
+2026-04-09 01:14:46,630 [INFO] Looking for Flet executable at: C:\Users\nepul\AppData\Local\Programs\Python\Python310\lib\site-packages\flet_desktop\app\flet\flet.exe
+2026-04-09 01:14:46,630 [INFO] Flet View found in: C:\Users\nepul\AppData\Local\Programs\Python\Python310\lib\site-packages\flet_desktop\app\flet\flet.exe
+2026-04-09 01:14:47,318 [INFO] App session started
+2026-04-09 01:14:47,353 [ERROR] Unhandled error in main() handler
+Traceback (most recent call last):
+  File "C:\Users\nepul\AppData\Local\Programs\Python\Python310\lib\site-packages\flet\app.py", line 351, in on_session_created
+    main(session.page)
+  File "C:\Users\nepul\Downloads\adspower_manager\adspower_manager\advanced_gui.py", line 420, in main
+    app = AdvancedGUI(page, worker)
+  File "C:\Users\nepul\Downloads\adspower_manager\adspower_manager\advanced_gui.py", line 60, in __init__
+    ft.Icon(ft.icons.BOLT, size=18),
+AttributeError: module 'flet.controls.material.icons' has no attribute 'BOLT'
+2026-04-09 01:17:00,354 [INFO] Assets path configured: C:\Users\nepul\Downloads\adspower_manager\adspower_manager\assets
+2026-04-09 01:17:00,355 [INFO] Starting up TCP server on localhost:54912
+2026-04-09 01:17:00,359 [INFO] Flet app has started...
+2026-04-09 01:17:00,362 [INFO] App URL: tcp://localhost:54912
+2026-04-09 01:17:00,362 [INFO] Starting Flet View app...
+2026-04-09 01:17:00,362 [INFO] Looking for Flet executable at: C:\Users\nepul\AppData\Local\Programs\Python\Python310\lib\site-packages\flet_desktop\app\flet\flet.exe
+2026-04-09 01:17:00,363 [INFO] Flet View found in: C:\Users\nepul\AppData\Local\Programs\Python\Python310\lib\site-packages\flet_desktop\app\flet\flet.exe
+2026-04-09 01:17:00,709 [INFO] App session started
+2026-04-09 01:17:00,742 [ERROR] Unhandled error in main() handler
+Traceback (most recent call last):
+  File "C:\Users\nepul\AppData\Local\Programs\Python\Python310\lib\site-packages\flet\app.py", line 351, in on_session_created
+    main(session.page)
+  File "C:\Users\nepul\Downloads\adspower_manager\adspower_manager\advanced_gui.py", line 420, in main
+    app = AdvancedGUI(page, worker)
+  File "C:\Users\nepul\Downloads\adspower_manager\adspower_manager\advanced_gui.py", line 60, in __init__
+    ft.Icon(ft.icons.FLASH_ON_ROUNDED, size=18),
+AttributeError: module 'flet.controls.material.icons' has no attribute 'FLASH_ON_ROUNDED'
+2026-04-09 01:18:04,459 [INFO] Session was garbage collected: Ke8mMCKXgVfijQ2B
+2026-04-09 01:18:05,152 [INFO] Session was garbage collected: GV0n2IcAXt1G7NHG
+2026-04-09 01:18:05,279 [ERROR] Task was destroyed but it is pending!
+task: <Task pending name='Task-14' coro=<Event.wait() running at C:\Users\nepul\AppData\Local\Programs\Python\Python310\lib\asyncio\locks.py:214> wait_for=<Future pending cb=[Task.task_wakeup()]> cb=[_release_waiter(<Future pendi...ask_wakeup()]>)() at C:\Users\nepul\AppData\Local\Programs\Python\Python310\lib\asyncio\tasks.py:387]>
+2026-04-09 01:18:05,280 [ERROR] Task was destroyed but it is pending!
+task: <Task pending name='Task-12' coro=<AgentWorker.scheduler_loop() running at C:\Users\nepul\Downloads\adspower_manager\adspower_manager\gui_agent.py:352> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2026-04-09 01:18:06,695 [ERROR] Task was destroyed but it is pending!
+task: <Task pending name='Task-12' coro=<AgentWorker.scheduler_loop() running at C:\Users\nepul\Downloads\adspower_manager\adspower_manager\gui_agent.py:326>>
+2026-04-09 01:34:14,511 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:34:14,511 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:34:24,518 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 01:34:52,576 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:34:52,577 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:34:53,142 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-09 01:34:53,142 [ERROR] [k1aq7vt0] Erro na tarefa: 'charmap' codec can't encode character '\U0001f550' in position 4: character maps to <undefined>
+2026-04-09 01:35:03,173 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 01:35:04,841 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:35:04,841 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:35:12,808 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-09 01:35:12,808 [ERROR] [k1aq7vt0] Erro na tarefa: 'charmap' codec can't encode characters in position 4-5: character maps to <undefined>
+2026-04-09 01:35:22,856 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 01:46:12,590 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:46:12,590 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:46:20,538 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-09 01:46:20,539 [ERROR] [k1aq7vt0] Erro na tarefa: 'charmap' codec can't encode character '\U0001f550' in position 4: character maps to <undefined>
+2026-04-09 01:46:30,577 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 01:46:31,733 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:46:31,733 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:46:41,745 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 01:53:31,293 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:53:31,294 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:53:41,304 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 01:54:05,297 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:54:05,297 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:54:05,859 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-09 01:54:05,860 [ERROR] [k1aq7vt0] Erro na tarefa: 'charmap' codec can't encode character '\U0001f50d' in position 4: character maps to <undefined>
+2026-04-09 01:54:15,890 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 01:58:09,553 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:58:09,554 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:58:19,562 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 01:58:41,286 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:58:41,286 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:58:41,850 [INFO] Perfil k1aq7vt0 conectado. Título: samuel bm
+2026-04-09 01:58:45,090 [ERROR] [k1aq7vt0] Erro na tarefa: 'charmap' codec can't encode character '\U0001f50d' in position 4: character maps to <undefined>
+2026-04-09 01:58:55,121 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 01:58:56,876 [INFO] AdsPower detectado e ativo.
+2026-04-09 01:58:56,876 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 01:59:08,975 [INFO] Perfil k1aq7vt0 conectado. Título: Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-09 01:59:12,266 [ERROR] [k1aq7vt0] Erro na tarefa: 'charmap' codec can't encode character '\U0001f50d' in position 4: character maps to <undefined>
+2026-04-09 01:59:22,296 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 02:05:59,427 [INFO] AdsPower detectado e ativo.
+2026-04-09 02:05:59,427 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 02:06:13,397 [INFO] Perfil k1aq7vt0 conectado. Título: (3) Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-09 02:06:15,414 [ERROR] [k1aq7vt0] Erro na tarefa: 'charmap' codec can't encode character '\U0001f50d' in position 4: character maps to <undefined>
+2026-04-09 02:06:25,441 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 02:06:29,871 [INFO] AdsPower detectado e ativo.
+2026-04-09 02:06:29,872 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 02:06:43,079 [INFO] Perfil k1aq7vt0 conectado. Título: (3) Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-09 02:06:45,095 [ERROR] [k1aq7vt0] Erro na tarefa: 'charmap' codec can't encode character '\U0001f50d' in position 4: character maps to <undefined>
+2026-04-09 02:06:55,130 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 02:11:30,686 [INFO] AdsPower detectado e ativo.
+2026-04-09 02:11:30,687 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 02:11:39,698 [INFO] Perfil k1aq7vt0 conectado. Título: 
+2026-04-09 02:11:41,707 [ERROR] [k1aq7vt0] Erro na tarefa: 'charmap' codec can't encode character '\U0001f680' in position 2: character maps to <undefined>
+2026-04-09 02:11:51,733 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 02:13:24,980 [INFO] AdsPower detectado e ativo.
+2026-04-09 02:13:24,981 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 02:13:33,993 [INFO] Perfil k1aq7vt0 conectado. Título: 
+2026-04-09 02:14:22,503 [INFO] [k1aq7vt0] Tarefa concluída: {'ok': False, 'error': "'ciclos'"}
+2026-04-09 02:14:32,543 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 02:15:10,374 [INFO] AdsPower detectado e ativo.
+2026-04-09 02:15:10,374 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 02:15:21,461 [INFO] Perfil k1aq7vt0 conectado. Título: 
+2026-04-09 02:16:06,315 [INFO] [k1aq7vt0] Tarefa concluída: {'ok': False, 'error': "'ciclos'"}
+2026-04-09 02:16:16,361 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 02:17:44,613 [INFO] AdsPower detectado e ativo.
+2026-04-09 02:17:44,614 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 02:17:52,357 [INFO] Perfil k1aq7vt0 conectado. Título: samuel bm
+2026-04-09 02:29:06,561 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 2, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 4.2889206298443305, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 17791, 'tempo_gaming_real': 86.5888135433197, 'tempo_total_feed': 299.12541246414185, 'postagem': True}
+2026-04-09 02:29:17,004 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 02:35:58,437 [INFO] AdsPower detectado e ativo.
+2026-04-09 02:35:58,438 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 02:36:05,958 [INFO] Perfil k1aq7vt0 conectado. Título: AdsPower
+2026-04-09 02:44:39,856 [INFO] AdsPower detectado e ativo.
+2026-04-09 02:44:39,857 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 02:44:47,432 [INFO] Perfil k1aq7vt0 conectado. Título: Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-09 02:47:12,458 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0, 'tempo_live_total': 68.50462555885315}
+2026-04-09 02:47:14,489 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 02:57:05,371 [INFO] AdsPower detectado e ativo.
+2026-04-09 02:57:05,371 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 02:57:15,590 [INFO] Perfil k1aq7vt0 conectado. Título: Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-09 02:58:23,004 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-09 02:58:25,023 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-09 03:41:08,854 [INFO] AdsPower detectado e ativo.
+2026-04-09 03:41:08,854 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 03:41:09,664 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 03:41:15,241 [INFO] AdsPower detectado e ativo.
+2026-04-09 03:41:15,241 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 03:41:18,685 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 04:01:15,627 [INFO] AdsPower detectado e ativo.
+2026-04-09 04:01:15,627 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 04:01:19,072 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 04:01:32,550 [INFO] AdsPower detectado e ativo.
+2026-04-09 04:01:32,550 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 04:01:36,046 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 04:04:14,154 [INFO] AdsPower detectado e ativo.
+2026-04-09 04:04:14,155 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 04:04:17,626 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 04:04:19,505 [INFO] AdsPower detectado e ativo.
+2026-04-09 04:04:19,505 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 04:04:19,970 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 04:04:31,481 [INFO] AdsPower detectado e ativo.
+2026-04-09 04:04:31,481 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 04:04:32,931 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 04:06:20,629 [INFO] AdsPower detectado e ativo.
+2026-04-09 04:06:30,795 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 04:06:34,242 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 04:06:40,690 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 04:06:48,175 [ERROR] Falha ao abrir perfil k1aq7vt0.
+2026-04-09 04:09:27,115 [INFO] AdsPower detectado e ativo.
+2026-04-09 04:09:27,115 [INFO] Abrindo perfil k1bbc519 ()...
+2026-04-09 04:09:27,981 [ERROR] Falha ao abrir perfil k1bbc519.
+2026-04-09 15:09:27,027 [INFO] AdsPower detectado e ativo.
+2026-04-09 15:09:27,031 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-09 15:09:37,977 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-09 15:24:55,154 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 5, 'reels_curtidos': 0, 'ciclos': 2, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 25549, 'tempo_total_feed': 579.8183698654175, 'postagem': True}
+2026-04-09 15:25:05,182 [INFO] Perfil k1bc152h fechado.
+2026-04-09 22:38:16,143 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:38:16,678 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:38:17,677 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:38:18,676 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:38:19,678 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:38:20,684 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:38:21,674 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:38:22,681 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:38:23,682 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:38:24,680 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:38,576 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:39,488 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:40,500 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:41,491 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:42,496 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:43,488 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:44,485 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:45,500 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:46,492 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:47,526 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:48,492 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:49,496 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:50,497 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:51,484 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:52,487 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:39:53,489 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:47:54,907 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:47:55,693 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:47:56,433 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:47:57,415 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:47:58,415 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:47:59,418 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:00,415 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:01,425 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:02,414 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:03,415 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:04,416 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:05,416 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:06,423 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:07,487 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:08,420 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:09,423 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:10,416 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:11,419 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:12,421 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:13,413 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:14,416 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:15,414 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:16,414 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:17,412 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:18,413 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:19,417 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:20,414 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:21,421 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:22,424 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:23,418 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:24,415 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:25,416 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:26,413 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:27,432 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:28,416 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:29,413 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:30,414 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:31,416 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:33,159 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:34,152 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:35,150 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:36,159 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:37,147 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:38,156 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:39,164 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:40,161 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:41,150 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:42,146 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:43,158 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:44,157 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:45,158 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:46,158 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:47,159 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:48,154 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:49,164 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:50,163 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:51,161 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:52,157 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:53,154 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:54,153 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:55,159 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:56,156 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:57,155 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:58,170 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:48:59,160 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:00,167 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:01,164 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:02,167 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:03,159 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:04,157 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:05,156 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:06,166 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:07,165 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:08,156 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:09,166 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:10,174 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:10,974 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:11,425 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:17,509 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:17,828 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:18,458 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:18,498 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:19,434 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:19,480 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:20,430 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:20,466 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:21,437 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:21,477 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:22,432 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:22,465 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:23,430 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:23,486 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:24,453 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:24,490 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:25,431 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:25,469 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:26,437 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:26,476 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:27,434 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:27,470 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:28,429 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:28,468 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 22:49:29,450 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 22:49:29,493 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.nepulbila%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:52,354 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:52,681 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:53,104 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:53,112 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:53,141 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:53,147 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:53,855 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:53,889 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:54,870 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:54,901 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:55,858 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:55,890 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:56,773 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:56,822 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:56,857 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:56,892 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:57,857 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:57,888 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:57,947 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:57,981 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:58,919 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:58,967 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:59,863 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:59,908 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:22:59,945 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:22:59,982 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:00,861 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:00,898 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:01,857 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:01,910 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:02,856 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:02,892 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:03,855 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:03,891 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:04,855 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:04,895 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:05,863 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:05,908 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:06,888 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:06,939 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:07,864 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:07,907 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:08,101 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:08,143 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:08,859 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:08,892 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:09,855 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:09,891 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:10,261 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:10,305 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:10,858 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:10,895 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:23:11,863 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/auth/v1/user "HTTP/2 200 OK"
+2026-04-09 23:23:11,904 [INFO] HTTP Request: GET https://mewueckdincysvdhfxbp.supabase.co/rest/v1/subscriptions?select=%2A&email=eq.jcmendes608%40gmail.com "HTTP/2 200 OK"
+2026-04-09 23:35:32,723 [INFO] AdsPower detectado e ativo.
+2026-04-09 23:35:32,723 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-09 23:35:40,282 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-09 23:38:03,283 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 3, 'reels_curtidos': 1, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-09 23:38:05,301 [INFO] Perfil k1bc152h fechado.
+2026-04-09 23:50:19,219 [INFO] AdsPower detectado e ativo.
+2026-04-09 23:50:19,221 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-09 23:50:26,183 [INFO] Perfil k1bc152h conectado. Título: teste1
+2026-04-09 23:54:51,099 [INFO] AdsPower detectado e ativo.
+2026-04-09 23:54:51,099 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-09 23:54:54,519 [ERROR] Falha ao abrir perfil k1aq7vt0. {'code': -1, 'msg': 'Profile does not exist'}
+2026-04-09 23:54:54,519 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-09 23:54:58,964 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-09 23:55:21,904 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-09 23:55:23,915 [INFO] Perfil k1bc152h fechado.
+2026-04-10 00:11:34,095 [INFO] AdsPower detectado e ativo.
+2026-04-10 00:11:34,095 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-10 00:11:35,525 [ERROR] Falha ao abrir perfil k1aq7vt0. {'code': -1, 'msg': 'Profile does not exist'}
+2026-04-10 00:11:48,586 [INFO] AdsPower detectado e ativo.
+2026-04-10 00:11:48,586 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-10 00:11:51,980 [ERROR] Falha ao abrir perfil k1aq7vt0. {'code': -1, 'msg': 'Profile does not exist'}
+2026-04-10 00:11:51,980 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 00:11:57,347 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-10 00:19:03,792 [INFO] AdsPower detectado e ativo.
+2026-04-10 00:19:03,792 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 00:19:10,590 [INFO] Perfil k1bc152h conectado. Título: teste1
+2026-04-10 00:21:43,563 [INFO] AdsPower detectado e ativo.
+2026-04-10 00:21:43,563 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 00:21:51,718 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-10 00:22:02,039 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 0, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-10 00:22:04,047 [INFO] Perfil k1bc152h fechado.
+2026-04-10 00:41:46,558 [INFO] AdsPower detectado e ativo.
+2026-04-10 00:41:46,558 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 00:41:52,484 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-10 00:42:39,975 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-10 00:42:42,006 [INFO] Perfil k1bc152h fechado.
+2026-04-10 00:43:46,863 [INFO] AdsPower detectado e ativo.
+2026-04-10 00:43:46,863 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 00:43:56,870 [ERROR] Falha ao abrir perfil k1bc152h. {'code': -1, 'msg': "HTTPConnectionPool(host='127.0.0.1', port=50325): Read timed out. (read timeout=10)"}
+2026-04-10 00:43:59,627 [INFO] AdsPower detectado e ativo.
+2026-04-10 00:43:59,627 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 00:44:00,172 [INFO] Perfil k1bc152h conectado. Título: teste1
+2026-04-10 00:51:01,873 [INFO] AdsPower detectado e ativo.
+2026-04-10 00:51:01,873 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 00:51:10,015 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-10 00:58:39,969 [INFO] AdsPower detectado e ativo.
+2026-04-10 00:58:39,969 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 00:58:47,140 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-10 00:58:56,899 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 0, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-10 00:58:58,911 [INFO] Perfil k1bc152h fechado.
+2026-04-10 01:03:40,457 [INFO] AdsPower detectado e ativo.
+2026-04-10 01:03:40,459 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 01:03:45,668 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-10 01:08:34,832 [INFO] AdsPower detectado e ativo.
+2026-04-10 01:08:34,832 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 01:08:42,213 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-10 01:09:13,805 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 0, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-10 01:09:15,827 [INFO] Perfil k1bc152h fechado.
+2026-04-10 01:12:57,033 [INFO] AdsPower detectado e ativo.
+2026-04-10 01:12:57,033 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 01:13:04,231 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-10 01:14:05,004 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0, 'tempo_gaming_real': 4.531954526901245}
+2026-04-10 01:14:07,019 [INFO] Perfil k1bc152h fechado.
+2026-04-10 01:18:17,891 [INFO] AdsPower detectado e ativo.
+2026-04-10 01:18:17,891 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 01:18:25,117 [INFO] Perfil k1bc152h conectado. Título: AdsPower
+2026-04-10 01:18:27,119 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 0, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-10 01:18:29,131 [INFO] Perfil k1bc152h fechado.

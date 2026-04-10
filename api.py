@@ -23,6 +23,9 @@ class ConnectionManager:
     def __init__(self):
         # machine_id -> socket
         self.active_agents: Dict[str, WebSocket] = {}
+        # request_id -> asyncio.Future (for request-response pattern)
+        self._pending: Dict[str, asyncio.Future] = {}
+        self._req_counter = 0
 
     async def connect(self, machine_id: str, websocket: WebSocket):
         await websocket.accept()
@@ -39,6 +42,38 @@ class ConnectionManager:
             await self.active_agents[machine_id].send_json(command)
             return True
         return False
+
+    async def send_and_wait(self, machine_id: str, request_type: str, timeout: float = 5.0) -> Any:
+        """Send a data request to the agent and wait for the response."""
+        self._req_counter += 1
+        req_id = f"req_{self._req_counter}"
+        
+        loop = asyncio.get_event_loop()
+        future = loop.create_future()
+        self._pending[req_id] = future
+        
+        ok = await self.send_command(machine_id, {
+            "type": "DATA_REQUEST",
+            "request_id": req_id,
+            "request_type": request_type
+        })
+        
+        if not ok:
+            del self._pending[req_id]
+            return None
+        
+        try:
+            result = await asyncio.wait_for(future, timeout=timeout)
+            return result
+        except asyncio.TimeoutError:
+            self._pending.pop(req_id, None)
+            return None
+    
+    def resolve_request(self, req_id: str, data: Any):
+        """Called when an agent responds to a data request."""
+        future = self._pending.pop(req_id, None)
+        if future and not future.done():
+            future.set_result(data)
 
 manager = ConnectionManager()
 
@@ -82,9 +117,10 @@ def get_supabase() -> Optional[Client]:
     return create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 class WarmupRequest(BaseModel):
-    machine_id: str = "default"  # Added machine_id to specify which agent to target
+    machine_id: str = "default"
     profile_ids: List[str]
     mode: str 
+    duration: Optional[int] = None
 
 @app.get("/api/health")
 def health_check():
@@ -92,6 +128,7 @@ def health_check():
 
 @app.post("/api/warmup/start")
 async def start_warmup(req: WarmupRequest):
+    print(f"DEBUG: Backend recebeu solicitação de warmup para os IDs: {req.profile_ids} (Agent: {req.machine_id})")
     state = get_state(req.machine_id)
     if state.is_running:
         raise HTTPException(status_code=400, detail="Agent is already busy")
@@ -101,7 +138,8 @@ async def start_warmup(req: WarmupRequest):
         "type": "START",
         "data": {
             "profile_ids": req.profile_ids,
-            "mode": req.mode
+            "mode": req.mode,
+            "duration": req.duration
         }
     }
     
@@ -140,6 +178,30 @@ def get_status(machine_id: str = "default"):
         "scheduler_status": state.scheduler_status,
         "agent_connected": machine_id in manager.active_agents
     }
+
+@app.get("/api/profiles")
+async def get_profiles_from_agent(machine_id: str = "default"):
+    """Fetch profiles from the local SAS agent via WebSocket tunnel."""
+    if machine_id not in manager.active_agents:
+        raise HTTPException(status_code=404, detail="Agent not connected. Open the SAS app first.")
+    
+    data = await manager.send_and_wait(machine_id, "GET_PROFILES")
+    if data is None:
+        raise HTTPException(status_code=504, detail="Agent did not respond in time")
+    
+    return data
+
+@app.get("/api/scheduler")
+async def get_scheduler_from_agent(machine_id: str = "default"):
+    """Fetch scheduler config from the local SAS agent via WebSocket tunnel."""
+    if machine_id not in manager.active_agents:
+        raise HTTPException(status_code=404, detail="Agent not connected")
+    
+    data = await manager.send_and_wait(machine_id, "GET_SCHEDULER")
+    if data is None:
+        return {"config": {}, "status": {}}
+    
+    return data
 
 @app.post("/api/scheduler/update")
 async def update_scheduler(machine_id: str, config: Dict[str, Any]):
@@ -257,6 +319,11 @@ async def agent_tunnel(websocket: WebSocket, machine_id: str):
 
             elif msg_type == "HEARTBEAT":
                 pass
+
+            elif msg_type == "DATA_RESPONSE":
+                req_id = data.get("request_id")
+                if req_id:
+                    manager.resolve_request(req_id, data.get("data"))
 
             elif msg_type == "FINISHED":
                 state.is_running = False

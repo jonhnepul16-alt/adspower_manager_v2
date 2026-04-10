@@ -74,8 +74,20 @@ class AccountManager:
         log.info(f"Abrindo perfil {profile_id} ({profile_name})...")
 
         data = self.api.open_browser(profile_id)
-        if not data:
-            log.error(f"Falha ao abrir perfil {profile_id}.")
+        
+        # Check for specific AdsPower rate limits / fail-safe
+        if data is None:
+            log.error(f"Falha ao abrir perfil {profile_id}. Unknown API error.")
+            return None
+            
+        # Often raw api returns something if it fails. The apic in `adspower_api.py` returns `res.get("data")` 
+        # Wait, if code != 0, it logs and returns None. We need to catch this. Let's fix adspower_api.py to return the full dict if possible, or we raise exception here if None, but we need to know the MSG.
+        # For now, if data is None, we'll try to guess or use the new adspower_api format we will implement.
+        if isinstance(data, dict) and data.get("code") == -1 and "limit" in str(data.get("msg", "")).lower():
+            raise Exception("Exceeding open daily limit")
+            
+        if not data or (isinstance(data, dict) and "ws" not in data):
+            log.error(f"Falha ao abrir perfil {profile_id}. {data}")
             return None
 
         ws_url = data.get("ws", {}).get("selenium")

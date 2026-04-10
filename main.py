@@ -565,8 +565,9 @@ def scroll_com_leitura_simulada(driver):
 #  DEEP COMMENTS (QUEBRA DE PADRÃO)
 # ═══════════════════════════════════════════════════════════════
 
-def task_deep_comments(driver, wait, resultados: dict, **_):
+def task_deep_comments(driver, wait, resultados: dict, stop_check=None, **_):
     """40% de prob por ciclo. Explora comentários de um post por ~20s."""
+    if stop_check and stop_check(): return
     if random.random() > 0.40:
         return
 
@@ -611,6 +612,7 @@ def task_deep_comments(driver, wait, resultados: dict, **_):
         print("    👁  Lendo comentários por ~20s...")
         fim_cmt = time.time() + random.uniform(18, 23)
         while time.time() < fim_cmt:
+            if stop_check and stop_check(): break
             driver.execute_script(
                 f"window.scrollBy(0, {random.randint(100, 250)});"
             )
@@ -699,7 +701,7 @@ def _tentar_cta_em_tela(driver, resultados: dict) -> bool:
 # ═══════════════════════════════════════════════════════════════
 
 def task_curtir_feed(
-    driver, wait, resultados: dict, nome_modo: str = "Padrão", **_
+    driver, wait, resultados: dict, nome_modo: str = "Padrão", stop_check=None, **_
 ):
     """
     Tarefa A — Fast-Scroll de Feed (v3.4).
@@ -832,8 +834,9 @@ def task_curtir_feed(
 #  TAREFA B — REELS
 # ═══════════════════════════════════════════════════════════════
 
-def task_reels_watch(driver, wait, resultados: dict, **_):
+def task_reels_watch(driver, wait, resultados: dict, stop_check=None, **_):
     """Tarefa B — Reels com estratégia tripla de avanço e curtida 30%."""
+    if stop_check and stop_check(): return
     print("\n  ▶ [B] Assistindo Reels...")
     try:
         driver.get("https://www.facebook.com/reel/")
@@ -845,6 +848,7 @@ def task_reels_watch(driver, wait, resultados: dict, **_):
 
         qtd = random.randint(2, 5)
         for i in range(qtd):
+            if stop_check and stop_check(): break
             # 25% de chance de pular o reel rápido (indecisão) nos primeiros (HC-1)
             if i < 2 and random.random() < 0.25:
                 watch_time = random.uniform(1, 3)
@@ -866,7 +870,12 @@ def task_reels_watch(driver, wait, resultados: dict, **_):
             except Exception:
                 pass
 
-            time.sleep(watch_time)
+            # Responsive sleep for reels
+            sleep_end = time.time() + watch_time
+            while time.time() < sleep_end:
+                if stop_check and stop_check(): break
+                time.sleep(0.5)
+            
             resultados["reels_assistidos"] = resultados.get("reels_assistidos", 0) + 1
 
             avancou = False
@@ -910,7 +919,7 @@ def task_reels_watch(driver, wait, resultados: dict, **_):
 #  TAREFA C — BUSCA RÁPIDA POR NICHO (v3.4)
 # ═══════════════════════════════════════════════════════════════
 
-def task_busca_aleatoria(driver, wait, resultados: dict, **_):
+def task_busca_aleatoria(driver, wait, resultados: dict, stop_check=None, **_):
     """
     Tarefa C — Busca Rápida por Nicho (v3.4).
 
@@ -971,6 +980,7 @@ def task_busca_aleatoria(driver, wait, resultados: dict, **_):
         dist_busca     = 0
 
         while time.time() < fim_varredura:
+            if stop_check and stop_check(): break
             px = random.randint(350, 600)
             driver.execute_script(f"window.scrollBy(0, {px});")
             dist_busca   += px
@@ -1013,8 +1023,9 @@ def task_busca_aleatoria(driver, wait, resultados: dict, **_):
 #  TAREFA D — WATCH LIVE
 # ═══════════════════════════════════════════════════════════════
 
-def task_watch_live(driver, wait, resultados: dict, nome_modo: str = "Padrão", **_):
+def task_watch_live(driver, wait, resultados: dict, nome_modo: str = "Padrão", stop_check=None, **_):
     """Tarefa D — Assiste live. Tempo proporcional ao modo."""
+    if stop_check and stop_check(): return
     print(f"\n  ▶ [D] Assistindo Live ({nome_modo})...")
     try:
         driver.get("https://www.facebook.com/watch/live/")
@@ -1040,6 +1051,7 @@ def task_watch_live(driver, wait, resultados: dict, nome_modo: str = "Padrão", 
         ultimo_move  = inicio_live
 
         while time.time() - inicio_live < duracao_live:
+            if stop_check and stop_check(): break
             agora = time.time()
             if agora - ultimo_move >= 40:
                 if player:
@@ -1053,8 +1065,12 @@ def task_watch_live(driver, wait, resultados: dict, nome_modo: str = "Padrão", 
                         pass
                 ultimo_move = time.time()
                 print("    · Micro-movimento no player (anti-inatividade).")
-            time.sleep(random.uniform(4, 8))
-
+            # Responsive sleep for live
+            sleep_end_l = time.time() + random.uniform(4, 8)
+            while time.time() < sleep_end_l:
+                if stop_check and stop_check(): break
+                time.sleep(0.5)
+ 
         tempo_assistido = time.time() - inicio_live
         resultados["tempo_live_total"] = (
             resultados.get("tempo_live_total", 0) + tempo_assistido
@@ -1068,8 +1084,9 @@ def task_watch_live(driver, wait, resultados: dict, nome_modo: str = "Padrão", 
 #  TAREFA E — MARKETPLACE + MESSENGER
 # ═══════════════════════════════════════════════════════════════
 
-def task_marketplace_messenger(driver, wait, resultados: dict, **_):
+def task_marketplace_messenger(driver, wait, resultados: dict, stop_check=None, **_):
     """Sub-tarefa: intenção de compra via Messenger (20% / 1x por sessão)."""
+    if stop_check and stop_check(): return
     if resultados.get("interacao_comercial_messenger"):
         return
     if random.random() > 0.20:
@@ -1159,9 +1176,10 @@ def task_marketplace_messenger(driver, wait, resultados: dict, **_):
 
 
 def task_marketplace_browse(
-    driver, wait, resultados: dict, nome_modo: str = "Padrão", **_
+    driver, wait, resultados: dict, nome_modo: str = "Padrão", stop_check=None, **_
 ):
     """Tarefa E — Navega no Marketplace. Integra Messenger com 20% de chance."""
+    if stop_check and stop_check(): return
     categoria = random.choice(CATEGORIAS_MARKETPLACE)
     print(f"\n  ▶ [E] Marketplace — categoria: '{categoria}'...")
     try:
@@ -1186,6 +1204,7 @@ def task_marketplace_browse(
 
         fim_mp = time.time() + duracao_mp
         while time.time() < fim_mp:
+            if stop_check and stop_check(): break
             scroll_humano_avancado(driver, random.randint(400, 900))
             
             if random.random() < 0.20:
@@ -1203,7 +1222,7 @@ def task_marketplace_browse(
                 except Exception:
                     pass
 
-        task_marketplace_messenger(driver, wait, resultados)
+        task_marketplace_messenger(driver, wait, resultados, stop_check=stop_check)
 
         resultados["itens_marketplace_vistos"] = (
             resultados.get("itens_marketplace_vistos", 0) + 1
@@ -1217,8 +1236,9 @@ def task_marketplace_browse(
 #  TAREFA F — CONSUMIDOR VIP (CTA no Feed)
 # ═══════════════════════════════════════════════════════════════
 
-def task_interact_ad(driver, wait, resultados: dict, **_):
+def task_interact_ad(driver, wait, resultados: dict, stop_check=None, **_):
     """Tarefa F — Consumidor VIP. 30% prob por ciclo. Detecta por CTA."""
+    if stop_check and stop_check(): return
     if random.random() > 0.30:
         return
 
@@ -1238,6 +1258,7 @@ def task_interact_ad(driver, wait, resultados: dict, **_):
 
         btn_cta = None
         for _ in range(5):
+            if stop_check and stop_check(): break
             driver.execute_script(
                 f"window.scrollBy(0, {random.randint(400, 700)});"
             )
@@ -1279,6 +1300,7 @@ def task_interact_ad(driver, wait, resultados: dict, **_):
             print("    ✓ Acessou site de destino. Navegando ~20s...")
             fim_ad = time.time() + random.uniform(18, 24)
             while time.time() < fim_ad:
+                if stop_check and stop_check(): break
                 driver.execute_script(
                     f"window.scrollBy(0, {random.randint(200, 420)});"
                 )
@@ -1302,8 +1324,9 @@ def task_interact_ad(driver, wait, resultados: dict, **_):
 #  TAREFA G — POSTAGEM DE STATUS
 # ═══════════════════════════════════════════════════════════════
 
-def task_postagem_status(driver, wait, resultados: dict, **_):
+def task_postagem_status(driver, wait, resultados: dict, stop_check=None, **_):
     """Tarefa G — Publicação de status (uma única vez por sessão)."""
+    if stop_check and stop_check(): return
     print("\n  ▶ [G] Publicando status de texto...")
     try:
         driver.get("https://www.facebook.com/")
@@ -1372,8 +1395,9 @@ def task_postagem_status(driver, wait, resultados: dict, **_):
 #  TAREFA I — REAÇÕES VARIADAS (HUMANIZADAS)
 # ═══════════════════════════════════════════════════════════════
 
-def task_reagir_posts(driver, wait, resultados: dict, **_):
+def task_reagir_posts(driver, wait, resultados: dict, stop_check=None, **_):
     """Tarefa I — Reage a posts no feed com distribuição natural (35% prob)."""
+    if stop_check and stop_check(): return
     if random.random() > 0.35:
         return
 
@@ -1383,6 +1407,7 @@ def task_reagir_posts(driver, wait, resultados: dict, **_):
         time.sleep(random.uniform(4, 6))
 
         for _ in range(random.randint(1, 3)):
+            if stop_check and stop_check(): break
             driver.execute_script(f"window.scrollBy(0, {random.randint(400, 800)});")
             time.sleep(random.uniform(2, 4))
 
@@ -1432,8 +1457,9 @@ def task_reagir_posts(driver, wait, resultados: dict, **_):
 #  TAREFA J — COMENTÁRIOS EM POSTS
 # ═══════════════════════════════════════════════════════════════
 
-def task_comentar_posts(driver, wait, resultados: dict, **_):
+def task_comentar_posts(driver, wait, resultados: dict, stop_check=None, **_):
     """Tarefa J — Comenta em posts do feed (25% prob)."""
+    if stop_check and stop_check(): return
     if random.random() > 0.25:
         return
 
@@ -1504,8 +1530,9 @@ def task_comentar_posts(driver, wait, resultados: dict, **_):
 #  TAREFA K — ENTRAR E EXPLORAR GRUPOS
 # ═══════════════════════════════════════════════════════════════
 
-def task_entrar_grupo(driver, wait, resultados: dict, nome_modo: str = "Padrão", **_):
+def task_entrar_grupo(driver, wait, resultados: dict, nome_modo: str = "Padrão", stop_check=None, **_):
     """Tarefa K — Busca nicho em grupos e explora (20% prob, 1x por sessão)."""
+    if stop_check and stop_check(): return
     if resultados.get("grupos_visitados", 0) > 0:
         return
     if random.random() > 0.20:
@@ -1533,6 +1560,7 @@ def task_entrar_grupo(driver, wait, resultados: dict, nome_modo: str = "Padrão"
 
         fim = time.time() + duracao
         while time.time() < fim:
+            if stop_check and stop_check(): break
             driver.execute_script(f"window.scrollBy(0, {random.randint(300, 700)});")
             time.sleep(random.uniform(3, 6))
             
@@ -1558,8 +1586,9 @@ def task_entrar_grupo(driver, wait, resultados: dict, nome_modo: str = "Padrão"
 #  TAREFA L — ADICIONAR AMIGOS (SUGESTÕES)
 # ═══════════════════════════════════════════════════════════════
 
-def task_adicionar_amigos(driver, wait, resultados: dict, **_):
+def task_adicionar_amigos(driver, wait, resultados: dict, stop_check=None, **_):
     """Tarefa L — Vê sugestões de amizade e adiciona 1-2 (15% prob, 1x)."""
+    if stop_check and stop_check(): return
     if resultados.get("amigos_adicionados", 0) > 0:
         return
     if random.random() > 0.15:
@@ -1583,6 +1612,7 @@ def task_adicionar_amigos(driver, wait, resultados: dict, **_):
             try:
                 perfil = sugestoes[i]
                 driver.execute_script("arguments[0].scrollIntoView({behavior:'smooth',block:'center'});", perfil)
+                if stop_check and stop_check(): break
                 time.sleep(random.uniform(2, 4))
                 
                 # Clica no botão "Adicionar amigo"
@@ -1602,8 +1632,9 @@ def task_adicionar_amigos(driver, wait, resultados: dict, **_):
 #  TAREFA H — FACEBOOK GAMING
 # ═══════════════════════════════════════════════════════════════
 
-def task_facebook_gaming(driver, wait, resultados: dict, nome_modo: str = "Padrão", **_):
+def task_facebook_gaming(driver, wait, resultados: dict, nome_modo: str = "Padrão", stop_check=None, **_):
     """Tarefa H — Retenção Gamer. Tempo proporcional ao modo."""
+    if stop_check and stop_check(): return
     print(f"\n  ▶ [H] Facebook Gaming ({nome_modo})...")
     try:
         driver.get("https://www.facebook.com/gaming")
@@ -1662,6 +1693,7 @@ def task_facebook_gaming(driver, wait, resultados: dict, nome_modo: str = "Padr�
         ultimo_move_g = inicio_g
 
         while time.time() - inicio_g < duracao_gaming:
+            if stop_check and stop_check(): break
             agora = time.time()
             if agora - ultimo_move_g >= 40:
                 if player:
@@ -1675,7 +1707,11 @@ def task_facebook_gaming(driver, wait, resultados: dict, nome_modo: str = "Padr�
                         pass
                 ultimo_move_g = time.time()
                 print("    · Micro-movimento no player Gaming (anti-inatividade).")
-            time.sleep(random.uniform(4, 8))
+            # Responsive sleep for gaming
+            sleep_end_g = time.time() + random.uniform(4, 8)
+            while time.time() < sleep_end_g:
+                if stop_check and stop_check(): break
+                time.sleep(0.5)
 
         tempo_gaming = time.time() - inicio_g
         resultados["tempo_gaming_real"] = (
@@ -1691,8 +1727,9 @@ def task_facebook_gaming(driver, wait, resultados: dict, nome_modo: str = "Padr�
 #  HC-A — EXPLORAÇÃO ORGÂNICA E CURIOSIDADE
 # ═══════════════════════════════════════════════════════════════
 
-def task_explorar_organico(driver, wait, resultados: dict, **_):
+def task_explorar_organico(driver, wait, resultados: dict, stop_check=None, **_):
     """HC-4: Navega por hashtags, aba explorar e sugestões."""
+    if stop_check and stop_check(): return
     print("\n  ▶ [HC-A] Exploração Orgânica...")
     try:
         # 1. Tenta ir para a aba Explorar
@@ -1732,8 +1769,9 @@ def task_explorar_organico(driver, wait, resultados: dict, **_):
 #  HC-B — TROCA DE CONTEXTO E RITUAIS
 # ═══════════════════════════════════════════════════════════════
 
-def task_troca_contexto(driver, wait, resultados: dict, **_):
+def task_troca_contexto(driver, wait, resultados: dict, stop_check=None, **_):
     """HC-6: Alterna entre feed, perfil e notificações."""
+    if stop_check and stop_check(): return
     print("\n  ▶ [HC-B] Troca de Contexto...")
     try:
         # Ritual: Feed -> Ver Próprio Perfil -> Voltar
@@ -1762,8 +1800,9 @@ def task_troca_contexto(driver, wait, resultados: dict, **_):
 #  HC-C — AÇÕES INCOMPLETAS E GHOSTING
 # ═══════════════════════════════════════════════════════════════
 
-def task_acoes_incompletas(driver, wait, resultados: dict, **_):
+def task_acoes_incompletas(driver, wait, resultados: dict, stop_check=None, **_):
     """HC-7: Simula interações que não são concluídas (Comentário fantasma, inbox peek)."""
+    if stop_check and stop_check(): return
     print("\n  ▶ [HC-C] Ações Incompletas...")
     try:
         # 1. Inbox Peek (Messenger)
@@ -1829,149 +1868,138 @@ def facebook_warmup_por_tempo(
 ):
     """
     Orquestra todas as tarefas em ciclos embaralhados até o tempo esgotar.
-
-    Comportamentos de Alta Confiança ativos:
-      HC-1   check_notificacoes          — ritual de entrada
-      HC-2   scroll_com_leitura          — scroll reverso + 'Ver mais'
-      HC-3   task_busca_aleatoria        — 1x/sessão, varredura rápida 30–45s
-      HC-4   fast scroll 10/5/85%        — curtidas/leitura/passa no feed
-      HC-5   task_watch_live             — ciclo, tempo proporcional ao modo
-      HC-6   task_marketplace_browse     — ciclo, tempo proporcional ao modo
-      HC-7   task_interact_ad            — ciclo, 30% prob, detecção por CTA
-      HC-8   task_marketplace_messenger  — sub-tarefa Marketplace, 20% / 1x
-      HC-9   task_deep_comments          — ciclo, 40% prob
-      HC-10  task_facebook_gaming        — ciclo, tempo proporcional ao modo
-      HC-11  task_curtir_feed            — Fast-Scroll 40–50% do tempo total,
-                                           puxadas 1500–2000px, reverso 10–15x
-    Postagem (HC-12): única vez, nos últimos 20% do tempo.
     """
-    driver = extrair_driver(controller)
-    wait   = WebDriverWait(driver, 25)
-
-    # ── DETERMINAR PROFUNDIDADE DA SESSÃO ─────────────────
-    tipo_sessao = random.choices(
-        ["rasa", "media", "longa"], weights=[20, 70, 10], k=1
-    )[0]
+    print("\n🚀 [BOT] SISTEMA INICIALIZADO")
+    print(f"📅 Início: {time.strftime('%H:%M:%S')}")
     
-    duracao_segundos = duracao_original
-    if tipo_sessao == "rasa":
-        duracao_segundos = random.randint(40, 80)
-        print(f"    ⚠️  [Sessão Rasa] Comportamento de 'pressa' ativado ({duracao_segundos}s).")
-    elif tipo_sessao == "longa":
-        duracao_segundos = int(duracao_original * 1.25)
-        print(f"    🌟 [Sessão Longa] Comportamento 'imersivo' ativado (+25% tempo).")
-
-    if resultados is None:
-        resultados = {
-            "curtidas_feed": 0,
-            "reacoes_dadas": 0,
-            "comentarios_feitos": 0,
-            "reels_assistidos": 0,
-            "reels_curtidos": 0,
-            "buscas": 0,
-            "busca_nicho_concluida": False,
-            "tempo_gasto_na_busca": 0,
-            "tempo_live_total": 0,
-            "tempo_gaming_real": 0,
-            "tempo_total_feed": 0,
-            "ads_clicados": 0,
-            "ads_clicados_por_cta": 0,
-            "anuncios_clicados_na_varredura": 0,
-            "distancia_total_scrollada": 0,
-            "itens_marketplace_vistos": 0,
-            "grupos_visitados": 0,
-            "amigos_adicionados": 0,
-            "interacao_comercial_messenger": False,
-            "postagem": False,
-            "ciclos": 0,
-            "ok": True,
-        }
-    else:
-        # Garante que as chaves básicas existem no proxy
-        defaults = {
-            "curtidas_feed": 0, "reacoes_dadas": 0, "comentarios_feitos": 0,
-            "reels_assistidos": 0, "reels_curtidos": 0, "ok": True
-        }
-        for k, v in defaults.items():
-            if k not in resultados: resultados[k] = v
-
-    ctx = {"nome_modo": nome_modo}
-
-    tarefas_ciclicas = [
-        task_curtir_feed,
-        task_reels_watch,
-        task_busca_aleatoria,
-        task_watch_live,
-        task_marketplace_browse,
-        task_interact_ad,
-        task_deep_comments,
-        task_facebook_gaming,
-        task_reagir_posts,
-        task_comentar_posts,
-        task_entrar_grupo,
-        task_adicionar_amigos,
-        task_explorar_organico,
-        task_troca_contexto,
-        task_acoes_incompletas,
-    ]
-
-    postagem_feita = False
-    inicio = time.time()
-
-    print(f"\n  🕐 Modo {nome_modo} — duração: {duracao_segundos // 60} min")
-    print("  " + "─" * 54)
-
     try:
-        # ── RITUAL DE ENTRADA: HC-1 ───────────────────────────
-        driver.get("https://www.facebook.com/")
-        time.sleep(random.uniform(4, 6))
-        check_notificacoes(driver, wait)
-        time.sleep(random.uniform(2, 4))
+        print("🔍 [PASSO 1] Capturando WebDriver do AdsPower...")
+        try:
+            driver = extrair_driver(controller)
+            if not driver:
+                raise Exception("WebDriver não pôde ser extraído do controller.")
+            print("✅ [PASSO 1] WebDriver capturado e pronto.")
+        except Exception as e:
+            print(f"❌ [ERRO] Falha crítica ao capturar driver: {e}")
+            return {"ok": False, "error": str(e)}
 
-        # ── CICLO PRINCIPAL ───────────────────────────────────
+        wait = WebDriverWait(driver, 25)
+
+        # ── DETERMINAR PROFUNDIDADE DA SESSÃO ─────────────────
+        tipo_sessao = random.choices(
+            ["rasa", "media", "longa"], weights=[20, 70, 10], k=1
+        )[0]
+        
+        duracao_segundos = duracao_original
+        if tipo_sessao == "rasa":
+            duracao_segundos = random.randint(40, 80)
+            print(f"⚠️  [Sessão Rasa] Comportamento de 'pressa' ({duracao_segundos}s).")
+        elif tipo_sessao == "longa":
+            duracao_segundos = int(duracao_original * 1.25)
+            print(f"🌟 [Sessão Longa] Comportamento 'imersivo' (+25%).")
+
+        if resultados is None:
+            resultados = {
+                "curtidas_feed": 0, "reacoes_dadas": 0, "comentarios_feitos": 0,
+                "reels_assistidos": 0, "reels_curtidos": 0, "buscas": 0,
+                "busca_nicho_concluida": False, "tempo_gasto_na_busca": 0,
+                "tempo_live_total": 0, "tempo_gaming_real": 0, "tempo_total_feed": 0,
+                "ads_clicados": 0, "ads_clicados_por_cta": 0, "anuncios_clicados_na_varredura": 0,
+                "distancia_total_scrollada": 0, "itens_marketplace_vistos": 0,
+                "grupos_visitados": 0, "amigos_adicionados": 0,
+                "interacao_comercial_messenger": False, "postagem": False,
+                "ciclos": 0, "ok": True,
+            }
+        else:
+            # Garante que as chaves essenciais existam
+            defaults = {
+                "curtidas_feed": 0, "reacoes_dadas": 0, "comentarios_feitos": 0,
+                "reels_assistidos": 0, "reels_curtidos": 0, "buscas": 0,
+                "ciclos": 0, "ok": True, "distancia_total_scrollada": 0
+            }
+            for k, v in defaults.items():
+                if k not in resultados:
+                    resultados[k] = v
+        
+        ctx = {"nome_modo": nome_modo}
+        tarefas_ciclicas = [
+            task_curtir_feed, task_reels_watch, task_busca_aleatoria,
+            task_watch_live, task_marketplace_browse, task_interact_ad,
+            task_deep_comments, task_facebook_gaming, task_reagir_posts,
+            task_comentar_posts, task_entrar_grupo, task_adicionar_amigos,
+            task_explorar_organico, task_troca_contexto, task_acoes_incompletas,
+        ]
+
+        postagem_feita = False
+        inicio = time.time()
+
+        print(f"🕐 [LOG] Meta de Duração: {duracao_segundos // 60} minutos.")
+        print("🌐 [PASSO 2] Carregando portal Facebook...")
+        
+        try:
+            driver.get("https://www.facebook.com/")
+            time.sleep(random.uniform(5, 8))
+            print("✅ [PASSO 2] Facebook carregado. Iniciando rituais...")
+            check_notificacoes(driver, wait)
+        except Exception as e:
+            print(f"⚠️ [AVISO] Falha no ritual de entrada (não fatal): {e}")
+
+        # ── CICLO DE PERSISTÊNCIA ─────────────────────────────
+        print("⚡ [PASSO 3] Entrando em loop de atividades persistente.")
+        
         while True:
-            if stop_check and stop_check():
-                print("\n🛑 Interrupção detectada pelo Agente.")
-                break
             elapsed = time.time() - inicio
             if elapsed >= duracao_segundos:
+                print(f"⏲️ [FIM] Tempo de aquecimento atingido ({duracao_segundos}s).")
+                break
+            
+            if stop_check and stop_check():
+                print("🛑 [STOP] Interrupção manual detectada.")
                 break
 
-            barra_progresso(elapsed, duracao_segundos)
+            print(f"🔄 [CICLO] Iniciando rodada {resultados['ciclos'] + 1}...")
             random.shuffle(tarefas_ciclicas)
             resultados["ciclos"] += 1
 
             for tarefa in tarefas_ciclicas:
                 if stop_check and stop_check(): break
-                elapsed = time.time() - inicio
-                if elapsed >= duracao_segundos:
-                    break
-                barra_progresso(elapsed, duracao_segundos)
-                tarefa(driver, wait, resultados, **ctx)
                 
-                # 30% de chance de ruído humano entre tarefas
-                if random.random() < 0.30:
-                    ruido_humano(driver, "baixa")
-                else:
-                    time.sleep(random.uniform(3, 8))
+                elapsed = time.time() - inicio
+                if elapsed >= duracao_segundos: break
+                
+                t_name = tarefa.__name__.replace('task_', '').upper()
+                print(f"🎬 [ATIVIDADE] Executando {t_name}...")
+                
+                try:
+                    tarefa(driver, wait, resultados, stop_check=stop_check, **ctx)
+                    print(f"✔️ [OK] {t_name} finalizada.")
+                except Exception as e:
+                    print(f"⚠️ [ERRO] Falha na tarefa {t_name}: {e}")
+                    # Mantemos o loop vivo mesmo se uma tarefa falhar
+                
+                time.sleep(random.uniform(2, 5))
 
-            # Postagem única nos últimos 20% do tempo
+            # Postagem única nos últimos 20% do tempo (HC-12)
             elapsed = time.time() - inicio
             if (
                 not postagem_feita
                 and (duracao_segundos - elapsed) <= duracao_segundos * 0.20
             ):
-                barra_progresso(elapsed, duracao_segundos)
-                task_postagem_status(driver, wait, resultados)
-                postagem_feita = True
+                print("📝 [POST] Iniciando ritual de postagem (HC-12)...")
+                try:
+                    task_postagem_status(driver, wait, resultados, stop_check=stop_check)
+                    postagem_feita = True
+                except Exception as e:
+                    print(f"⚠️ [ERRO] Falha na postagem: {e}")
 
-        barra_progresso(duracao_segundos, duracao_segundos)
-        print()
+        print(f"🏁 [FINALIZADO] Automação concluída em {time.strftime('%H:%M:%S')}")
+        return resultados
 
     except Exception as e:
-        resultados["ok"]    = False
-        resultados["error"] = str(e)
-        print(f"\n  ✗ Erro durante o aquecimento: {e}")
+        print(f"🔴 [ERRO CRÍTICO] Falha no coração do bot: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"ok": False, "error": str(e)}
 
     return resultados
 

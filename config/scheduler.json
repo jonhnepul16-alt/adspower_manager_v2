@@ -1,0 +1,82 @@
+{
+    "rules": [
+        {
+            "name": "teste",
+            "start": "23:56",
+            "end": "00:00",
+            "type": "time",
+            "id": "1775789819169",
+            "enabled": true
+        }
+    ],
+    "windows": {
+        "1775789819169": {
+            "enabled": true,
+            "start": "23:56",
+            "end": "00:00"
+        }
+    },
+    "profile_ids": [
+        "k1bc152h",
+        "k1aq7vt0"
+    ],
+    "active": false,
+    "_access_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjRkYWJkOTY5LTZmMDctNDdiMC04MWMyLWExYjFhNWY0N2FhOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL21ld3VlY2tkaW5jeXN2ZGhmeGJwLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0NWQ0ZjU1Ny00YjdlLTRhYmItOTVhYy05ODVlZThhZDMzZjQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc1NzkyOTIzLCJpYXQiOjE3NzU3ODkzMjMsImVtYWlsIjoiamNtZW5kZXM2MDhAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZX0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NzU3ODkzMjN9XSwic2Vzc2lvbl9pZCI6ImYwMGRkMTRhLTQyYzctNDI4My05ZWZlLTYxMjlhNDU5YzkwMyIsImlzX2Fub255bW91cyI6ZmFsc2V9.OBp6W2vMusw15__33xeUmGHPTuX3Gk-GaJnpamuhVUZk4VOv9INWR5Q8iCm8CkpunEtn-vaqR3Zbotc7le2GMg",
+    "_slots": [
+        {
+            "time": "00:11",
+            "profile_id": "k1aq7vt0",
+            "executed": false
+        },
+        {
+            "time": "00:16",
+            "profile_id": "k1aq7vt0",
+            "executed": false
+        },
+        {
+            "time": "00:21",
+            "profile_id": "k1aq7vt0",
+            "executed": false
+        },
+        {
+            "time": "00:21",
+            "profile_id": "k1bc152h",
+            "executed": false
+        },
+        {
+            "time": "00:24",
+            "profile_id": "k1bc152h",
+            "executed": false
+        },
+        {
+            "time": "00:28",
+            "profile_id": "k1aq7vt0",
+            "executed": false
+        },
+        {
+            "time": "00:28",
+            "profile_id": "k1bc152h",
+            "executed": false
+        },
+        {
+            "time": "00:32",
+            "profile_id": "k1bc152h",
+            "executed": false
+        },
+        {
+            "time": "00:34",
+            "profile_id": "k1aq7vt0",
+            "executed": false
+        },
+        {
+            "time": "00:35",
+            "profile_id": "k1bc152h",
+            "executed": false
+        }
+    ],
+    "_slots_date": "2026-04-10",
+    "start_time": "00:11",
+    "end_time": "00:40",
+    "warmup_duration": 5,
+    "repetitions": 5
+}

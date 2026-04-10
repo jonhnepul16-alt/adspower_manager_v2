@@ -267,7 +267,7 @@ class AgentWorker:
             self.is_running = False
             await self.update_status(False)
 
-    async def execute_manual_warmup(self, pids: List[str], mode: str):
+    async def execute_manual_warmup(self, pids: List[str], mode: str, custom_duration: Optional[int] = None):
         if self.is_running: 
             await self.log("⚠ Agente já está executando uma tarefa.")
             return
@@ -286,6 +286,10 @@ class AgentWorker:
                 if session:
                     try:
                         nome_modo, dur = MODOS_TEMPO.get(mode, ("Padrão", 1800))
+                        if custom_duration:
+                            dur = custom_duration * 60
+                            nome_modo = f"Custom ({custom_duration}m)"
+                        
                         await self.log(f"🚀 [AUTO] Perfil {idx+1}/{len(pids)}: {pid} ({nome_modo})")
                         
                         proxy_res = ProxyResult({"curtidas_feed": 0, "reacoes_dadas": 0, "comentarios_feitos": 0, "reels_assistidos": 0, "reels_curtidos": 0, "ok": True}, pid, self)
@@ -371,8 +375,9 @@ class AgentWorker:
                                 config = data.get("data", {})
                                 pids = config.get("profile_ids", [])
                                 mode = config.get("mode", "2")
-                                await self.log(f"📥 Comando recebido: Iniciar {len(pids)} perfis no modo {mode}")
-                                asyncio.create_task(self.execute_manual_warmup(pids, mode))
+                                duration = config.get("duration")
+                                await self.log(f"📥 Comando recebido: Iniciar {len(pids)} perfis no modo {mode} (Duração: {duration if duration else 'Padrão'})")
+                                asyncio.create_task(self.execute_manual_warmup(pids, mode, duration))
                             elif mtype == "SCHEDULER_UPDATE":
                                 cfg = data.get("data", {})
                                 self.target_profiles = cfg.get("profile_ids", self.target_profiles)

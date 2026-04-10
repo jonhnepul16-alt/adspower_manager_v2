@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
+import Profiles from "./pages/Profiles.tsx";
+import Scheduler from "./pages/Scheduler.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -55,6 +57,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Index />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profiles" 
+            element={
+              <ProtectedRoute>
+                <Profiles />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/scheduler" 
+            element={
+              <ProtectedRoute>
+                <Scheduler />
               </ProtectedRoute>
             } 
           />
