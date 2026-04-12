@@ -19,6 +19,7 @@ from core.account_manager import AccountManager
 from core.plan_manager import PlanManager
 from core.profile_db import ProfileDB
 from core.cloud_bridge import CloudBridge, generate_machine_id
+from core.path_utils import user_data_path
 
 app = FastAPI(title="AdsPower Manager - Local API")
 
@@ -42,9 +43,13 @@ class AppState:
         self.manager = AccountManager()
         self.plan_manager = PlanManager()
         self.profile_db = ProfileDB()
+        self.current_task_start = 0
+        self.current_task_duration = 0
+        self.last_logged_account = None  # To avoid log spam
+        self.last_logged_plan = None     # To avoid log spam
         
         # Scheduler Internal Engine
-        self.scheduler_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "scheduler.json")
+        self.scheduler_file = user_data_path(os.path.join("config", "scheduler.json"))
         self.scheduler_config = self._load_scheduler()
         self.scheduler_status = {"active_tasks": len([w for w in self.scheduler_config.get("windows", {}).values() if w.get("enabled")])}
 
@@ -77,8 +82,14 @@ class LogBuffer:
             self.terminal.flush()
         except UnicodeEncodeError:
             # Fallback if the raw console really can't handle the characters
-            self.terminal.write(message.encode('ascii', 'replace').decode('ascii'))
-            self.terminal.flush()
+            try:
+                self.terminal.write(message.encode('ascii', 'replace').decode('ascii'))
+                self.terminal.flush()
+            except Exception:
+                pass
+        except Exception:
+            # Ignore OS/pipe errors (like [Errno 22] Invalid argument in Windows Concurrently)
+            pass
         
         msg = message.strip()
         if msg:
@@ -108,10 +119,11 @@ class StartRequest(BaseModel):
     mode: str
     machine_id: Optional[str] = "default"
     duration: Optional[int] = None
+    minimized: Optional[bool] = False
 
-def run_automation_thread(profile_ids: List[str], mode: str, access_token: str, custom_duration: Optional[int] = None):
+def run_automation_thread(profile_ids: List[str], mode: str, access_token: str, custom_duration: Optional[int] = None, minimized: bool = False):
     try:
-        run_automation(profile_ids, mode, access_token, custom_duration)
+        run_automation(profile_ids, mode, access_token, custom_duration, minimized)
     except Exception as e:
         state.logs.append(f"🔴 ERRO FATAL NA EXECUÇÃO: {str(e)}")
         import traceback
@@ -121,9 +133,21 @@ def run_automation_thread(profile_ids: List[str], mode: str, access_token: str, 
         state.current_profile = None
         state.logs.append("✅ Fila de automação finalizada com segurança.")
 
-def run_automation(profile_ids: List[str], mode: str, access_token: str, custom_duration: Optional[int] = None):
+def run_automation(profile_ids: List[str], mode: str, access_token: str, custom_duration: Optional[int] = None, minimized: bool = False):
     state.is_running = True
     state.stop_requested = False
+    
+    # ── LOGGING BRIDGE ──
+    from main import set_log_callback
+    def log_bridge(msg):
+        msg = str(msg).strip()
+        if msg:
+            state.logs.append(msg)
+            if len(state.logs) > 500: # Limit history
+                state.logs.pop(0)
+    set_log_callback(log_bridge)
+
+    state.logs.append("🚀 Iniciando automação...")
     
     # ── ROTATION SYSTEM & LIMITS CHECK
     available_profs = [p for p in state.profile_db.get_all() if p["id"] in profile_ids]
@@ -174,6 +198,8 @@ def run_automation(profile_ids: List[str], mode: str, access_token: str, custom_
                 break
                 
             state.current_profile = pid
+            state.current_task_start = time.time()
+            state.current_task_duration = duracao
             state.logs.append(f"\n[{idx+1}/{len(selected_ids)}] Iniciando perfil: {pid}")
             
             state.results[pid] = {
@@ -182,7 +208,7 @@ def run_automation(profile_ids: List[str], mode: str, access_token: str, custom_
             }
             
             try:
-                session = state.manager.open_account(pid)
+                session = state.manager.open_account(pid, minimized=minimized)
             except Exception as adspower_ex:
                 if "open daily limit" in str(adspower_ex).lower():
                     state.logs.append("🚨 FAIL-SAFE ATIVADO: O AdsPower retornou 'Exceeding open daily limit'.")
@@ -442,7 +468,7 @@ async def start_bot(req: StartRequest, request: Request):
         raise HTTPException(status_code=400, detail="Bot is already running")
     
     token = extract_token(request)
-    thread = threading.Thread(target=run_automation_thread, args=(req.profile_ids, req.mode, token, req.duration), daemon=True)
+    thread = threading.Thread(target=run_automation_thread, args=(req.profile_ids, req.mode, token, req.duration, req.minimized), daemon=True)
     thread.start()
     
     return {"message": "Automation started securely and dynamically evaluated"}
@@ -485,6 +511,24 @@ async def get_status(request: Request, machine_id: str = "default"):
     token = extract_token(request)
     plan_status = state.plan_manager.get_status(token)
     
+    # PEGAR E-MAIL REAL DO TOKEN PARA A TRAVA
+    real_email = ""
+    try:
+        from core.supabase_client import SupabaseManager
+        sm = SupabaseManager()
+        user_data = sm.client.auth.get_user(token)
+        if user_data and user_data.user:
+            real_email = user_data.user.email.lower().strip()
+    except:
+        pass
+
+    # Só printar se o status mudar para evitar spam
+    current_plan = plan_status.get('plan')
+    if state.last_logged_account != real_email or state.last_logged_plan != current_plan:
+        print(f"DEBUG [Server]: Account Identified: {real_email or 'Unknown'} | Final Plan: {current_plan}")
+        state.last_logged_account = real_email
+        state.last_logged_plan = current_plan
+    
     # Calculate scheduler status dynamically
     slots = state.scheduler_config.get("_slots", [])
     pending = len([s for s in slots if not s.get("executed")])
@@ -506,6 +550,8 @@ async def get_status(request: Request, machine_id: str = "default"):
         "cloud_connected": cloud_connected,
         "machine_id": machine_id,
         "plan_status": plan_status,
+        "current_task_start": state.current_task_start,
+        "current_task_duration": state.current_task_duration,
         "scheduler_config": state.scheduler_config,
         "scheduler_status": scheduler_status
     }
@@ -521,9 +567,9 @@ async def cloud_status():
 #  CLOUD BRIDGE - callbacks for remote commands
 # ═══════════════════════════════════════════════════════════════
 
-def _cloud_on_start(profile_ids, mode, token, duration):
+def _cloud_on_start(profile_ids, mode, token, duration, minimized=False):
     """Called when the cloud dashboard sends a START command."""
-    run_automation_thread(profile_ids, mode, token, duration)
+    run_automation_thread(profile_ids, mode, token, duration, minimized)
 
 def _cloud_on_stop():
     """Called when the cloud dashboard sends a STOP command."""
@@ -535,6 +581,8 @@ def _cloud_get_status():
         "is_running": state.is_running,
         "current_profile": state.current_profile,
         "results": state.results,
+        "current_task_start": state.current_task_start,
+        "current_task_duration": state.current_task_duration,
     }
 
 def _cloud_get_profiles():
@@ -559,7 +607,7 @@ machine_id = generate_machine_id()
 cloud_bridge = None
 
 # Load saved machine_id if exists
-_config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "config.json")
+_config_path = user_data_path(os.path.join("config", "config.json"))
 try:
     if os.path.exists(_config_path):
         with open(_config_path, 'r') as f:

@@ -597,3 +597,131 @@ task: <Task pending name='Task-12' coro=<AgentWorker.scheduler_loop() running at
 2026-04-10 01:18:25,117 [INFO] Perfil k1bc152h conectado. Título: AdsPower
 2026-04-10 01:18:27,119 [INFO] [k1bc152h] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 0, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
 2026-04-10 01:18:29,131 [INFO] Perfil k1bc152h fechado.
+2026-04-10 01:39:58,282 [INFO] AdsPower detectado e ativo.
+2026-04-10 01:39:58,283 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 01:40:05,346 [INFO] Perfil k1bc152h conectado. Título: teste1
+2026-04-10 02:24:38,252 [INFO] AdsPower detectado e ativo.
+2026-04-10 02:24:38,252 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 02:24:48,254 [ERROR] Falha ao abrir perfil k1bc152h. {'code': -1, 'msg': "HTTPConnectionPool(host='127.0.0.1', port=50325): Read timed out. (read timeout=10)"}
+2026-04-10 02:26:08,075 [ERROR] AdsPower não está rodando. Inicie o AdsPower antes de continuar.
+2026-04-10 02:26:15,887 [ERROR] AdsPower não está rodando. Inicie o AdsPower antes de continuar.
+2026-04-10 02:26:29,473 [ERROR] AdsPower não está rodando. Inicie o AdsPower antes de continuar.
+2026-04-10 02:26:34,903 [INFO] AdsPower detectado e ativo.
+2026-04-10 02:26:34,903 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 12:21:00,920 [INFO] AdsPower detectado e ativo.
+2026-04-10 12:21:00,920 [INFO] Abrindo perfil k1bc152h ()...
+2026-04-10 13:19:03,173 [INFO] AdsPower detectado e ativo.
+2026-04-10 13:19:03,176 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-10 13:19:17,410 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-11 13:34:30,947 [INFO] AdsPower detectado e ativo.
+2026-04-11 13:34:30,947 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-11 13:35:12,216 [INFO] Perfil k1aq7vt0 conectado. Título: Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-11 13:37:52,700 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 1, 'distancia_total_scrollada': 24724, 'busca_nicho_concluida': True, 'tempo_gasto_na_busca': 64.83083534240723}
+2026-04-11 13:37:54,717 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-11 13:51:19,115 [INFO] AdsPower detectado e ativo.
+2026-04-11 13:51:19,116 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-11 13:51:25,557 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-11 13:52:22,395 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 1, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-11 13:52:24,416 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-11 14:01:34,648 [INFO] AdsPower detectado e ativo.
+2026-04-11 14:01:34,648 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-11 14:01:42,303 [INFO] Perfil k1aq7vt0 conectado. Título: 
+2026-04-11 14:23:14,358 [INFO] AdsPower detectado e ativo.
+2026-04-11 14:23:14,358 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-11 14:23:21,368 [INFO] Perfil k1aq7vt0 conectado. Título: 
+2026-04-11 14:24:08,113 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-11 14:24:10,154 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-11 14:49:16,662 [INFO] AdsPower detectado e ativo.
+2026-04-11 14:49:16,662 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-11 14:49:27,161 [INFO] Perfil k1aq7vt0 conectado. Título: 
+2026-04-11 15:10:05,255 [INFO] AdsPower detectado e ativo.
+2026-04-11 15:10:05,256 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-11 15:10:10,711 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-11 15:35:42,652 [INFO] AdsPower detectado e ativo.
+2026-04-11 15:35:42,652 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-11 15:35:57,402 [INFO] Perfil k1aq7vt0 conectado. Título: (3) Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-11 15:40:44,807 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 1, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-11 15:40:46,845 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-12 15:28:11,332 [INFO] AdsPower detectado e ativo.
+2026-04-12 15:28:11,332 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-12 15:28:21,336 [ERROR] Falha ao abrir perfil k1aq7vt0. {'code': -1, 'msg': "HTTPConnectionPool(host='127.0.0.1', port=50325): Read timed out. (read timeout=10)"}
+2026-04-12 15:29:13,105 [INFO] AdsPower detectado e ativo.
+2026-04-12 15:29:13,106 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-12 15:29:13,720 [INFO] Perfil k1aq7vt0 conectado. Título: 25 dolares em reais - Pesquisa Google
+2026-04-12 15:30:41,041 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0, 'tempo_gaming_real': 30.12012028694153}
+2026-04-12 15:30:43,066 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-12 16:06:32,802 [INFO] AdsPower detectado e ativo.
+2026-04-12 16:06:32,802 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-12 16:06:37,535 [INFO] Conectando Selenium ao perfil k1aq7vt0 (Tentativa 1/3)...
+2026-04-12 16:06:47,148 [INFO] Perfil k1aq7vt0 conectado com sucesso. Título: 
+2026-04-12 16:23:30,461 [INFO] AdsPower detectado e ativo.
+2026-04-12 16:23:30,461 [INFO] Abrindo perfil k1aq7vt0 ()...
+2026-04-12 16:23:36,738 [INFO] Conectando Selenium ao perfil k1aq7vt0 (Tentativa 1/3)...
+2026-04-12 16:23:43,002 [INFO] Perfil k1aq7vt0 conectado com sucesso. Título: Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-12 16:35:16,433 [INFO] AdsPower detectado e ativo.
+2026-04-12 16:35:16,435 [INFO] Abrindo perfil k1aq7vt0 () [Minimizado: False]...
+2026-04-12 16:35:19,785 [INFO] Conectando Selenium ao perfil k1aq7vt0 (Tentativa 1/3)...
+2026-04-12 16:35:26,124 [INFO] Perfil k1aq7vt0 conectado com sucesso. Título: 
+2026-04-12 16:35:51,917 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-12 16:35:53,944 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-12 16:38:14,481 [INFO] AdsPower detectado e ativo.
+2026-04-12 16:38:14,481 [INFO] Abrindo perfil k1aq7vt0 () [Minimizado: False]...
+2026-04-12 16:38:18,111 [INFO] Conectando Selenium ao perfil k1aq7vt0 (Tentativa 1/3)...
+2026-04-12 16:38:18,902 [INFO] Perfil k1aq7vt0 conectado com sucesso. Título: 25 dolares em reais - Pesquisa Google
+2026-04-12 16:41:39,961 [INFO] AdsPower detectado e ativo.
+2026-04-12 16:41:39,962 [INFO] Abrindo perfil k1aq7vt0 () [Minimizado: False]...
+2026-04-12 16:41:44,196 [INFO] Conectando Selenium ao perfil k1aq7vt0 (Tentativa 1/3)...
+2026-04-12 16:41:45,455 [INFO] Perfil k1aq7vt0 conectado com sucesso. Título: 25 dolares em reais - Pesquisa Google
+2026-04-12 16:42:33,148 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-12 18:19:20,889 [INFO] AdsPower detectado e ativo.
+2026-04-12 18:19:20,890 [INFO] Abrindo perfil k1aq7vt0 () [Minimizado: True]...
+2026-04-12 18:19:20,893 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 1/5)
+2026-04-12 18:19:22,899 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 2/5)
+2026-04-12 18:19:24,917 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 3/5)
+2026-04-12 18:19:26,931 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 4/5)
+2026-04-12 18:19:28,946 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 5/5)
+2026-04-12 18:19:30,958 [ERROR] Falha definitiva ao obter dados de conexão para o perfil k1aq7vt0 após 10s.
+2026-04-12 18:19:39,344 [INFO] AdsPower detectado e ativo.
+2026-04-12 18:19:39,344 [INFO] Abrindo perfil k1aq7vt0 () [Minimizado: True]...
+2026-04-12 18:19:39,345 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 1/5)
+2026-04-12 18:19:41,350 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 2/5)
+2026-04-12 18:19:43,369 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 3/5)
+2026-04-12 18:19:45,386 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 4/5)
+2026-04-12 18:19:47,391 [WARNING] Aguardando socket Selenium para k1aq7vt0... (Tentativa 5/5)
+2026-04-12 18:19:49,398 [ERROR] Falha definitiva ao obter dados de conexão para o perfil k1aq7vt0 após 10s.
+2026-04-12 18:22:34,379 [INFO] AdsPower detectado e ativo.
+2026-04-12 18:22:34,379 [INFO] 🚀 [Manager] Iniciando abertura do perfil k1aq7vt0 () [Min: True]
+2026-04-12 18:22:40,563 [INFO] 🔍 [Manager] DEBUG RAW Resposta AdsPower (Tentativa 0): {'ws': {'puppeteer': 'ws://127.0.0.1:65126/devtools/browser/d4880b58-11f7-4d5d-954e-5bcabc8461ed', 'selenium': '127.0.0.1:65126'}, 'debug_port': '65126', 'webdriver': 'C:\\Users\\nepul\\AppData\\Roaming\\adspower_global\\cwd_global\\chrome_145\\chromedriver.exe'}
+2026-04-12 18:22:40,563 [INFO] ✅ [Manager] Dados de conexão capturados com sucesso.
+2026-04-12 18:22:40,563 [INFO] 🔌 [Manager] Conectando Selenium (Tentativa 1/3)...
+2026-04-12 18:22:55,632 [INFO] ✨ [Manager] Perfil k1aq7vt0 CONECTADO. Título: (3) Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-12 18:22:55,632 [INFO] 📉 [Manager] Garantindo janela minimizada...
+2026-04-12 18:23:13,906 [INFO] [k1aq7vt0] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 0, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-12 18:23:15,934 [INFO] Perfil k1aq7vt0 fechado.
+2026-04-12 18:25:24,227 [INFO] AdsPower detectado e ativo.
+2026-04-12 18:25:24,228 [INFO] 🚀 [Manager] Iniciando abertura do perfil k1aq7vt0 () [Min: True]
+2026-04-12 18:25:30,433 [INFO] 🔍 [Manager] DEBUG RAW Resposta AdsPower (Tentativa 0): {'ws': {'puppeteer': 'ws://127.0.0.1:51861/devtools/browser/fafb83af-58c1-46d5-bc71-749c56c2198a', 'selenium': '127.0.0.1:51861'}, 'debug_port': '51861', 'webdriver': 'C:\\Users\\nepul\\AppData\\Roaming\\adspower_global\\cwd_global\\chrome_145\\chromedriver.exe'}
+2026-04-12 18:25:30,433 [INFO] ✅ [Manager] Dados de conexão capturados com sucesso.
+2026-04-12 18:25:30,433 [INFO] 🔌 [Manager] Conectando Selenium (Tentativa 1/3)...
+2026-04-12 18:25:39,080 [INFO] ✨ [Manager] Perfil k1aq7vt0 CONECTADO. Título: (3) Gerenciador de Anúncios - Gerenciar anúncios - Anúncios
+2026-04-12 18:25:39,080 [INFO] 📉 [Manager] Garantindo janela minimizada...
+2026-04-12 18:28:31,466 [INFO] AdsPower detectado e ativo.
+2026-04-12 18:28:31,466 [INFO] 🚀 [Manager] Iniciando abertura do perfil k1aq7vt0 () [Min: True]
+2026-04-12 18:28:34,925 [INFO] 🔍 [Manager] DEBUG RAW Resposta AdsPower (Tentativa 0): {'code': -1, 'msg': 'Exceeding open daily limit, recovery after 21 hours'}
+2026-04-12 18:32:17,680 [INFO] AdsPower detectado e ativo.
+2026-04-12 18:32:17,680 [INFO] 🚀 [Manager] Iniciando abertura do perfil k1akdrpr () [Min: False]
+2026-04-12 18:32:22,254 [INFO] 🔍 [Manager] DEBUG RAW Resposta AdsPower (Tentativa 0): {'ws': {'puppeteer': 'ws://127.0.0.1:57473/devtools/browser/38dcf3d8-eb43-459b-86f0-941d9f5c1211', 'selenium': '127.0.0.1:57473'}, 'debug_port': '57473', 'webdriver': 'C:\\Users\\nepul\\AppData\\Roaming\\adspower_global\\cwd_global\\chrome_145\\chromedriver.exe'}
+2026-04-12 18:32:22,254 [INFO] ✅ [Manager] Dados de conexão capturados com sucesso.
+2026-04-12 18:32:22,254 [INFO] 🔌 [Manager] Conectando Selenium (Tentativa 1/3)...
+2026-04-12 18:32:26,106 [INFO] ✨ [Manager] Perfil k1akdrpr CONECTADO. Título: Facebook
+2026-04-12 18:32:33,471 [INFO] [k1akdrpr] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 0, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 0, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-12 18:32:35,491 [INFO] Perfil k1akdrpr fechado.
+2026-04-12 18:32:39,091 [INFO] AdsPower detectado e ativo.
+2026-04-12 18:32:39,091 [INFO] 🚀 [Manager] Iniciando abertura do perfil k1akdrpr () [Min: True]
+2026-04-12 18:32:44,909 [INFO] 🔍 [Manager] DEBUG RAW Resposta AdsPower (Tentativa 0): {'ws': {'puppeteer': 'ws://127.0.0.1:58312/devtools/browser/d626f043-9bf6-48ce-95ad-84617d1908c7', 'selenium': '127.0.0.1:58312'}, 'debug_port': '58312', 'webdriver': 'C:\\Users\\nepul\\AppData\\Roaming\\adspower_global\\cwd_global\\chrome_145\\chromedriver.exe'}
+2026-04-12 18:32:44,909 [INFO] ✅ [Manager] Dados de conexão capturados com sucesso.
+2026-04-12 18:32:44,909 [INFO] 🔌 [Manager] Conectando Selenium (Tentativa 1/3)...
+2026-04-12 18:32:46,872 [INFO] ✨ [Manager] Perfil k1akdrpr CONECTADO. Título: AdsPower
+2026-04-12 18:32:46,872 [INFO] 📉 [Manager] Garantindo janela minimizada...
+2026-04-12 18:33:33,709 [INFO] [k1akdrpr] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 1, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
+2026-04-12 18:33:43,736 [INFO] Perfil k1akdrpr fechado.

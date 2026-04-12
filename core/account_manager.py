@@ -69,45 +69,89 @@ class AccountManager:
         return profiles
 
     # ─── Abrir conta ──────────────────────────────────────────────
-    def open_account(self, profile_id: str, profile_name: str = "") -> Optional[AccountSession]:
-        """Abre o browser de um perfil e retorna a sessão."""
-        log.info(f"Abrindo perfil {profile_id} ({profile_name})...")
+    def open_account(self, profile_id: str, profile_name: str = "", minimized: bool = False) -> Optional[AccountSession]:
+        """Abre o browser de um perfil e retorna a sessão com lógica de retry robusta."""
+        log.info(f"🚀 [Manager] Iniciando abertura do perfil {profile_id} ({profile_name}) [Min: {minimized}]")
 
-        data = self.api.open_browser(profile_id)
+        # 1. Tentar abrir o browser
+        data = self.api.open_browser(profile_id, minimized=minimized)
         
-        # Check for specific AdsPower rate limits / fail-safe
-        if data is None:
-            log.error(f"Falha ao abrir perfil {profile_id}. Unknown API error.")
-            return None
+        ws_url = None
+        driver_path = None
+        
+        # 2. Loop de Retry/Captura (6 ciclos de 2s = 10s totais)
+        for attempt in range(6):
+            log.info(f"🔍 [Manager] DEBUG RAW Resposta AdsPower (Tentativa {attempt}): {data}")
             
-        # Often raw api returns something if it fails. The apic in `adspower_api.py` returns `res.get("data")` 
-        # Wait, if code != 0, it logs and returns None. We need to catch this. Let's fix adspower_api.py to return the full dict if possible, or we raise exception here if None, but we need to know the MSG.
-        # For now, if data is None, we'll try to guess or use the new adspower_api format we will implement.
-        if isinstance(data, dict) and data.get("code") == -1 and "limit" in str(data.get("msg", "")).lower():
-            raise Exception("Exceeding open daily limit")
+            if isinstance(data, dict):
+                # Caso comum: os dados estão em data['data']
+                chunk = data.get("data")
+                if isinstance(chunk, dict) and "ws" in chunk:
+                    ws_url = chunk.get("ws", {}).get("selenium")
+                    driver_path = chunk.get("webdriver")
+                
+                # Caso alternativo: o AdsPower retornou os dados no nível raiz (flattened)
+                elif "ws" in data:
+                    ws_url = data.get("ws", {}).get("selenium")
+                    driver_path = data.get("webdriver")
+
+                # Verificações de mensagens de erro
+                msg = str(data.get("msg", "")).lower()
+                if "limit" in msg:
+                    raise Exception("Exceeding AdsPower daily open limit")
+
+            # FALLBACK: Se ainda não temos os dados, consultamos o endpoint /active explicitamente
+            if not ws_url or not driver_path:
+                if attempt > 0: # Não precisa na primeira tentativa se o start já resolveu
+                    log.info(f"⏳ [Manager] Dados incompletos. Consultando endpoint /active como fallback...")
+                    active_data = self.api.browser_status(profile_id)
+                    log.info(f"🔍 [Manager] DEBUG RAW Fallback /active: {active_data}")
+                    
+                    if isinstance(active_data, dict) and "ws" in active_data:
+                        ws_url = active_data.get("ws", {}).get("selenium")
+                        driver_path = active_data.get("webdriver")
+
+            if ws_url and driver_path:
+                log.info(f"✅ [Manager] Dados de conexão capturados com sucesso.")
+                break
             
-        if not data or (isinstance(data, dict) and "ws" not in data):
-            log.error(f"Falha ao abrir perfil {profile_id}. {data}")
-            return None
+            if attempt < 5:
+                log.warning(f"⚠️ [Manager] Socket Selenium não disponível para {profile_id}. Aguardando 2s... ({attempt+1}/5)")
+                time.sleep(2)
+                # Na próxima tentativa o loop usará o retorno do status mais recente se disponível
+                # ou repetirá a consulta ao start no primeiro loop (já feito acima via fallback)
+            else:
+                log.error(f"❌ [Manager] Falha definitiva ao obter socket para o perfil {profile_id}.")
+                return None
 
-        ws_url = data.get("ws", {}).get("selenium")
-        driver_path = data.get("webdriver")
+        # 3. Conectar o Selenium
+        max_retries = 3
+        for attempt_conn in range(max_retries):
+            try:
+                log.info(f"🔌 [Manager] Conectando Selenium (Tentativa {attempt_conn + 1}/{max_retries})...")
+                session = AccountSession(profile_id, profile_name or profile_id)
+                session.browser = BrowserController(ws_url, driver_path)
+                session.status = "idle"
+                self.sessions[profile_id] = session
+                
+                # Verify connection
+                title = session.browser.get_title()
+                log.info(f"✨ [Manager] Perfil {profile_id} CONECTADO. Título: {title}")
 
-        if not ws_url or not driver_path:
-            log.error(f"Dados de conexão incompletos para {profile_id}: {data}")
-            return None
+                if minimized:
+                    log.info(f"📉 [Manager] Garantindo janela minimizada...")
+                    time.sleep(1)
+                    session.browser.minimize()
 
-        try:
-            session = AccountSession(profile_id, profile_name or profile_id)
-            session.browser = BrowserController(ws_url, driver_path)
-            session.status = "idle"
-            self.sessions[profile_id] = session
-            log.info(f"Perfil {profile_id} conectado. Título: {session.browser.get_title()}")
-            return session
-        except Exception as e:
-            log.error(f"Erro ao conectar Selenium ao perfil {profile_id}: {e}")
-            self.api.close_browser(profile_id)
-            return None
+                return session
+            except Exception as e:
+                log.warning(f"⚠️ [Manager] Erro na conexão Selenium: {e}")
+                if attempt_conn < max_retries - 1:
+                    time.sleep(3)
+                else:
+                    log.error(f"❌ [Manager] Falha final na conexão: {e}")
+                    return None
+        return None
 
     # ─── Fechar conta ─────────────────────────────────────────────
     def close_account(self, profile_id: str):

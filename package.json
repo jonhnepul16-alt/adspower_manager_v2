@@ -7,7 +7,29 @@
     "frontend": "cd frontend && npm run dev",
     "backend": "set PYTHONIOENCODING=utf-8 && py backend/server.py",
     "electron": "electron .",
-    "dev": "concurrently \"npm run backend\" \"npm run frontend\" \"wait-on http://localhost:8080 && electron .\""
+    "dev": "concurrently -n \"backend,frontend,electron\" -c \"blue,magenta,green\" \"npm run backend\" \"npm run frontend\" \"wait-on http://localhost:8080 && electron .\"",
+    "python:build": "pyinstaller --noconfirm --clean --onefile --noconsole --name backend --paths . --collect-all selenium --hidden-import httpx --hidden-import email_validator backend/server.py",
+    "frontend:build": "cd frontend && npm run build",
+    "electron:build": "electron-builder build --win",
+    "build:deps": "concurrently -n \"python,frontend\" -c \"yellow,cyan\" \"npm run python:build\" \"npm run frontend:build\"",
+    "build": "npm run build:deps && npm run electron:build"
+  },
+  "build": {
+    "appId": "com.warmads.sas",
+    "productName": "WarmAds SAS",
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "frontend/public/logo2_cropped.ico"
+    },
+    "extraResources": [
+      {
+        "from": "dist/backend.exe",
+        "to": "backend.exe"
+      }
+    ]
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

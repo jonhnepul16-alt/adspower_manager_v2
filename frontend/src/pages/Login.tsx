@@ -2,8 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { Zap, Lock, Mail } from "lucide-react";
+import { Zap, Lock, Mail, Minus, Square, X } from "lucide-react";
 import { motion } from "framer-motion";
+
+const isElectron = typeof window !== 'undefined' && window.process && (window.process as any).type === 'renderer';
+const ipc = isElectron && (window as any).require ? (window as any).require('electron').ipcRenderer : null;
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -35,23 +38,62 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background relative overflow-hidden">
+      {/* Window Controls for Electron */}
+      {isElectron && (
+        <div className="absolute top-0 right-0 p-4 z-50 flex items-center gap-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
+          <button 
+            type="button"
+            onClick={() => {
+              console.log("Minimizing...");
+              ipc?.send('window-minimize');
+            }} 
+            className="p-2 text-white/40 hover:text-white transition-colors cursor-pointer relative z-[60]"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+          <button 
+            type="button"
+            onClick={() => {
+              console.log("Maximizing...");
+              ipc?.send('window-toggle-maximize');
+            }} 
+            className="p-2 text-white/40 hover:text-white transition-colors cursor-pointer relative z-[60]"
+          >
+            <Square className="w-3.5 h-3.5" />
+          </button>
+          <button 
+            type="button"
+            onClick={() => {
+              console.log("Closing...");
+              ipc?.send('window-close');
+            }} 
+            className="p-2 text-white/40 hover:text-destructive transition-colors cursor-pointer relative z-[60]"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Draggable area - Adjusted to not cover the right-side buttons */}
+      <div className="absolute top-0 left-0 w-[calc(100%-120px)] h-12 z-40" style={{ WebkitAppRegion: 'drag' } as any} />
+
       {/* Background decorations */}
-      <div className="absolute inset-0 z-0 opacity-20">
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/30 blur-[120px]"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[100px]"></div>
       </div>
 
       <div className="z-10 w-full max-w-md p-6">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-48 h-20 mb-4 flex items-center justify-center relative">
-            <img src="/logo2.png" alt="Warm Ads" className="absolute w-full h-full object-contain" />
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-64 h-28 flex items-center justify-center relative transform -mb-4">
+            <img src="logo2.png" alt="WarmAds" className="absolute w-full h-full object-contain" />
           </div>
-          <h1 className="font-display text-2xl font-black text-foreground tracking-tight text-center">
-            Acesso Restrito
+          <h1 className="font-display text-5xl font-black tracking-tighter text-center bg-gradient-to-br from-orange-400 to-red-600 bg-clip-text text-transparent">
+            WarmADS
           </h1>
-          <p className="text-sm text-foreground/50 mt-1">
-            Painel de automação de elite
+          <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.4em] mt-2">
+            Elite Automation Panel
           </p>
         </div>
 

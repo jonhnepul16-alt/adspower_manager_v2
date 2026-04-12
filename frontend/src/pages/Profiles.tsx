@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import GlassCard from "@/components/dashboard/GlassCard";
 import HeaderBar from "@/components/dashboard/HeaderBar";
 import { toast } from "sonner";
-import { fetchProfiles, createProfile, updateProfile, deleteProfile } from "@/lib/api";
+import { fetchProfiles, createProfile, updateProfile, deleteProfile, fetchStatus } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
 interface Profile {
   id: string;
@@ -22,6 +23,8 @@ const Profiles = () => {
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [plan, setPlan] = useState<string>("START");
   const navigate = useNavigate();
 
   // Form State
@@ -49,6 +52,23 @@ const Profiles = () => {
 
   useEffect(() => {
     const init = async () => {
+      // Fetch user email
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email) {
+        setUserEmail(session.user.email);
+      }
+
+      // Fetch plan status
+      try {
+        const machineId = localStorage.getItem("vexel_machine_id") || "local_agent";
+        const status = await fetchStatus(machineId);
+        if (status?.plan_status?.plan) {
+          setPlan(status.plan_status.plan);
+        }
+      } catch (e) {
+        console.error("Failed to fetch plan status", e);
+      }
+
       const dbProfiles = await loadProfiles();
       // Migration from localStorage
       const saved = localStorage.getItem("warmads_profiles");
@@ -153,6 +173,8 @@ const Profiles = () => {
         isActive={false} 
         apiKey={localStorage.getItem("vexel_machine_id") || "local_agent"} 
         onApiKeyChange={(val) => localStorage.setItem("vexel_machine_id", val)} 
+        userEmail={userEmail}
+        plan={plan}
       />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-12 py-12">

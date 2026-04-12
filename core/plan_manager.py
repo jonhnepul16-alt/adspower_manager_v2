@@ -7,6 +7,7 @@ import logging
 from typing import List, Dict, Any, Tuple
 from core.supabase_client import SupabaseManager
 from core.adspower_api import AdsPowerAPI
+from core.path_utils import user_data_path
 
 # Silence verbose HTTP logs from external libraries
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -17,22 +18,21 @@ logging.getLogger("postgrest").setLevel(logging.WARNING)
 PLAN_LIMITS = {
     "START": {
         "max_profiles": 5,
-        "active_profiles_per_day": (3, 4),
+        "active_profiles_per_day": (4, 5),
         "session_time": (10, 15)
     },
     "SCALE": {
-        "max_profiles": 25, # Adjusted based on common Scale tier needs
-        "active_profiles_per_day": (10, 15),
-        "session_time": (30, 45)
+        "max_profiles": 100,
+        "active_profiles_per_day": (50, 100),
+        "session_time": (5, 60)
     }
 }
 
 
 class PlanManager:
     def __init__(self, config_dir: str = "config"):
-        self.config_dir = config_dir
-        os.makedirs(self.config_dir, exist_ok=True)
-        self.usage_file = os.path.join(self.config_dir, "daily_usage.json")
+        self.usage_file = user_data_path(os.path.join(config_dir, "daily_usage.json"))
+        os.makedirs(os.path.dirname(self.usage_file), exist_ok=True)
         self.supabase = SupabaseManager()
         self.adspower = AdsPowerAPI()
         
@@ -42,7 +42,8 @@ class PlanManager:
         
         # User Plan Cache: token -> (timestamp, data)
         self._plan_cache = {}
-        self._plan_cache_ttl = 10 # reduced for faster updates
+        self._plan_cache_ttl = 60 # 60 seconds cache
+        self._last_token = None
 
         
     def _get_today_str(self) -> str:
@@ -76,6 +77,11 @@ class PlanManager:
         """
         now = time.time()
         
+        # Reset cache completely if token changed
+        if access_token != self._last_token:
+            self._plan_cache = {}
+            self._last_token = access_token
+
         if access_token and access_token in self._plan_cache:
             last_check, cached_data = self._plan_cache[access_token]
             if now - last_check < self._plan_cache_ttl:
@@ -84,20 +90,18 @@ class PlanManager:
         if not access_token:
             plan_name = "START"
             safety_limit = 50
+            print("    [PlanManager] No access token provided, defaulting to START.")
         else:
             plan_data = self.supabase.get_user_plan(access_token)
             if not plan_data:
                 plan_name = "START"
                 safety_limit = 50
+                print(f"    [PlanManager] No plan data found for token, defaulting to START.")
             else:
-                plan_name = plan_data.get("plan", "START")
+                plan_name = str(plan_data.get("plan", "START")).strip().upper()
                 safety_limit = plan_data.get("adspower_limit", 50)
-            
-            # Use data for logging if available, otherwise fallback
-            status = plan_data.get("status", "unknown") if plan_data else "unknown"
-            print(f"    [Supabase] Plano detectado: {plan_name} (Status: {status})")
+                status = plan_data.get("status", "unknown")
 
-                
         if plan_name not in PLAN_LIMITS:
             plan_name = "START"
             
@@ -209,19 +213,28 @@ class PlanManager:
 
     def select_profiles(self, available_profiles: List[Dict], access_token: str) -> Tuple[List[str], List[Dict]]:
         """
-        Pass-through logic (No more blocks/travas). 
-        Returns everything passed to it to work 'like before'.
+        Enforce plan-based limits on profile selection.
         """
-        # We still fetch status for the UI/Logs, but we don't block
         status = self.get_status(access_token)
         plan_name = status["plan"]
-        remaining_capacity = status["usage"]["remaining_safe_capacity"]
+        max_limit = status["limits"]["max_profiles"]
         
-        # Log purely for information
-        print(f"    [Plano: {plan_name}] Executando sem travas conforme solicitado (Capacidade Seg: {remaining_capacity})")
-        
-        selected_ids = [p["id"] for p in available_profiles]
+        selected_ids = []
         skipped_info = []
+        
+        for i, p in enumerate(available_profiles):
+            if len(selected_ids) < max_limit:
+                selected_ids.append(p["id"])
+            else:
+                skipped_info.append({
+                    "id": p["id"],
+                    "reason": f"Limite do plano {plan_name} atingido ({max_limit} perfis)"
+                })
+        
+        if skipped_info:
+            print(f"    [Plano: {plan_name}] Limitando execução a {max_limit} perfis (Ignorados: {len(skipped_info)})")
+        else:
+            print(f"    [Plano: {plan_name}] Executando {len(selected_ids)} perfis.")
                 
         return selected_ids, skipped_info
 

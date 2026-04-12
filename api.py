@@ -116,6 +116,61 @@ def get_supabase() -> Optional[Client]:
         return None
     return create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
+def get_user_plan_from_token(token: str) -> Dict[str, Any]:
+    """Helper to fetch plan from Supabase using the access token."""
+    db = get_supabase()
+    if not db:
+        return {"plan": "START", "max_profiles": 5, "session_time": [10, 15]}
+        
+    try:
+        # 1. Get user from token
+        user_resp = db.auth.get_user(token)
+        if not user_resp or not user_resp.user:
+            print("DEBUG: Token validation failed - auth.get_user returned no user")
+            return {"plan": "START", "max_profiles": 5, "session_time": [10, 15]}
+        
+        email = user_resp.user.email
+        print(f"DEBUG: Identifying plan for account found in token: [{email}]")
+        
+        # 2. Get subscription (Case-insensitive search, get newest record first)
+        sub_resp = db.table("subscriptions").select("*").ilike("email", email).order("created_at", desc=True).execute()
+        
+        row_count = len(sub_resp.data)
+        if row_count > 1:
+            print(f"WARNING: Found {row_count} records for {email}. Using the newest one.")
+        else:
+            print(f"DEBUG: Supabase query for {email} returned {row_count} row.")
+
+        if sub_resp.data and len(sub_resp.data) > 0:
+            record = sub_resp.data[0]
+            print(f"DEBUG: Raw record from DB: {record}")
+            
+            # Canonicalize tier to uppercase for consistent logic
+            raw_tier = record.get("tier", "start")
+            tier = str(raw_tier).strip().upper()
+            status = str(record.get("status", "unknown")).strip().lower()
+            
+            # If not active, fallback to START
+            if status != "active":
+                print(f"DEBUG: Account {email} is NOT active (status: {status}). Defaulting to START.")
+                return {"plan": "START", "max_profiles": 5, "session_time": [10, 15], "detected_email": email}
+            
+            if tier == "SCALE":
+                print(f"DEBUG: Account {email} matched SCALE tier. LIBERATING.")
+                return {"plan": "SCALE", "max_profiles": 100, "session_time": [5, 60], "detected_email": email}
+            else:
+                print(f"DEBUG: Account {email} matched tier [{tier}]. Enforcing START limits.")
+                return {"plan": "START", "max_profiles": 5, "session_time": [10, 15], "detected_email": email}
+                
+        # Default fallback for any other case
+        print(f"DEBUG: No subscription record found for {email}. Defaulting to START.")
+        return {"plan": "START", "max_profiles": 5, "session_time": [10, 15], "detected_email": email}
+    except Exception as e:
+        print(f"CRITICAL ERROR in get_user_plan_from_token: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"plan": "START", "max_profiles": 5, "session_time": [10, 15]}
+
 class WarmupRequest(BaseModel):
     machine_id: str = "default"
     profile_ids: List[str]
@@ -127,19 +182,37 @@ def health_check():
     return {"status": "ok", "active_agents": list(manager.active_agents.keys())}
 
 @app.post("/api/warmup/start")
-async def start_warmup(req: WarmupRequest):
+async def start_warmup(request: Request, req: WarmupRequest):
     print(f"DEBUG: Backend recebeu solicitação de warmup para os IDs: {req.profile_ids} (Agent: {req.machine_id})")
     state = get_state(req.machine_id)
     if state.is_running:
         raise HTTPException(status_code=400, detail="Agent is already busy")
     
+    # Determine plan limits
+    plan_info = {"plan": "START", "max_profiles": 5, "session_time": [10, 15]}
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        pinfo = get_user_plan_from_token(auth_header.split(" ")[1])
+        if pinfo: plan_info = pinfo
+
+    # 1. Enforce max profiles
+    pids = req.profile_ids[:plan_info["max_profiles"]]
+
+    # 2. Enforce max duration
+    duration = min(req.duration or 15, plan_info["session_time"][1])
+
+    # 3. Enforce mode restrictions
+    mode = req.mode
+    if plan_info["plan"] == "START":
+        mode = "1"
+
     # Send command to agent
     command = {
         "type": "START",
         "data": {
-            "profile_ids": req.profile_ids,
-            "mode": req.mode,
-            "duration": req.duration
+            "profile_ids": pids,
+            "mode": mode,
+            "duration": duration
         }
     }
     
@@ -152,7 +225,7 @@ async def start_warmup(req: WarmupRequest):
     state.logs = []
     state.results = {}
     
-    return {"message": "Command sent to agent", "machine_id": req.machine_id}
+    return {"message": "Warmup started", "machine_id": req.machine_id}
 
 @app.post("/api/warmup/stop")
 async def stop_warmup(machine_id: str = "default"):
@@ -167,8 +240,16 @@ async def stop_warmup(machine_id: str = "default"):
     return {"message": "Stop command sent"}
 
 @app.get("/api/warmup/status")
-def get_status(machine_id: str = "default"):
+async def get_status(request: Request, machine_id: str = "default"):
     state = get_state(machine_id)
+    
+    # Try to get plan from token
+    plan_info = {"plan": "START", "max_profiles": 5, "session_time": [10, 15]}
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        plan_info = get_user_plan_from_token(token)
+
     return {
         "is_running": state.is_running,
         "current_profile": state.current_profile,
@@ -176,7 +257,11 @@ def get_status(machine_id: str = "default"):
         "results": state.results,
         "scheduler_config": state.scheduler_config,
         "scheduler_status": state.scheduler_status,
-        "agent_connected": machine_id in manager.active_agents
+        "agent_connected": machine_id in manager.active_agents,
+        "plan_status": {
+            "plan": plan_info["plan"],
+            "limits": plan_info
+        }
     }
 
 @app.get("/api/profiles")

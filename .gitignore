@@ -31,3 +31,7 @@ relatorios/
 *.exe
 debug_connection.py
 vxbulker_v1/
+
+release/
+
+config/*.json

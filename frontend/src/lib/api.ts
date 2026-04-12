@@ -4,13 +4,17 @@ import { supabase } from './supabase';
 // Auto-detect: local SAS (Electron/localhost) uses /api proxy, cloud site uses Railway
 const CLOUD_API = 'https://web-production-373eb.up.railway.app/api';
 
-const isLocal = typeof window !== 'undefined' && (
-  window.location.hostname === 'localhost' || 
-  window.location.hostname === '127.0.0.1' ||
-  (window.process && (window.process as any).type === 'renderer')  // Electron
-);
+const isElectron = typeof window !== 'undefined' && window.process && (window.process as any).type === 'renderer';
+const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || (isLocal ? '/api' : CLOUD_API);
+let detectedApiUrl = CLOUD_API;
+if (isElectron) {
+  detectedApiUrl = 'http://localhost:8000/api'; // Direct to python backend in Electron (works in file:// and dev)
+} else if (isLocalhost) {
+  detectedApiUrl = '/api'; // Use vite proxy for normal browser dev
+}
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || detectedApiUrl;
 
 const api = axios.create({
   baseURL: API_BASE_URL, 
@@ -53,8 +57,8 @@ export const deleteProfile = async (id: string) => {
   return res.data;
 };
 
-export const startWarmup = async (profile_ids: string[], mode: string, duration?: number, machine_id: string = "default") => {
-  const res = await api.post('/warmup/start', { profile_ids, mode, duration, machine_id });
+export const startWarmup = async (profile_ids: string[], mode: string, duration?: number, machine_id: string = "default", minimized: boolean = false) => {
+  const res = await api.post('/warmup/start', { profile_ids, mode, duration, machine_id, minimized });
   return res.data;
 };
 

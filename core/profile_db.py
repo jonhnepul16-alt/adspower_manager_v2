@@ -1,12 +1,12 @@
 import os
 import json
 from typing import List, Dict, Optional
+from core.path_utils import user_data_path
 
 class ProfileDB:
     def __init__(self, config_dir: str = "config"):
-        self.config_dir = config_dir
-        os.makedirs(self.config_dir, exist_ok=True)
-        self.db_file = os.path.join(self.config_dir, "profiles.json")
+        self.db_file = user_data_path(os.path.join(config_dir, "profiles.json"))
+        os.makedirs(os.path.dirname(self.db_file), exist_ok=True)
         
     def _read_db(self) -> List[Dict]:
         if os.path.exists(self.db_file):

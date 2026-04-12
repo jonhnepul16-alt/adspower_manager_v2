@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Monitor, Download, Key, Wifi, WifiOff, ArrowRight, Check, X, Copy } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { GITHUB_DOWNLOAD_URL } from "@/lib/constants";
 
 interface Props {
   isOpen: boolean;
@@ -59,62 +60,56 @@ const OnboardingModal = ({ isOpen, onClose, onConnect, agentConnected }: Props) 
                     </button>
                   </div>
 
-                  <h2 className="font-display text-xl font-black text-foreground mb-2">
-                    Bem-vindo ao WarmAds! 🔥
+                  <h2 className="font-display text-xl font-black text-foreground mb-4">
+                    🚀 Como funciona o WarmAds
                   </h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-8">
-                    Para aquecer perfis pelo site, você precisa do{" "}
-                    <span className="text-primary font-bold">WarmAds SAS</span> rodando no
-                    seu computador com o AdsPower.
-                  </p>
-
-                  {/* Steps */}
-                  <div className="space-y-3 mb-8">
-                    <div className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-                        <span className="text-xs font-black text-primary">1</span>
+                  
+                  {/* Simplifed Explanation Card */}
+                  <div className="space-y-4 mb-8">
+                    <div className="flex items-start gap-4 p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:border-primary/20 transition-all group">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                        <Download className="w-4 h-4 text-primary" />
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-foreground">Baixe e abra o WarmAds SAS no seu PC</p>
-                        <p className="text-[10px] text-muted-foreground">O app se conecta automaticamente ao AdsPower</p>
-                      </div>
+                      <p className="text-[11px] font-bold text-foreground leading-relaxed">
+                        Instale o aplicativo para iniciar o aquecimento dos seus perfis.
+                      </p>
                     </div>
 
-                    <div className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-                        <span className="text-xs font-black text-primary">2</span>
+                    <div className="flex items-start gap-4 p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:border-primary/20 transition-all group">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                        <Monitor className="w-4 h-4 text-primary" />
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-foreground">Copie o <span className="text-primary">SAS ID</span> que aparece no rodapé</p>
-                        <p className="text-[10px] text-muted-foreground">O ID é gerado automaticamente pelo seu computador</p>
-                      </div>
+                      <p className="text-[11px] font-bold text-foreground leading-relaxed">
+                        Use o site para controle remoto quando estiver fora de casa.
+                      </p>
                     </div>
 
-                    <div className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
-                        <span className="text-xs font-black text-primary">3</span>
+                    <div className="flex items-start gap-4 p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:border-primary/20 transition-all group">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                        <Wifi className="w-4 h-4 text-primary" />
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-foreground">Cole o SAS ID aqui e controle tudo remotamente</p>
-                        <p className="text-[10px] text-muted-foreground">Funciona do celular, tablet ou qualquer navegador</p>
-                      </div>
+                      <p className="text-[11px] font-bold text-foreground leading-relaxed">
+                        No computador, o app deve ficar aberto para executar os comandos.
+                      </p>
                     </div>
                   </div>
 
                   <div className="flex gap-3">
                     <a
-                      href="#"
-                      className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-primary-foreground font-display font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(240,90,40,0.3)] hover:shadow-[0_0_35px_rgba(240,90,40,0.5)] hover:-translate-y-0.5 transition-all"
+                      href={GITHUB_DOWNLOAD_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-3 py-4 rounded-xl bg-primary text-primary-foreground font-display font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(240,90,40,0.3)] hover:shadow-[0_0_35px_rgba(240,90,40,0.5)] hover:-translate-y-0.5 transition-all"
                     >
                       <Download className="w-4 h-4" />
-                      BAIXAR SAS
+                      BAIXAR APLICATIVO
                     </a>
                     <button
                       onClick={() => setStep("connect")}
-                      className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-foreground font-display font-black text-[10px] uppercase tracking-[0.2em] hover:bg-white/[0.06] transition-all"
+                      className="flex-1 flex items-center justify-center gap-3 py-4 rounded-xl bg-white/[0.03] border border-white/[0.08] text-foreground font-display font-black text-[10px] uppercase tracking-[0.2em] hover:bg-white/[0.06] transition-all"
                     >
-                      <Key className="w-4 h-4" />
-                      JÁ TENHO
+                      <Key className="w-4 h-4 text-primary" />
+                      JÁ INSTALEI
                     </button>
                   </div>
                 </>

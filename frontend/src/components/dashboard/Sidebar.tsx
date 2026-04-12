@@ -1,12 +1,17 @@
-import { Target, Shield, Settings, HelpCircle, LogOut } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
+import { GITHUB_DOWNLOAD_URL } from "@/lib/constants";
+import { Target, Shield, Settings, HelpCircle, LogOut, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const [activeItem, setActiveItem] = useState("COMMAND");
   const navigate = useNavigate();
+
+  // Robust Electron detection
+  const isElectron = typeof window !== 'undefined' && 
+    (window.process?.versions?.electron || window.navigator.userAgent.toLowerCase().includes('electron'));
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -48,6 +53,15 @@ const Sidebar = () => {
       </nav>
 
       <div className="mt-auto space-y-2 pt-8 border-t border-border/10">
+        {!isElectron && (
+          <a 
+            href={GITHUB_DOWNLOAD_URL}
+            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all duration-300 mb-2 group"
+          >
+            <Download className="w-[18px] h-[18px] group-hover:-translate-y-0.5 transition-transform" />
+            <span className="text-[10px] uppercase tracking-widest font-black">BAIXAR APP</span>
+          </a>
+        )}
         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-muted-foreground hover:bg-card hover:text-foreground transition-all duration-300">
           <HelpCircle className="w-[18px] h-[18px] text-muted-foreground/70" />
           <span className="text-xs uppercase tracking-widest font-medium">AJUDA</span>

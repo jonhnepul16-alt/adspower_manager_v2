@@ -11,6 +11,7 @@ function createWindow() {
     height: 850,
     backgroundColor: '#0f172a', // Matches the SaaS theme
     title: 'AdsPower Manager Pro',
+    icon: path.join(__dirname, 'frontend/public/logo2_cropped.png'),
     frame: false, // Frameless window
     webPreferences: {
       nodeIntegration: true,
@@ -42,30 +43,35 @@ function startBackend() {
     console.log('Skipping backend spawn: concurrently handles it in dev mode.');
     return;
   }
+  
   console.log('Starting Python backend (Production Mode)...');
   
-  // Try to use the .venv if it exists
-  const venvPython = process.platform === 'win32' 
-    ? path.join(__dirname, '.venv', 'Scripts', 'python.exe')
-    : path.join(__dirname, '.venv', 'bin', 'python');
-    
-  const pythonExe = require('fs').existsSync(venvPython) ? venvPython : 'py';
+  // O executável gerado pelo PyInstaller vai estar na pasta resources após o empacotamento com o electron-builder
+  // Se configurado corretamente no package.json em "extraResources"
+  const backendExe = path.join(process.resourcesPath, 'backend.exe');
 
-  pythonProcess = spawn(pythonExe, [path.join(__dirname, 'backend/server.py')], {
-    env: { ...process.env, PYTHONIOENCODING: 'utf-8' }
-  });
+  if (require('fs').existsSync(backendExe)) {
+      console.log('Found packaged backend.exe at:', backendExe);
+      pythonProcess = spawn(backendExe, [], {
+          env: { ...process.env, PYTHONIOENCODING: 'utf-8' }
+      });
+  } else {
+      console.error('Packaged backend.exe NOT FOUND at:', backendExe);
+  }
 
-  pythonProcess.stdout.on('data', (data) => {
-    console.log(`Backend: ${data}`);
-  });
+  if (pythonProcess) {
+    pythonProcess.stdout.on('data', (data) => {
+      console.log(`Backend: ${data}`);
+    });
 
-  pythonProcess.stderr.on('data', (data) => {
-    console.error(`Backend Error: ${data}`);
-  });
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`Backend Error: ${data}`);
+    });
 
-  pythonProcess.on('close', (code) => {
-    console.log(`Backend process exited with code ${code}`);
-  });
+    pythonProcess.on('close', (code) => {
+      console.log(`Backend process exited with code ${code}`);
+    });
+  }
 }
 
 app.on('ready', () => {

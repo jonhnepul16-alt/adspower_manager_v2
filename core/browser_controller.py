@@ -72,10 +72,23 @@ class BrowserController:
         self.execute_js("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(1)
 
+    def minimize(self):
+        """
+        Move a janela para fora da área visível.
+        Usado como alternativa ao minimize_window() que causa queda de sessão no AdsPower.
+        """
+        try:
+            print(f"DEBUG: Movendo janela para fora da tela (off-screen workaround)...")
+            self.driver.set_window_position(-10000, 0)
+        except Exception as e:
+            print(f"DEBUG: Erro ao tentar mover janela: {e}")
+            pass
+
     def wait_for_url_contains(self, fragment: str, timeout: int = 15):
         WebDriverWait(self.driver, timeout).until(EC.url_contains(fragment))
 
     def close(self):
+
         try:
             self.driver.quit()
         except Exception:

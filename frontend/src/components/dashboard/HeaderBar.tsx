@@ -1,21 +1,26 @@
-import { Bell, LogOut, User, X, Lock, Eye, EyeOff, Minus, Square, Copy } from "lucide-react";
+import { Bell, LogOut, User, X, Lock, Eye, EyeOff, Minus, Square, Copy, Target, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { GITHUB_DOWNLOAD_URL } from "@/lib/constants";
 
 interface HeaderBarProps {
   isActive: boolean;
   isAgentConnected?: boolean;
   apiKey: string;
   onApiKeyChange: (key: string) => void;
+  userEmail?: string;
+  plan?: string;
 }
 
-const isElectron = typeof window !== 'undefined' && window.process && (window.process as any).type === 'renderer';
+// Robust Electron detection
+const isElectron = typeof window !== 'undefined' && 
+  (window.process?.versions?.electron || window.navigator.userAgent.toLowerCase().includes('electron'));
 const ipc = isElectron ? (window as any).require('electron').ipcRenderer : null;
 
-const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange }: HeaderBarProps) => {
+const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange, userEmail, plan }: HeaderBarProps) => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -62,81 +67,92 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
 
   return (
     <>
-      <motion.header
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="flex items-center justify-between w-full py-6 border-b border-white/5 bg-background/50 backdrop-blur-md sticky top-0 z-40 px-6 lg:px-8 select-none relative"
-        style={{ WebkitAppRegion: 'drag' } as any}
-      >
-        <div className="flex items-center gap-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
-          <div className="flex items-center gap-2 group cursor-pointer" onClick={() => navigate("/")}>
-            <h1 className="font-display text-sm font-black text-foreground tracking-tight">
-              WarmAds <span className="text-primary italic">Panel</span>
-            </h1>
-          </div>
 
-        <div className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
-             <button 
-               key={link.label} 
-               onClick={() => navigate(link.path)}
-               className={`text-[9px] font-bold tracking-[0.15em] uppercase transition-all hover:text-primary ${currentPath === link.path ? "text-primary shadow-[0_2px_0_0_#FF4500]" : "text-muted-foreground"}`}
-             >
-               {link.label}
-             </button>
-          ))}
-        </div>
-        </div>
-
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ WebkitAppRegion: 'no-drag' } as any}>
-           <img src="/logo2.png" alt="WarmAds" className="h-20 w-auto opacity-100 transition-opacity drop-shadow-[0_0_15px_rgba(255,69,0,0.3)]" />
-        </div>
-
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-             <div className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-primary animate-pulse shadow-[0_0_10px_#FF4500]" />
-                <span className="text-[9px] font-bold tracking-[0.1em] text-primary uppercase">MOTOR ONLINE</span>
-             </div>
-          </div>
-
-          <div className="h-4 w-px bg-white/10" />
-
-          <div className="flex items-center gap-4" style={{ WebkitAppRegion: 'no-drag' } as any}>
-             <button onClick={() => setShowPasswordModal(true)} className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary">
-                <User className="w-4 h-4" />
-             </button>
-             <button onClick={handleLogout} className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-destructive">
-                <LogOut className="w-4 h-4" />
-             </button>
-          </div>
-
-          {/* Window Controls (Electron Only) */}
-          {isElectron && (
-            <div className="flex items-center ml-4 gap-1" style={{ WebkitAppRegion: 'no-drag' } as any}>
-              <button 
-                onClick={() => ipc?.send('window-minimize')}
-                className="p-2.5 text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all rounded-md"
-              >
-                <Minus className="w-3.5 h-3.5" />
-              </button>
-              <button 
-                onClick={() => ipc?.send('window-toggle-maximize')}
-                className="p-2.5 text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all rounded-md"
-              >
-                <Square className="w-3 h-3" />
-              </button>
-              <button 
-                onClick={() => ipc?.send('window-close')}
-                className="p-2.5 text-muted-foreground hover:bg-destructive hover:text-destructive-foreground transition-all rounded-md"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
+      <header className="flex flex-col w-full sticky top-0 z-40">
+        <motion.div 
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex h-20 items-center justify-between px-6 lg:px-8 bg-background/80 backdrop-blur-xl border-b border-white/[0.05]"
+          style={{ WebkitAppRegion: 'drag' } as any}
+        >
+          <div className="flex items-center gap-8" style={{ WebkitAppRegion: 'no-drag' } as any}>
+            <div className="flex items-center gap-3 group cursor-pointer min-w-fit" onClick={() => navigate("/")}>
+              <div className="w-14 h-14 flex items-center justify-center transition-all duration-300 transform group-hover:scale-105">
+                <img src="logo2.png" alt="WarmAds" className="w-12 h-12 object-contain" />
+              </div>
+              <h1 className="font-display text-xl font-black text-white tracking-tight flex items-center gap-2 whitespace-nowrap">
+                WarmAds <span className="bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent italic pr-1">Panel</span>
+              </h1>
             </div>
-          )}
-        </div>
-      </motion.header>
+
+            <nav className="hidden md:flex items-center gap-6 ml-4">
+              {navLinks.map((link) => (
+                <button 
+                  key={link.label} 
+                  onClick={() => navigate(link.path)}
+                  className={`text-[9px] font-bold tracking-[0.15em] uppercase transition-all hover:text-primary relative py-2 ${
+                    currentPath === link.path ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  {link.label}
+                  {currentPath === link.path && (
+                    <motion.div layoutId="nav-glow" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary shadow-[0_0_10px_#FF4500] rounded-full" />
+                  )}
+                </button>
+              ))}
+
+              {!isElectron && (
+                <a 
+                  href={GITHUB_DOWNLOAD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all group ml-2"
+                >
+                  <Download className="w-3 h-3 group-hover:-translate-y-0.5 transition-transform" />
+                  <span className="text-[8px] font-black uppercase tracking-widest">BAIXAR APP</span>
+                </a>
+              )}
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-6" style={{ WebkitAppRegion: 'no-drag' } as any}>
+            <div className="flex items-center gap-4">
+              {plan && (
+                <div className={`px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.15em] border transition-all ${
+                  plan === "SCALE" 
+                    ? "bg-primary/10 border-primary/30 text-primary shadow-[0_0_15px_rgba(255,69,0,0.1)]" 
+                    : "bg-white/5 border-white/10 text-white/40"
+                }`}>
+                  {plan}
+                </div>
+              )}
+              
+              <div className="hidden lg:flex flex-col items-end mr-2">
+                <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">{userEmail}</span>
+              </div>
+
+              <div className="h-4 w-px bg-white/10 mx-2" />
+
+              <div className="flex items-center gap-2">
+                <button onClick={() => setShowPasswordModal(true)} className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-primary">
+                  <User className="w-4 h-4" />
+                </button>
+                <button onClick={handleLogout} className="p-2 hover:bg-white/5 rounded-full transition-colors text-muted-foreground hover:text-destructive">
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {isElectron && (
+              <div className="flex items-center gap-1 border-l border-white/10 pl-4">
+                <button onClick={() => ipc?.send('window-minimize')} className="p-2 text-muted-foreground hover:text-white transition-colors"><Minus className="w-3.5 h-3.5" /></button>
+                <button onClick={() => ipc?.send('window-toggle-maximize')} className="p-2 text-muted-foreground hover:text-white transition-colors"><Square className="w-3 h-3" /></button>
+                <button onClick={() => ipc?.send('window-close')} className="p-2 text-muted-foreground hover:text-destructive transition-colors"><X className="w-3.5 h-3.5" /></button>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </header>
 
       {/* Modal de Alterar Senha */}
       <AnimatePresence>
@@ -177,7 +193,7 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
                       type={showNew ? "text" : "password"}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full bg-background border border-border/50 rounded-xl pl-10 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
+                      className="w-full bg-background border border-border/50 rounded-xl pl-10 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-mono"
                       placeholder="Mínimo 6 caracteres"
                       required
                     />
@@ -197,7 +213,7 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
                       type={showConfirm ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full bg-background border border-border/50 rounded-xl pl-10 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
+                      className="w-full bg-background border border-border/50 rounded-xl pl-10 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-mono"
                       placeholder="Repita a nova senha"
                       required
                     />
@@ -224,4 +240,3 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange 
 };
 
 export default HeaderBar;
-

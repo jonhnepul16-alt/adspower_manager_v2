@@ -4,8 +4,9 @@ from typing import Optional, Dict
 
 class SupabaseManager:
     def __init__(self):
-        self.url: str = os.environ.get("SUPABASE_URL", "https://mewueckdincysvdhfxbp.supabase.co")
-        self.key: str = os.environ.get("SUPABASE_ANON_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ld3VlY2tkaW5jeXN2ZGhmeGJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MTg3MzYsImV4cCI6MjA5MTE5NDczNn0.QjH55p0S3GOsNRZLtxomcFekfEpFqY2TnUqP561biG8")
+        # As chaves agora são carregadas exclusivamente do ambiente para segurança
+        self.url: str = os.environ.get("SUPABASE_URL", "")
+        self.key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 
         
         # Override with real credentials if passed through environment via Electron
@@ -39,27 +40,32 @@ class SupabaseManager:
             # but we can create a temporary client or just rely on the service role if RLS is an issue.
             # However, for local desktop, querying by email is safe if RLS allows it.
             
-            # Attempt to query with the user context (this handles RLS if policy allows 'select for authenticated')
-            sub_resp = self.client.postgrest.auth(access_token).table("subscriptions").select("*").eq("email", user_email).execute()
+            # Attempt to query with the user context (Ordering by newest first)
+            sub_resp = self.client.postgrest.auth(access_token).table("subscriptions").select("*").ilike("email", user_email).order("created_at", desc=True).execute()
             
             plan_data = {"plan": "START", "email": user_email, "adspower_limit": 50}
             
             status = "unknown"
             if sub_resp.data and len(sub_resp.data) > 0:
                 record = sub_resp.data[0]
-                status = record.get("status", "unknown")
-                tier = record.get("tier", "START").upper()
+                status = str(record.get("status", "unknown")).strip().lower()
+                tier = str(record.get("tier", "START")).strip().upper()
                 is_premium = record.get("is_premium", False)
                 adspower_limit = record.get("adspower_limit", 50)
                 
-                # If they are premium but tier isn't fully defined, default gracefully
-                if is_premium and tier == "START":
-                    tier = "SCALE" 
-                
-                plan_data["plan"] = tier if status == "active" else "START"
+                # STRICT ENFORCEMENT: Plan is tier if status is active, otherwise START
+                if status == "active":
+                    plan_data["plan"] = tier
+                    plan_data["status"] = status
+                else:
+                    plan_data["plan"] = "START"
+                    plan_data["status"] = status
+                    
                 plan_data["adspower_limit"] = adspower_limit
+                plan_data["email"] = record.get("email", user_email)
+            else:
+                print(f"    [Supabase] No subscription record found for {user_email}")
             
-            print(f"    [Supabase] Plano detectado para {user_email}: {plan_data['plan']} (Status: {status})")
             return plan_data
 
 

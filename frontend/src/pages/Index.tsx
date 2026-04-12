@@ -12,7 +12,9 @@ import StatCard from "@/components/dashboard/StatCard";
 import OnboardingBanner from "@/components/dashboard/OnboardingBanner";
 import { fetchStatus, startWarmup, stopWarmup, fetchProfiles } from "@/lib/api";
 import { Cloud, Calendar, TrendingUp, Activity } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import OnboardingModal from "@/components/dashboard/OnboardingModal";
 
 
 interface Profile {
@@ -45,19 +47,28 @@ const Index = () => {
   const [schedulerStatus, setSchedulerStatus] = useState<any>(null);
   const [schedulerActive, setSchedulerActive] = useState(false);
   const [currentProfile, setCurrentProfile] = useState<string | null>(null);
+  const [currentTaskStart, setCurrentTaskStart] = useState<number>(0);
+  const [currentTaskDuration, setCurrentTaskDuration] = useState<number>(0);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [planLimits, setPlanLimits] = useState<any>(null);
+  const [planLimits, setPlanLimits] = useState<any>({
+    plan: "START",
+    max_profiles: 5,
+    session_time: [10, 15]
+  });
   const [warmupDuration, setWarmupDuration] = useState<number | null>(null);
   const [adsApiKey, setAdsApiKey] = useState(() => localStorage.getItem("adspower_api_key") || "");
   const [machineId, setMachineId] = useState(() => {
     // 1. Tenta pegar do localStorage ou "default"
     return localStorage.getItem("vexel_machine_id") || "local_agent";
   });
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
 
   const safeResults = results ?? {};
 
-  // Detect if running in Electron (local) or browser (cloud site)
-  const isElectron = typeof window !== 'undefined' && window.process && (window.process as any).type === 'renderer';
+  // Robust Electron detection
+  const isElectron = typeof window !== 'undefined' && 
+    (window.process?.versions?.electron || window.navigator.userAgent.toLowerCase().includes('electron'));
   
   // Connection state for onboarding banner (cloud site only)
   const [bannerDismissed, setBannerDismissed] = useState(false);
@@ -91,6 +102,22 @@ const Index = () => {
     localStorage.setItem("selected_profiles", JSON.stringify(selectedProfiles));
   }, [selectedProfiles]);
 
+  // Handle First Access Onboarding
+  useEffect(() => {
+    if (isElectron) return; // App version doesn't need this
+    
+    const hasSeen = localStorage.getItem("has_seen_onboarding");
+    if (!hasSeen && connectionState !== "connected") {
+      setIsOnboardingOpen(true);
+    }
+  }, [isElectron, connectionState]);
+
+  const handleOnboardingConnect = (mid: string) => {
+    setMachineId(mid);
+    localStorage.setItem("has_seen_onboarding", "true");
+    setIsOnboardingOpen(false);
+  };
+
   const profileIds = selectedProfiles.map(p => p.adsPowerId);
 
   useEffect(() => {
@@ -107,9 +134,14 @@ const Index = () => {
         setSchedulerConfig(cfg);
         setSchedulerStatus(status.scheduler_status ?? null);
         setCurrentProfile(status.current_profile ?? null);
+        setCurrentTaskStart(status.current_task_start ?? 0);
+        setCurrentTaskDuration(status.current_task_duration ?? 0);
         
-        if (status.plan_status?.limits) {
-          setPlanLimits(status.plan_status.limits);
+        if (status.plan_status) {
+          console.log("DEBUG: Plan Status Received:", status.plan_status);
+          if (status.plan_status.limits) {
+            setPlanLimits(status.plan_status.limits);
+          }
         }
         setCloudConnected(status.cloud_connected ?? false);
         if (status.machine_id) setMachineId(status.machine_id);
@@ -128,10 +160,10 @@ const Index = () => {
   }, [machineId]);
 
   const handleStart = async () => {
-    console.log("Iniciando warmup para os IDs:", profileIds, "Duração:", warmupDuration);
+    console.log("Iniciando warmup para os IDs:", profileIds, "Duração:", warmupDuration, "Minimizado:", isMinimized);
     if (!profileIds.length) return;
     try {
-      await startWarmup(profileIds, selectedMode, warmupDuration, machineId);
+      await startWarmup(profileIds, selectedMode, warmupDuration, machineId, isMinimized);
       setIsActive(true);
       toast.success("Comando de inicialização enviado!");
     } catch (err) {
@@ -184,12 +216,31 @@ const Index = () => {
     loadProfiles();
   }, [isPickerOpen]);
 
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email) {
+        setUserEmail(session.user.email);
+      }
+    };
+    getUser();
+  }, []);
+
   const toggleProfile = (profile: Profile) => {
     setSelectedProfiles(prev => {
       const exists = prev.find(p => p.id === profile.id);
       if (exists) {
         return prev.filter(p => p.id !== profile.id);
       } else {
+        const maxLimit = planLimits?.max_profiles || 5;
+        if (planLimits?.plan === "START" && prev.length >= maxLimit) {
+          toast.error("Limite do Plano Start", {
+            description: `O seu plano permite no máximo ${maxLimit} perfis ativos por vez. Faça o upgrade para o Scale para liberar mais.`
+          });
+          return prev;
+        }
         return [...prev, profile];
       }
     });
@@ -199,7 +250,15 @@ const Index = () => {
     if (selectedProfiles.length === savedProfiles.length) {
       setSelectedProfiles([]);
     } else {
-      setSelectedProfiles(savedProfiles);
+      const maxLimit = planLimits?.max_profiles || 5;
+      if (planLimits?.plan === "START" && savedProfiles.length > maxLimit) {
+        setSelectedProfiles(savedProfiles.slice(0, maxLimit));
+        toast.info("Limite de 5 perfis aplicado", {
+          description: "No plano Start, você pode selecionar até 5 perfis simultâneos. Selecionamos os 5 primeiros para você."
+        });
+      } else {
+        setSelectedProfiles(savedProfiles);
+      }
     }
   };
 
@@ -220,51 +279,65 @@ const Index = () => {
         isAgentConnected={isAgentConnected}
         apiKey={machineId}
         onApiKeyChange={setMachineId}
+        userEmail={userEmail}
+        plan={planLimits?.plan}
       />
 
       <main className="flex-1 p-4 lg:p-6 w-full max-w-full">
-        {/* Onboarding Banner (cloud site only) */}
-        {!isElectron && !bannerDismissed && connectionState !== "connected" && (
-          <div className="mb-6">
-            <OnboardingBanner
-              connectionState={connectionState}
-              onDismiss={() => setBannerDismissed(true)}
-            />
-          </div>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-[25fr_45fr_30fr] gap-4 items-start h-full">
           
           {/* COLUMN 1: CONTROLS (25%) */}
           <div className="flex flex-col gap-4">
-             <GlassCard delay={0.1} className="p-4 border-l-2 border-l-primary/30">
-                <div className="flex items-center justify-between mb-3">
-                   <h2 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                     <Calendar className="w-3 h-3 text-primary" />
-                     Agendamento
-                   </h2>
-                   <div className={`px-2 py-0.5 rounded-full border text-[8px] font-black ${schedulerActive ? "border-emerald-500/50 text-emerald-500" : "border-white/10 text-muted-foreground"}`}>
-                      {schedulerActive ? "ON" : "OFF"}
-                   </div>
-                </div>
-                <p className="text-[9px] text-white/30 mb-3">
-                  {schedulerActive 
-                    ? `${schedulerStatus?.pending_sessions ?? 0} sessões restantes hoje`
-                    : "Configure horários automáticos de aquecimento"
-                  }
-                </p>
-                <button 
-                  onClick={() => navigate("/scheduler")}
-                  className="w-full py-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-[9px] font-black text-primary uppercase tracking-widest hover:bg-primary/5 hover:border-primary/20 transition-all"
-                >
-                  CONFIGURAR →
-                </button>
-             </GlassCard>
+              <GlassCard delay={0.1} className={`p-4 border-l-2 ${planLimits?.plan === "START" ? "border-l-white/10 opacity-80" : "border-l-primary/30"}`}>
+                 <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                      <Calendar className="w-3 h-3 text-primary" />
+                      Agendamento
+                    </h2>
+                    {planLimits?.plan === "START" ? (
+                      <div className="px-2 py-0.5 rounded-full border border-white/10 text-white/40 text-[8px] font-black flex items-center gap-1">
+                        🔒 SCALE
+                      </div>
+                    ) : (
+                      <div className={`px-2 py-0.5 rounded-full border text-[8px] font-black ${schedulerActive ? "border-emerald-500/50 text-emerald-500" : "border-white/10 text-muted-foreground"}`}>
+                         {schedulerActive ? "ON" : "OFF"}
+                      </div>
+                    )}
+                 </div>
+                 <p className="text-[9px] text-white/30 mb-3">
+                   {planLimits?.plan === "START" 
+                     ? "Disponível exclusivamente no plano Scale"
+                     : (schedulerActive 
+                        ? `${schedulerStatus?.pending_sessions ?? 0} sessões restantes hoje`
+                        : "Configure horários automáticos de aquecimento")
+                   }
+                 </p>
+                 <button 
+                   onClick={() => {
+                     if (planLimits?.plan === "START") {
+                       toast.info("O agendamento automático é uma função exclusiva do plano Scale.");
+                       return;
+                     }
+                     navigate("/scheduler");
+                   }}
+                   className={`w-full py-2.5 rounded-lg border text-[9px] font-black uppercase tracking-widest transition-all ${
+                     planLimits?.plan === "START"
+                     ? "bg-white/5 border-white/10 text-white/20 cursor-not-allowed group-hover:border-primary/20"
+                     : "bg-white/[0.03] border-white/[0.06] text-primary hover:bg-primary/5 hover:border-primary/20"
+                   }`}
+                 >
+                   {planLimits?.plan === "START" ? "🔒 BLOQUEADO" : "CONFIGURAR →"}
+                 </button>
+              </GlassCard>
 
              <GlassCard delay={0.2} className="p-4">
                 <h2 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em] mb-4">Configurações</h2>
                 <div className="space-y-4">
-                    <StrategySelector value={selectedMode} onChange={setSelectedMode} />
+                     <StrategySelector 
+                       value={planLimits?.plan === "START" ? "1" : selectedMode} 
+                       onChange={setSelectedMode} 
+                       plan={planLimits?.plan}
+                     />
                     
                     <div className="space-y-2">
                        <label className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2">
@@ -324,6 +397,23 @@ const Index = () => {
                          placeholder="Cole a API Key do AdsPower aqui..."
                          className="w-full bg-white/[0.02] border border-white/[0.06] rounded-lg px-3 py-2 text-[10px] font-mono text-foreground outline-none focus:border-primary/30 transition-all placeholder:text-white/10"
                        />
+                    </div>
+
+                    {/* Window Mode Toggle */}
+                    <div className="flex items-center justify-between pt-3 border-t border-white/[0.04]">
+                       <div className="flex flex-col">
+                          <label className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2">
+                             <Minus className="w-3 h-3" />
+                             Minimizar Janelas
+                          </label>
+                          <p className="text-[7px] text-white/10 uppercase font-black">Rodar browsers em background</p>
+                       </div>
+                       <button
+                         onClick={() => setIsMinimized(!isMinimized)}
+                         className={`w-8 h-4 rounded-full p-0.5 transition-all relative ${isMinimized ? 'bg-primary' : 'bg-white/10'}`}
+                       >
+                         <div className={`w-3 h-3 rounded-full bg-white transition-all shadow-sm ${isMinimized ? 'translate-x-4' : 'translate-x-0'}`} />
+                       </button>
                     </div>
                 </div>
              </GlassCard>
@@ -456,6 +546,8 @@ const Index = () => {
                     profiles={profileIds}
                     currentProfile={currentProfile}
                     results={safeResults}
+                    currentTaskStart={currentTaskStart}
+                    currentTaskDuration={currentTaskDuration}
                   />
                 </div>
              </GlassCard>
@@ -602,6 +694,16 @@ const Index = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <OnboardingModal 
+        isOpen={isOnboardingOpen}
+        onClose={() => {
+          setIsOnboardingOpen(false);
+          localStorage.setItem("has_seen_onboarding", "true");
+        }}
+        onConnect={handleOnboardingConnect}
+        agentConnected={cloudConnected}
+      />
     </div>
   );
 };

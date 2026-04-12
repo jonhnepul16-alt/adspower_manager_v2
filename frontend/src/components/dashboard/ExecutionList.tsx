@@ -1,13 +1,30 @@
 import { motion } from "framer-motion";
-import { Zap } from "lucide-react";
+import { Zap, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface Props {
   profiles: string[];
   currentProfile: string | null;
   results: Record<string, any>;
+  currentTaskStart?: number;
+  currentTaskDuration?: number;
 }
 
-const ExecutionList = ({ profiles, currentProfile, results }: Props) => {
+const formatTime = (seconds: number) => {
+  if (seconds <= 0) return "00:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+};
+
+const ExecutionList = ({ profiles, currentProfile, results, currentTaskStart, currentTaskDuration }: Props) => {
+  const [now, setNow] = useState(Date.now() / 1000);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now() / 1000), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="space-y-4">
       {profiles.map((pid, i) => {
@@ -16,6 +33,13 @@ const ExecutionList = ({ profiles, currentProfile, results }: Props) => {
         const isCompleted = !isCurrent && result.ok && (result.ciclos > 0);
         const interactions = (result.curtidas_feed || 0) + (result.reacoes_dadas || 0) + (result.comentarios_feitos || 0) + (result.reels_assistidos || 0);
         
+        // Calculate remaining time
+        let timeLeft = 0;
+        if (isCurrent && currentTaskStart && currentTaskDuration) {
+          const elapsed = now - currentTaskStart;
+          timeLeft = Math.max(0, currentTaskDuration - elapsed);
+        }
+
         return (
           <div key={pid} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.05] rounded-2xl hover:bg-white/[0.05] transition-all">
             <div className="flex items-center gap-4">
@@ -42,8 +66,18 @@ const ExecutionList = ({ profiles, currentProfile, results }: Props) => {
                   </div>
                </div>
                
-               <div className="w-10 text-right">
-                  <span className="font-mono text-sm font-bold text-foreground/80">{interactions}</span>
+               <div className="flex flex-col items-end min-w-[60px]">
+                  {isCurrent ? (
+                    <div className="flex items-center gap-1 text-primary">
+                      <Clock className="w-3 h-3 animate-pulse" />
+                      <span className="font-mono text-xs font-black">{formatTime(timeLeft)}</span>
+                    </div>
+                  ) : (
+                    <span className="font-mono text-sm font-bold text-foreground/80">{interactions}</span>
+                  )}
+                  {isCurrent && (
+                    <span className="text-[8px] text-white/20 font-bold uppercase tracking-widest mt-0.5">restante</span>
+                  )}
                </div>
             </div>
           </div>

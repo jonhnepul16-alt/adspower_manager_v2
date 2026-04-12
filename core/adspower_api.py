@@ -44,16 +44,25 @@ class AdsPowerAPI:
         print(f"[ERRO] list_profiles: {res.get('msg')}")
         return []
 
-    def open_browser(self, profile_id: str) -> Optional[dict]:
+    def open_browser(self, profile_id: str, **kwargs) -> Optional[dict]:
         """
         Abre o browser de um perfil.
         Retorna dict com 'ws' (WebSocket URL) e 'webdriver', ou o json de erro.
         """
-        res = self._get("/api/v1/browser/start", {"user_id": profile_id})
+        params = {"user_id": profile_id}
+            
+        res = self._get("/api/v1/browser/start", params)
+        
+        # Se code for 0, retornamos o data (sucesso padrão)
         if res.get("code") == 0:
             return res.get("data")
-        print(f"[ERRO] open_browser({profile_id}): {res.get('msg')}")
-        # Return the error response to let account_manager handle specific fail-safes
+            
+        # Se não for 0, mas tivermos os dados de conexão (ex: já estava aberto)
+        # permitimos o retorno do data para que o manager tente conectar
+        if isinstance(res.get("data"), dict) and "ws" in res.get("data"):
+            return res.get("data")
+            
+        print(f"[ERROR] open_browser({profile_id}): {res.get('msg')}")
         return res
 
     def close_browser(self, profile_id: str) -> bool:
@@ -61,12 +70,12 @@ class AdsPowerAPI:
         res = self._get("/api/v1/browser/stop", {"user_id": profile_id})
         return res.get("code") == 0
 
-    def browser_status(self, profile_id: str) -> str:
-        """Retorna 'Active' ou 'Inactive'."""
+    def browser_status(self, profile_id: str) -> dict:
+        """Retorna os dados do browser se estiver 'Active', incluindo ws e webdriver."""
         res = self._get("/api/v1/browser/active", {"user_id": profile_id})
         if res.get("code") == 0:
-            return res.get("data", {}).get("status", "Inactive")
-        return "Inactive"
+            return res.get("data", {})
+        return {}
 
     def is_running(self) -> bool:
         """Verifica se o AdsPower está rodando."""
