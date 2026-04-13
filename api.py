@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Requ
 from supabase import create_client, Client
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Vexel Cloud API")
+app = FastAPI(title="WarmAds Cloud API v2")
 
 app.add_middleware(
     CORSMiddleware,
