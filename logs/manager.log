@@ -725,3 +725,9 @@ task: <Task pending name='Task-12' coro=<AgentWorker.scheduler_loop() running at
 2026-04-12 18:32:46,872 [INFO] 📉 [Manager] Garantindo janela minimizada...
 2026-04-12 18:33:33,709 [INFO] [k1akdrpr] Tarefa concluída: {'curtidas_feed': 0, 'reacoes_dadas': 1, 'comentarios_feitos': 0, 'reels_assistidos': 0, 'reels_curtidos': 0, 'ciclos': 1, 'ok': True, 'buscas': 0, 'distancia_total_scrollada': 0}
 2026-04-12 18:33:43,736 [INFO] Perfil k1akdrpr fechado.
+2026-04-12 23:16:35,518 [INFO] AdsPower detectado e ativo.
+2026-04-12 23:16:35,518 [INFO] 🚀 [Manager] Iniciando abertura do perfil k1akdrpr () [Min: False]
+2026-04-12 23:16:42,596 [INFO] 🔍 [Manager] DEBUG RAW Resposta AdsPower (Tentativa 0): {'ws': {'puppeteer': 'ws://127.0.0.1:63814/devtools/browser/9fae709f-e368-4b5e-9964-974f791c34a8', 'selenium': '127.0.0.1:63814'}, 'debug_port': '63814', 'webdriver': 'C:\\Users\\nepul\\AppData\\Roaming\\adspower_global\\cwd_global\\chrome_145\\chromedriver.exe'}
+2026-04-12 23:16:42,596 [INFO] ✅ [Manager] Dados de conexão capturados com sucesso.
+2026-04-12 23:16:42,596 [INFO] 🔌 [Manager] Conectando Selenium (Tentativa 1/3)...
+2026-04-12 23:16:43,353 [INFO] ✨ [Manager] Perfil k1akdrpr CONECTADO. Título: AdsPower

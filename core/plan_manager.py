@@ -25,6 +25,11 @@ PLAN_LIMITS = {
         "max_profiles": 100,
         "active_profiles_per_day": (50, 100),
         "session_time": (5, 60)
+    },
+    "TEAM": {
+        "max_profiles": 1000,
+        "active_profiles_per_day": (100, 1000),
+        "session_time": (1, 120)
     }
 }
 

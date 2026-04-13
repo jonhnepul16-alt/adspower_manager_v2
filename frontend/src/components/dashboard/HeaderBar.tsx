@@ -119,7 +119,9 @@ const HeaderBar = ({ isActive, isAgentConnected = false, apiKey, onApiKeyChange,
             <div className="flex items-center gap-4">
               {plan && (
                 <div className={`px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.15em] border transition-all ${
-                  plan === "SCALE" 
+                  plan === "TEAM"
+                    ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.1)]"
+                  : plan === "SCALE" 
                     ? "bg-primary/10 border-primary/30 text-primary shadow-[0_0_15px_rgba(255,69,0,0.1)]" 
                     : "bg-white/5 border-white/10 text-white/40"
                 }`}>

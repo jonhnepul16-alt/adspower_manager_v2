@@ -4,9 +4,8 @@ from typing import Optional, Dict
 
 class SupabaseManager:
     def __init__(self):
-        # As chaves agora são carregadas exclusivamente do ambiente para segurança
-        self.url: str = os.environ.get("SUPABASE_URL", "")
-        self.key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+        self.url: str = os.environ.get("SUPABASE_URL", "https://mewueckdincysvdhfxbp.supabase.co")
+        self.key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "sb_secret_dKzjoZfmr4E6MmJ1AlrlCA_fjKrNDTN")
 
         
         # Override with real credentials if passed through environment via Electron

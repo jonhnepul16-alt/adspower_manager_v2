@@ -153,23 +153,32 @@ def get_user_plan_from_token(token: str) -> Dict[str, Any]:
             # If not active, fallback to START
             if status != "active":
                 print(f"DEBUG: Account {email} is NOT active (status: {status}). Defaulting to START.")
-                return {"plan": "START", "max_profiles": 5, "session_time": [10, 15], "detected_email": email}
+                return {"plan": "START", "max_profiles": 5, "session_time": [10, 15], "max_machines": 1, "detected_email": email}
             
-            if tier == "SCALE":
+            if tier == "TEAM":
+                print(f"DEBUG: Account {email} matched TEAM tier. UNLEASHING FULL POWER.")
+                return {"plan": "TEAM", "max_profiles": 1000, "session_time": [1, 120], "max_machines": 8, "detected_email": email}
+            elif tier == "SCALE":
                 print(f"DEBUG: Account {email} matched SCALE tier. LIBERATING.")
-                return {"plan": "SCALE", "max_profiles": 100, "session_time": [5, 60], "detected_email": email}
+                return {"plan": "SCALE", "max_profiles": 100, "session_time": [5, 60], "max_machines": 3, "detected_email": email}
             else:
                 print(f"DEBUG: Account {email} matched tier [{tier}]. Enforcing START limits.")
-                return {"plan": "START", "max_profiles": 5, "session_time": [10, 15], "detected_email": email}
+                return {"plan": "START", "max_profiles": 5, "session_time": [10, 15], "max_machines": 1, "detected_email": email}
                 
         # Default fallback for any other case
         print(f"DEBUG: No subscription record found for {email}. Defaulting to START.")
-        return {"plan": "START", "max_profiles": 5, "session_time": [10, 15], "detected_email": email}
+        return {"plan": "START", "max_profiles": 5, "session_time": [10, 15], "max_machines": 1, "detected_email": email}
     except Exception as e:
         print(f"CRITICAL ERROR in get_user_plan_from_token: {e}")
         import traceback
         traceback.print_exc()
         return {"plan": "START", "max_profiles": 5, "session_time": [10, 15]}
+
+class ProfileUpdate(BaseModel):
+    id: str # AdsPower ID
+    name: str
+    tag: str
+    history: Optional[List[Dict[str, Any]]] = None
 
 class WarmupRequest(BaseModel):
     machine_id: str = "default"
@@ -265,8 +274,114 @@ async def get_status(request: Request, machine_id: str = "default"):
     }
 
 @app.get("/api/profiles")
+async def get_profiles_db(request: Request):
+    """Fetch profiles from the cloud database (Supabase) for the logged-in user."""
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    token = auth_header.split(" ")[1]
+    user_info = get_user_plan_from_token(token)
+    email = user_info.get("detected_email")
+    
+    if not email:
+        raise HTTPException(status_code=401, detail="User not found in token")
+
+    db = get_supabase()
+    if not db:
+        return {"profiles": []}
+    
+    try:
+        resp = db.table("profiles").select("*").eq("email", email).order("created_at", desc=True).execute()
+        return {"profiles": resp.data}
+    except Exception as e:
+        print(f"Error fetching profiles from DB: {e}")
+        return {"profiles": []}
+
+@app.post("/api/profiles")
+async def create_profile_db(request: Request, profile: ProfileUpdate):
+    """Create or update a profile in the cloud database."""
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    token = auth_header.split(" ")[1]
+    user_info = get_user_plan_from_token(token)
+    email = user_info.get("detected_email")
+    
+    if not email:
+        raise HTTPException(status_code=401, detail="User not found in token")
+
+    db = get_supabase()
+    if not db:
+        raise HTTPException(status_code=500, detail="Database connection failed")
+    
+    profile_data = {
+        "id": profile.id,
+        "name": profile.name,
+        "tag": profile.tag,
+        "email": email
+    }
+    
+    if profile.history is not None:
+        profile_data["history"] = profile.history
+
+    try:
+        # Upsert: If ID exists, update it. Otherwise create.
+        # Note: In Supabase, upsert requires the primary key 'id' to be provided.
+        resp = db.table("profiles").upsert(profile_data).execute()
+        if not resp.data:
+            raise HTTPException(status_code=400, detail="Failed to save profile")
+        return {"message": "Profile saved", "profile": resp.data[0]}
+    except Exception as e:
+        print(f"Error saving profile: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/profiles/{profile_id}")
+async def update_profile_db(request: Request, profile_id: str, profile: ProfileUpdate):
+    """Update an existing profile."""
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    token = auth_header.split(" ")[1]
+    user_info = get_user_plan_from_token(token)
+    email = user_info.get("detected_email")
+    
+    db = get_supabase()
+    try:
+        resp = db.table("profiles").update({
+            "name": profile.name,
+            "tag": profile.tag,
+        }).eq("id", profile_id).eq("email", email).execute()
+        
+        if not resp.data:
+            raise HTTPException(status_code=404, detail="Profile not found or access denied")
+        return {"message": "Profile updated", "profile": resp.data[0]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/profiles/{profile_id}")
+async def delete_profile_db(request: Request, profile_id: str):
+    """Delete a profile from the database."""
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    token = auth_header.split(" ")[1]
+    user_info = get_user_plan_from_token(token)
+    email = user_info.get("detected_email")
+    
+    db = get_supabase()
+    try:
+        resp = db.table("profiles").delete().eq("id", profile_id).eq("email", email).execute()
+        return {"message": "Profile deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/agent/profiles")
 async def get_profiles_from_agent(machine_id: str = "default"):
-    """Fetch profiles from the local SAS agent via WebSocket tunnel."""
+    """Fetch live profiles directly from the local SAS agent via WebSocket tunnel."""
     if machine_id not in manager.active_agents:
         raise HTTPException(status_code=404, detail="Agent not connected. Open the SAS app first.")
     
@@ -320,9 +435,23 @@ async def cakto_webhook(request: Request):
     elif "email" in payload:
         customer_email = payload.get("email")
 
-    if not customer_email:
-        print("Cakto Webhook ignorado: Sem email atrelado à requisição.")
-        return {"status": "ignored", "reason": "no email provided"}
+    # Identifica o plano (Tier) através do nome do produto
+    product_name = ""
+    if "data" in payload and "product" in payload["data"]:
+        product_name = payload["data"]["product"].get("name", "")
+    elif "product" in payload:
+        product_name = payload["product"] if isinstance(payload["product"], str) else payload["product"].get("name", "")
+    elif "product_name" in payload:
+        product_name = payload.get("product_name", "")
+
+    tier = "START"
+    product_name_str = str(product_name).lower()
+    if "equipe" in product_name_str or "team" in product_name_str:
+        tier = "TEAM"
+    elif "scale" in product_name_str:
+        tier = "SCALE"
+    
+    print(f"Cakto Webhook: Evento de {customer_email} para o produto [{product_name}] -> Tier Detectado: {tier}")
 
     # Verifica se foi um pagamento aprovado/PIX finalizado
     if event_status in ["payment.approved", "PAID", "approved", "paid"]:
@@ -341,20 +470,21 @@ async def cakto_webhook(request: Request):
                     "email_confirm": True
                 })
                 print(f"Cakto Webhook: Conta VIP nova criada para {customer_email}.")
-            except Exception as auth_err:
-                # Se falhar, na maioria das vezes é porque a conta já existe, o que é ótimo!
+            except Exception:
+                # Se falhar, na maioria das vezes é porque a conta já existe
                 pass
 
-            # 2. Atualiza o is_premium para conta do cara
+            # 2. Atualiza o is_premium, status e TIER para conta do cara
             response = db.table("subscriptions").update({
                 "is_premium": True,
-                "status": "active"
+                "status": "active",
+                "tier": tier
             }).eq("email", customer_email).execute()
 
             if len(response.data) == 0:
-                print(f"Cakto Webhook pago: Mas conta {customer_email} não foi encontrada no banco.")
+                print(f"Cakto Webhook pago: Mas conta {customer_email} não foi encontrada na tabela subscriptions.")
             else:
-                print(f"Cakto Webhook: Perfil {customer_email} atualizado para VIP/Premium com sucesso!")
+                print(f"Cakto Webhook: Perfil {customer_email} atualizado para {tier} com sucesso!")
                 
         except Exception as e:
             print(f"Cakto Webhook Falhou ao atualizar BD: {e}")

@@ -236,8 +236,8 @@ const Index = () => {
       } else {
         const maxLimit = planLimits?.max_profiles || 5;
         if (planLimits?.plan === "START" && prev.length >= maxLimit) {
-          toast.error("Limite do Plano Start", {
-            description: `O seu plano permite no máximo ${maxLimit} perfis ativos por vez. Faça o upgrade para o Scale para liberar mais.`
+          toast.error("Limite de Perfis Atingido", {
+            description: `O seu plano (${planLimits?.plan}) permite no máximo ${maxLimit} perfis ativos por vez. Faça o upgrade para um plano superior para liberar mais.`
           });
           return prev;
         }
@@ -296,7 +296,7 @@ const Index = () => {
                     </h2>
                     {planLimits?.plan === "START" ? (
                       <div className="px-2 py-0.5 rounded-full border border-white/10 text-white/40 text-[8px] font-black flex items-center gap-1">
-                        🔒 SCALE
+                        🔒 PREMIUM
                       </div>
                     ) : (
                       <div className={`px-2 py-0.5 rounded-full border text-[8px] font-black ${schedulerActive ? "border-emerald-500/50 text-emerald-500" : "border-white/10 text-muted-foreground"}`}>
@@ -306,7 +306,7 @@ const Index = () => {
                  </div>
                  <p className="text-[9px] text-white/30 mb-3">
                    {planLimits?.plan === "START" 
-                     ? "Disponível exclusivamente no plano Scale"
+                     ? "Disponível exclusivamente em planos Premium"
                      : (schedulerActive 
                         ? `${schedulerStatus?.pending_sessions ?? 0} sessões restantes hoje`
                         : "Configure horários automáticos de aquecimento")
@@ -315,7 +315,7 @@ const Index = () => {
                  <button 
                    onClick={() => {
                      if (planLimits?.plan === "START") {
-                       toast.info("O agendamento automático é uma função exclusiva do plano Scale.");
+                       toast.info("O agendamento automático é uma função exclusiva de planos Premium (Scale/Team).");
                        return;
                      }
                      navigate("/scheduler");

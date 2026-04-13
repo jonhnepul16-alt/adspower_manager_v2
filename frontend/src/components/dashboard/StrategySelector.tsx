@@ -28,14 +28,14 @@ const StrategySelector = ({ value, onChange, plan }: Props) => {
     <div className="segmented-control p-1 bg-white/[0.02] border border-white/[0.05] rounded-xl flex gap-1">
       {modes.map((mode) => {
         const isActive = value === mode.id;
-        const isLocked = mode.isPremium && plan !== "SCALE";
+        const isLocked = mode.isPremium && plan !== "SCALE" && plan !== "TEAM";
 
         return (
           <button
             key={mode.id}
             onClick={() => {
               if (isLocked) {
-                toast.info("O modo Agressivo é exclusivo para o plano Scale.", {
+                toast.info("Este modo é exclusivo para planos Premium (Scale/Team).", {
                   description: "Faça o upgrade para desbloquear funções premium."
                 });
                 return;
